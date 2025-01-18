@@ -10,6 +10,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.ExponentialProfile.ProfileTiming;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -30,6 +31,7 @@ public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
     public boolean fieldCentric = false;
+    private double speedMultiplier = 1.0;
     private double dummyVar = 0;
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -75,6 +77,8 @@ public class RobotContainer {
         driverCommandController.rightBumper().onTrue(new SequentialCommandGroup(
             new InstantCommand(() -> fieldCentric = false),
             driveDummy()));
+        
+            driverCommandController.rightTrigger().onTrue(new InstantCommand(() -> speedMultiplier = 0.5));
 
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
         driverCommandController.y().whileTrue(drivetrain.applyRequest(() ->
@@ -103,11 +107,11 @@ public class RobotContainer {
         
         Command driveCom =
             drivetrain.applyRequest(fieldCentric ? 
-                () -> driveFieldRel.withVelocityX(-driverCommandController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                .withVelocityY(-driverCommandController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                () -> driveFieldRel.withVelocityX(-driverCommandController.getLeftY() * MaxSpeed * speedMultiplier) // Drive forward with negative Y (forward)
+                .withVelocityY(-driverCommandController.getLeftX() * MaxSpeed * speedMultiplier) // Drive left with negative X (left)
                 .withRotationalRate(-driverCommandController.getRightX() * MaxAngularRate) : // Drive counterclockwise with negative X (left)
-                () -> driveRoboRel.withVelocityX(-driverCommandController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                .withVelocityY(-driverCommandController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                () -> driveRoboRel.withVelocityX(-driverCommandController.getLeftY() * MaxSpeed * speedMultiplier) // Drive forward with negative Y (forward)
+                .withVelocityY(-driverCommandController.getLeftX() * MaxSpeed * speedMultiplier) // Drive left with negative X (left)
                 .withRotationalRate(-driverCommandController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             );
 
