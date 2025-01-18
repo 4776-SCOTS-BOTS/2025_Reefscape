@@ -12,8 +12,11 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -26,7 +29,8 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-    private boolean fieldCentric = true;
+    public boolean fieldCentric = false;
+    private double dummyVar = 0;
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric driveFieldRel = new SwerveRequest.FieldCentric()
@@ -60,22 +64,18 @@ public class RobotContainer {
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(fieldCentric ? 
-                    () -> driveFieldRel.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) : // Drive counterclockwise with negative X (left)
-                    () -> driveRoboRel.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
-
+            // driveCommand()
+            new RunCommand(driveRunnable, drivetrain)
         );
 
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.leftBumper().whileTrue(new InstantCommand(() -> fieldCentric = true));
-        joystick.rightBumper().whileTrue(new InstantCommand(() -> fieldCentric = false));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+       
+        driverCommandController.leftBumper().onTrue(new SequentialCommandGroup(
+            new InstantCommand(() -> fieldCentric = true),
+            driveDummy()));
+        driverCommandController.rightBumper().onTrue(new SequentialCommandGroup(
+            new InstantCommand(() -> fieldCentric = false),
+            driveDummy()));
+
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
         driverCommandController.y().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-driverCommandController.getLeftY(), -driverCommandController.getLeftX()))
@@ -97,4 +97,26 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
     }
+
+    Runnable driveRunnable = () -> {
+        // System.out.println(fieldCentric);
+        
+        Command driveCom =
+            drivetrain.applyRequest(fieldCentric ? 
+                () -> driveFieldRel.withVelocityX(-driverCommandController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                .withVelocityY(-driverCommandController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                .withRotationalRate(-driverCommandController.getRightX() * MaxAngularRate) : // Drive counterclockwise with negative X (left)
+                () -> driveRoboRel.withVelocityX(-driverCommandController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                .withVelocityY(-driverCommandController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                .withRotationalRate(-driverCommandController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+            );
+
+        CommandScheduler.getInstance().schedule(driveCom);
+
+    };
+
+    public Command driveDummy(){
+        return drivetrain.runOnce(() -> dummyVar = 0);
+    }
+
 }
