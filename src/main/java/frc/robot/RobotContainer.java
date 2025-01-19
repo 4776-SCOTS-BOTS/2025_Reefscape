@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -26,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Elevator;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -46,8 +48,15 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
+    //subsytems
+    private boolean hasElevator = false;
+
+    private Elevator elevator;
+
     private final CommandXboxController driverCommandController = new CommandXboxController(Constants.Controllers.kDriverControllerPort);
     XboxController m_driverController = new XboxController(Constants.Controllers.kDriverControllerPort);
+
+    private final CommandXboxController manipCommandController = new CommandXboxController(Constants.Controllers.kManipulatorControllerPort);
 
     JoystickButton brakeButton = new JoystickButton(m_driverController, XboxController.Button.kX.value);
     POVButton resetGyro = new POVButton(m_driverController, 0); // Up on the D-Pad
@@ -58,6 +67,13 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public RobotContainer() {
+
+        if(hasElevator){
+        elevator = new Elevator();
+        } else {
+            elevator = null;
+        }
+        
         configureBindings();
     }
 
@@ -108,6 +124,9 @@ public class RobotContainer {
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
+        driverCommandController.povRight().onTrue(new InstantCommand(() -> SignalLogger.start()));
+        driverCommandController.povLeft().onTrue(new InstantCommand(() -> SignalLogger.stop()));
+
         driverCommandController.back().and(driverCommandController.b()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
         driverCommandController.back().and(driverCommandController.a()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         driverCommandController.start().and(driverCommandController.b()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
@@ -117,6 +136,13 @@ public class RobotContainer {
         resetGyro.onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+
+        if (hasElevator) {
+            manipCommandController.b().whileTrue(new InstantCommand(elevator.intake::intakeIn))
+                    .onFalse(new InstantCommand(elevator.intake::intakeIn));
+        }
+
+
     }
 
     public Command getAutonomousCommand() {
@@ -124,7 +150,7 @@ public class RobotContainer {
     }
 
     Runnable driveRunnable = () -> {
-        System.out.println(fieldCentric);
+        // System.out.println(fieldCentric);
         
         Command driveCom =
             drivetrain.applyRequest(fieldCentric ? 

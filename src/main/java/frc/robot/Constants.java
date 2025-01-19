@@ -50,7 +50,8 @@ public final class Constants {
   public static final CRGB kRGB_black = new CRGB(0, 0, 0);
   
   public static final class IntakeConstants {
-    public static final int intakeMotorPort = 20;
+    public static final int intakeMotorCANID = 20;
+    public static final int wristMotorCANID = 21;
   }
   
   public static final class ShooterConstants {
