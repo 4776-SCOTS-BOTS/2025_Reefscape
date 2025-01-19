@@ -29,10 +29,10 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-    public boolean fieldCentric = false;
-    private double speedMultiplier = 1.0;
-    private double dummyVar = 0;
+    private double MaxAngularRate = RotationsPerSecond.of(1.0).in(RadiansPerSecond); // Chaged from 3/4  to 1 of a rotation per second max angular velocity
+    public boolean fieldCentric = true;
+    private double speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
+    private double rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric driveFieldRel = new SwerveRequest.FieldCentric()
@@ -46,8 +46,8 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandXboxController driverCommandController = new CommandXboxController(0);
-    XboxController m_driverController = new XboxController(0);
+    private final CommandXboxController driverCommandController = new CommandXboxController(Constants.Controllers.kDriverControllerPort);
+    XboxController m_driverController = new XboxController(Constants.Controllers.kDriverControllerPort);
 
     JoystickButton brakeButton = new JoystickButton(m_driverController, XboxController.Button.kX.value);
     POVButton resetGyro = new POVButton(m_driverController, 0); // Up on the D-Pad
@@ -71,14 +71,35 @@ public class RobotContainer {
         );
 
        
-        driverCommandController.leftBumper().onTrue(new SequentialCommandGroup(
-            new InstantCommand(() -> fieldCentric = true),
-            driveDummy()));
-        driverCommandController.rightBumper().onTrue(new SequentialCommandGroup(
-            new InstantCommand(() -> fieldCentric = false),
-            driveDummy()));
+        driverCommandController.leftBumper().onTrue(setFieldCent());
+        driverCommandController.rightBumper().onTrue(setRobotCent());
         
-            driverCommandController.rightTrigger().onTrue(new InstantCommand(() -> speedMultiplier = 0.5));
+        lowSpeedTrigger.onTrue(new InstantCommand(() -> {
+            speedMultiplier = Constants.DriveConstants.driveLowPercentScale;
+            rotMultiplier = Constants.DriveConstants.rotLowRateModifier;
+        }))
+                .onFalse(new InstantCommand(() -> {
+                    speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
+                    rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
+                }));
+
+        reallylowSpeedTrigger.onTrue(new InstantCommand(() -> {
+            speedMultiplier = Constants.DriveConstants.driveLowPercentScale * 0.5;
+            rotMultiplier = Constants.DriveConstants.rotLowRateModifier;
+        }))
+                .onFalse(new InstantCommand(() -> {
+                    speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
+                    rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
+                }));
+
+        sprintTrigger.onTrue(new InstantCommand(() -> {
+            speedMultiplier = 1.0;
+            rotMultiplier = 1.0;
+        }))
+                .onFalse(new InstantCommand(() -> {
+                    speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
+                    rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
+                }));
 
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
         driverCommandController.y().whileTrue(drivetrain.applyRequest(() ->
@@ -103,24 +124,33 @@ public class RobotContainer {
     }
 
     Runnable driveRunnable = () -> {
-        // System.out.println(fieldCentric);
+        System.out.println(fieldCentric);
         
         Command driveCom =
             drivetrain.applyRequest(fieldCentric ? 
                 () -> driveFieldRel.withVelocityX(-driverCommandController.getLeftY() * MaxSpeed * speedMultiplier) // Drive forward with negative Y (forward)
                 .withVelocityY(-driverCommandController.getLeftX() * MaxSpeed * speedMultiplier) // Drive left with negative X (left)
-                .withRotationalRate(-driverCommandController.getRightX() * MaxAngularRate) : // Drive counterclockwise with negative X (left)
+                .withRotationalRate(-driverCommandController.getRightX() * MaxAngularRate * rotMultiplier) : // Drive counterclockwise with negative X (left)
                 () -> driveRoboRel.withVelocityX(-driverCommandController.getLeftY() * MaxSpeed * speedMultiplier) // Drive forward with negative Y (forward)
                 .withVelocityY(-driverCommandController.getLeftX() * MaxSpeed * speedMultiplier) // Drive left with negative X (left)
-                .withRotationalRate(-driverCommandController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                .withRotationalRate(-driverCommandController.getRightX() * MaxAngularRate * rotMultiplier) // Drive counterclockwise with negative X (left)
             );
 
         CommandScheduler.getInstance().schedule(driveCom);
 
     };
 
-    public Command driveDummy(){
-        return drivetrain.runOnce(() -> dummyVar = 0);
+    // public Command driveDummy(){
+    //     return drivetrain.runOnce(() -> dummyVar = 0);
+    // }
+
+    private Command setFieldCent(){
+        return drivetrain.runOnce(() -> fieldCentric = true);
     }
+
+    private Command setRobotCent(){
+        return drivetrain.runOnce(() -> fieldCentric = false);
+    }
+
 
 }
