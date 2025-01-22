@@ -9,7 +9,9 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.ExponentialProfile.ProfileTiming;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import edu.wpi.first.math.controller.PIDController;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -33,6 +36,30 @@ public class RobotContainer {
     public boolean fieldCentric = false;
     private double speedMultiplier = 1.0;
     private double dummyVar = 0;
+
+    // PID stuff
+    private static final double KpX = 0.1;
+    private static final double KiX = 0.01;
+    private static final double KdX = 0.1;
+
+    private static final double KpY = 0.1;
+    private static final double KiY = 0.01;
+    private static final double KdY = 0.1;
+
+    private static final double KpRot = 0.1;
+    private static final double KiRot = 0.01;
+    private static final double KdRot = 0.1;
+
+    // Create PIDController instances for each direction
+    private PIDController pidControllerX = new PIDController(KpX, KiX, KdX);
+    private PIDController pidControllerY = new PIDController(KpY, KiY, KdY);
+    private PIDController pidControllerRot = new PIDController(KpRot, KiRot, KdRot);
+    // end of PID stuff
+
+    // Desired setpoints for each direction
+    private double setpointX = 0.0;
+    private double setpointY = 0.0;
+    private double setpointRot = 0.0;
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric driveFieldRel = new SwerveRequest.FieldCentric()
