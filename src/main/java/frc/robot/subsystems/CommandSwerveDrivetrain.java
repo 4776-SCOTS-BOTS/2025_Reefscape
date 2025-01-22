@@ -194,6 +194,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return run(() -> this.setControl(requestSupplier.get()));
     }
 
+        /**
+     * A method that applies the specified control request to this swerve drivetrain.
+     * Does not require the above command
+     *
+     * @param request Function returning the request to apply
+     * @return Command to run
+     */
+    public void applyRequestMethod(Supplier<SwerveRequest> requestSupplier) {
+        this.setControl(requestSupplier.get());
+    }
+
+
     /**
      * Runs the SysId Quasistatic test in the given direction for the routine
      * specified by {@link #m_sysIdRoutineToApply}.
