@@ -119,10 +119,10 @@ public class RobotContainer {
                     rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
                 }));
 
-        brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
-        driverCommandController.y().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-driverCommandController.getLeftY(), -driverCommandController.getLeftX()))
-        ));
+        // brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
+        // driverCommandController.y().whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(-driverCommandController.getLeftY(), -driverCommandController.getLeftX()))
+        // ));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -133,6 +133,9 @@ public class RobotContainer {
         driverCommandController.back().and(driverCommandController.a()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         driverCommandController.start().and(driverCommandController.b()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driverCommandController.start().and(driverCommandController.a()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
+        driverCommandController.x().onTrue(new MoveRobot(drivetrain, 1, 0, 0))
+            .onFalse(new InstantCommand(driveRunnable, drivetrain));
 
         // reset the field-centric heading on left bumper press
         resetGyro.onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
