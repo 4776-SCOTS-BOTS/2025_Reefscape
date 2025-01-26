@@ -58,7 +58,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
   private final TalonFX elevatorLeader;
   private final TalonFX elevatorFollower;
-  // private final AnalogInput analogSensor;
+  private final AnalogInput analogSensor = new AnalogInput(0); //! this is not correct, change before running
 
   // Limit switches - FALSE means at limit
   private final DigitalInput topLimitSwitch = new DigitalInput(8); //TODO: Need to update.  Do we use?
