@@ -84,41 +84,6 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     double maxVel = 10000;
     double maxAcc = 30000;
 
-    // TalonFXConfiguration config = new TalonFXConfiguration();
-    // config.MotionMagic.
-    // config.slot0.kP = kP;
-    // config.slot0.kI = kI;
-    // config.slot0.kD = kD;
-    // config.slot0.integralZone = kIz;
-    // config.slot0.kF = kF;
-    // config.slot0.allowableClosedloopError = allowedErr;
-    
-    // config.motionCruiseVelocity = maxVel;
-    // config.motionAcceleration = maxAcc;
-
-    // // Voltage compensation and current limits
-    // config.voltageCompSaturation = 12;
-    // // config.supplyCurrLimit = new SupplyCurrentLimitConfiguration(); // TODO research this
-
-    // Configure soft limits
-    // config.forwardSoftLimitEnable = true;
-    // config.forwardSoftLimitThreshold = MOTOR_TOP - metersToMotorPosition(0.005);
-    // config.reverseSoftLimitEnable = true;
-    // config.reverseSoftLimitThreshold = MOTOR_BOTTOM + metersToMotorPosition(0.02);
-    // config.forwardLimitSwitchNormal = LimitSwitchNormal.NormallyOpen;
-    // config.reverseLimitSwitchNormal = LimitSwitchNormal.NormallyOpen;
-    // config.neutralDeadband = .02;
-
-    // elevatorLeader.configAllSettings(config);
-    // elevatorFollower.configAllSettings(config);
-
-    // elevatorLeader.configPeakOutputForward(kMaxOutput);
-    // elevatorLeader.configPeakOutputReverse(kMinOutput);
-    // elevatorLeader.enableVoltageCompensation(true);
-
-    // elevatorLeader.setInverted(true);
-    // elevatorFollower.setInverted(true);
-
     TalonFXConfiguration cfg = new TalonFXConfiguration();
 
     /* Configure Motion Magic */
@@ -139,11 +104,10 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
     elevatorLeader.getConfigurator().apply(cfg);
 
-    // Mathew start here:
-    // elevatorFollower.follow(elevatorLeader); //TODO: Set Follower to follow leader
+    //Setup Follower
     elevatorFollower.setControl(new Follower(elevatorLeader.getDeviceID(), false));
 
-    // Brake mode helps hold the elevator in place TODO: Update to v6 code
+    // Brake mode helps hold the elevator in place
     elevatorLeader.setNeutralMode(NeutralModeValue.Brake);
     elevatorFollower.setNeutralMode(NeutralModeValue.Brake);
 
