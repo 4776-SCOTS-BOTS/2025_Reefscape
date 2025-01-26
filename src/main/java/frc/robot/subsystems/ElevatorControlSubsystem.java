@@ -10,11 +10,14 @@ import java.util.Map;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -45,17 +48,17 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   private static final double MAX_ROT_ACCEL = MOTOR_ENCODER_POSITION_COEFFICIENT / MAX_LINEAR_ACCEL;// rot /s^2
 
 
-//   private static final int ANALOG_BOTTOM = 758;
-//   private static final int ANALOG_TOP = 1796;
+  private static final int ANALOG_BOTTOM = 758;
+  private static final int ANALOG_TOP = 1796;
 
   private static final double GRAVITY_FEED_FORWARD = 0.05; //TODO: Need to update
 
 //   // Mutiply by sensor position to get meters
-//   private static final double ANALOG_SENSOR_COEFFICIENT = ELEVATOR_HEIGHT / (ANALOG_TOP - ANALOG_BOTTOM);
+  private static final double ANALOG_SENSOR_COEFFICIENT = ELEVATOR_HEIGHT / (ANALOG_TOP - ANALOG_BOTTOM);
 
   private final TalonFX elevatorLeader;
   private final TalonFX elevatorFollower;
-//   private final AnalogInput analogSensor;
+  private final AnalogInput analogSensor;
 
   // Limit switches - FALSE means at limit
   private final DigitalInput topLimitSwitch = new DigitalInput(8); //TODO: Need to update.  Do we use?
@@ -136,14 +139,13 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
     elevatorLeader.getConfigurator().apply(cfg);
 
-    
     // Mathew start here:
-    elevatorFollower.follow   //TODO: Set Follower to follow leader
-
+    // elevatorFollower.follow(elevatorLeader); //TODO: Set Follower to follow leader
+    elevatorFollower.setControl(new Follower(elevatorLeader.getDeviceID(), false));
 
     // Brake mode helps hold the elevator in place TODO: Update to v6 code
-    elevatorLeader.setNeutralMode(NeutralMode.Brake);
-    elevatorFollower.setNeutralMode(NeutralMode.Brake);
+    elevatorLeader.setNeutralMode(NeutralModeValue.Brake);
+    elevatorFollower.setNeutralMode(NeutralModeValue.Brake);
 
     //TODO: Set inverts correctly. Leader is inverted, follower is not inverted (need to use strict follow mode I think?)
 
@@ -152,7 +154,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
   public void addDashboardWidgets(ShuffleboardLayout layout) {
     layout.withProperties(Map.of("Number of columns", 1, "Number of rows", 3));
-    layout.addNumber("Position Raw", elevatorLeader::getSelectedSensorPosition).withPosition(0, 0);
+    layout.addNumber("Position Raw", () -> elevatorLeader.getRotorPosition().getValueAsDouble()).withPosition(0, 0);
     layout.addNumber("Position Meters", this::getElevatorPosition).withPosition(0, 1);
     layout.addNumber("Target Position Meters", () -> targetPosition).withPosition(0, 2);
     var limitsLayout = layout.getLayout("Limits", BuiltInLayouts.kGrid)
