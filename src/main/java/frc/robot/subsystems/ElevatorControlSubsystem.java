@@ -58,7 +58,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
   private final TalonFX elevatorLeader;
   private final TalonFX elevatorFollower;
-  private final AnalogInput analogSensor;
+  // private final AnalogInput analogSensor;
 
   // Limit switches - FALSE means at limit
   private final DigitalInput topLimitSwitch = new DigitalInput(8); //TODO: Need to update.  Do we use?
@@ -163,13 +163,16 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     limitsLayout.addBoolean("Botton Limit", this::isAtBottomLimit).withPosition(1, 0);
   }
 
+  // ! this is porbably not correct but it gets the red line to go away
+  final MotionMagicVoltage m_request = new MotionMagicVoltage(0); 
+  
   @Override
   public void periodic() {
     // Handle elevator limit switches
     if (isAtBottomLimit()) {
-      elevatorLeader.setSelectedSensorPosition(MOTOR_BOTTOM);
+      elevatorLeader.setControl(m_request.withPosition(MOTOR_BOTTOM));
     } else if (isAtTopLimit()) {
-      elevatorLeader.setSelectedSensorPosition(MOTOR_TOP);
+      elevatorLeader.setControl(m_request.withPosition(MOTOR_TOP));
     }
   }
 
@@ -189,8 +192,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   public void moveToPosition(double meters) {
     //Mathew need to use the Motion Magic control requests.
     targetPosition = meters;
-    elevatorLeader.set(TalonFXControlMode.MotionMagic, metersToMotorPosition(meters),
-        DemandType.ArbitraryFeedForward, GRAVITY_FEED_FORWARD);
+    elevatorLeader.setControl(m_request.withPosition(MOTOR_TOP));
   }
   
   /**
@@ -198,7 +200,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
    * @return position in meters
    */
   public double getElevatorPosition() {
-    return motorPositionToMeters(elevatorLeader.getSelectedSensorPosition());
+    return motorPositionToMeters(elevatorLeader.getRotorPosition().getValueAsDouble());
   }
 
   /**
