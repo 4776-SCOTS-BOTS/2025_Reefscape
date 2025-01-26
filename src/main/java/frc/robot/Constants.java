@@ -53,6 +53,15 @@ public final class Constants {
     public static final int intakeMotorCANID = 20;
     public static final int wristMotorCANID = 21;
   }
+
+  public static final class ElevatorConstants {
+    public static final double ELEVATOR_PARK_HEIGHT = 0.0;
+
+    public static final int ELEVATOR_LEADER_ID = 28;
+    public static final int ELEVATOR_FOLLOWER_ID = 29;
+  }
+
+  
   
   public static final class ShooterConstants {
     //Rename or remove. Keeping for reference for now.
@@ -77,6 +86,8 @@ public final class Constants {
     public static final double kTypRPM = 4750;
 
   }
+
+
 
 
   public static final class DriveConstants {
