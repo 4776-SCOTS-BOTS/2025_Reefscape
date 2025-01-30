@@ -15,6 +15,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.ExponentialProfile.ProfileTiming;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -29,7 +32,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.ElevatorAssembly;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -51,10 +54,14 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     //subsytems
-    private boolean hasElevator = false;
+    private boolean hasElevator = true;
+    private ElevatorAssembly elevator;
 
-    private Elevator elevator;
+    private boolean hasClimber = false;
 
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+
+    //Controls
     private final CommandXboxController driverCommandController = new CommandXboxController(Constants.Controllers.kDriverControllerPort);
     XboxController m_driverController = new XboxController(Constants.Controllers.kDriverControllerPort);
 
@@ -65,16 +72,26 @@ public class RobotContainer {
     Trigger lowSpeedTrigger = driverCommandController.rightTrigger(0.5);
     Trigger reallylowSpeedTrigger = driverCommandController.leftTrigger(0.5);
     JoystickButton sprintTrigger = new JoystickButton(m_driverController, XboxController.Button.kRightStick.value);
-    
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+
+    //Shuffleboard
+    ShuffleboardLayout elevatorLayout;
 
     public RobotContainer() {
-
+        //Setup Elevator if present
         if(hasElevator){
-        elevator = new Elevator();
+            elevator = new ElevatorAssembly();
+            elevatorLayout = Shuffleboard.getTab("Elevator Assembly").getLayout("ElevatorControl", BuiltInLayouts.kList);
+            elevator.elevatorControl.addDashboardWidgets(elevatorLayout);
         } else {
             elevator = null;
         }
+
+        //Setup Climber if present
+        // if(hasClimber){
+        //     climber = new Clkimber();
+        //     } else {
+        //         elevator = null;
+        //     }
         
         configureBindings();
     }

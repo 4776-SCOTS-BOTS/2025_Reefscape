@@ -5,13 +5,16 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ElevatorConstants;
 
-public class Elevator extends SubsystemBase {
-  /** Creates a new Elevator. */
+public class ElevatorAssembly extends SubsystemBase {
+  /** Creates a new Elevator Assembly. */
 
   public Intake intake;
-  public Elevator() {
+  public ElevatorControlSubsystem elevatorControl;
+  public ElevatorAssembly() {
     intake = new Intake();
+    elevatorControl = new ElevatorControlSubsystem();
   }
 
   @Override

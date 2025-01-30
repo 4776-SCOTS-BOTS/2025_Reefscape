@@ -15,8 +15,10 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -48,17 +50,12 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   private static final double MAX_ROT_ACCEL = MOTOR_ENCODER_POSITION_COEFFICIENT / MAX_LINEAR_ACCEL;// rot /s^2
 
 
-  private static final int ANALOG_BOTTOM = 758;
-  private static final int ANALOG_TOP = 1796;
-
   private static final double GRAVITY_FEED_FORWARD = 0.05; //TODO: Need to update
-
-//   // Mutiply by sensor position to get meters
-  private static final double ANALOG_SENSOR_COEFFICIENT = ELEVATOR_HEIGHT / (ANALOG_TOP - ANALOG_BOTTOM);
 
   private final TalonFX elevatorLeader;
   private final TalonFX elevatorFollower;
-  private final AnalogInput analogSensor = new AnalogInput(0); //! this is not correct, change before running
+
+  final MotionMagicVoltage m_request = new MotionMagicVoltage(0); 
 
   // Limit switches - FALSE means at limit
   private final DigitalInput topLimitSwitch = new DigitalInput(8); //TODO: Need to update.  Do we use?
@@ -70,49 +67,51 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     elevatorLeader = new TalonFX(ElevatorConstants.ELEVATOR_LEADER_ID, "rio");
     elevatorFollower = new TalonFX(ElevatorConstants.ELEVATOR_FOLLOWER_ID, "rio");
 
-    // Configure closed-loop control
-    double kP = 0.13;
-    double kI = 0;
-    double kD = 0; 
-    double kIz = 0;
-    double kF = 0.00;
-    double kMaxOutput = 0.7;
-    double kMinOutput = -.4;
-    double allowedErr = 1;
+    // // Configure closed-loop control
+    // double kP = 0.13;
+    // double kI = 0;
+    // double kD = 0; 
+    // double kIz = 0;
+    // double kF = 0.00;
+    // double kMaxOutput = 0.7;
+    // double kMinOutput = -.4;
+    // double allowedErr = 1;
 
-    // Magic Motion Coefficients
-    double maxVel = 10000;
-    double maxAcc = 30000;
+    // // Magic Motion Coefficients
+    // double maxVel = 10000;
+    // double maxAcc = 30000;
 
-    TalonFXConfiguration cfg = new TalonFXConfiguration();
+    TalonFXConfiguration leader_cfg = new TalonFXConfiguration();
+    TalonFXConfiguration follower_cfg = new TalonFXConfiguration();
 
     /* Configure Motion Magic */
-    MotionMagicConfigs mm = cfg.MotionMagic;
-    mm.withMotionMagicCruiseVelocity(RotationsPerSecond.of(MAX_ROT_SPEED)) // (mechanism) rotations per second cruise
+    MotionMagicConfigs mm = leader_cfg.MotionMagic;
+    mm.withMotionMagicCruiseVelocity(RotationsPerSecond.of(MAX_ROT_SPEED)) // (motor) rotations per second cruise
       .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(MAX_ROT_ACCEL)) // Take approximately 0.5 seconds to reach max vel
       .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(MAX_ROT_SPEED * 10)); // Take approximately 0.1 seconds to reach max accel 
 
-    Slot0Configs slot0 = cfg.Slot0;
+    Slot0Configs slot0 = leader_cfg.Slot0;
     slot0.kS = 0.25; // Add 0.25 V output to overcome static friction
     slot0.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
     slot0.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
-    slot0.kP = 60; // A position error of 0.2 rotations results in 12 V output
+    slot0.kP = 30; // A position error of 0.2 rotations results in 12 V output
     slot0.kI = 0; // No output for integrated error
     slot0.kD = 0.5; // A velocity error of 1 rps results in 0.5 V output
     slot0.GravityType = GravityTypeValue.Elevator_Static;
     slot0.kG = 0.5;
 
-    elevatorLeader.getConfigurator().apply(cfg);
+    MotorOutputConfigs leader_mo = leader_cfg.MotorOutput;
+    leader_mo.Inverted = InvertedValue.CounterClockwise_Positive;
+    leader_mo.NeutralMode = NeutralModeValue.Brake;
 
+    MotorOutputConfigs follower_mo = leader_cfg.MotorOutput;
+    follower_mo.Inverted = InvertedValue.CounterClockwise_Positive;
+    follower_mo.NeutralMode = NeutralModeValue.Brake;
+
+    elevatorLeader.getConfigurator().apply(leader_cfg);
+    
     //Setup Follower
-    elevatorFollower.setControl(new Follower(elevatorLeader.getDeviceID(), false));
-
-    // Brake mode helps hold the elevator in place
-    elevatorLeader.setNeutralMode(NeutralModeValue.Brake);
-    elevatorFollower.setNeutralMode(NeutralModeValue.Brake);
-
-    //TODO: Set inverts correctly. Leader is inverted, follower is not inverted (need to use strict follow mode I think?)
-
+    elevatorFollower.setControl(new StrictFollower(elevatorLeader.getDeviceID()));
 
   }
 
@@ -126,9 +125,6 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     limitsLayout.addBoolean("Top Limit", this::isAtTopLimit).withPosition(0, 0);
     limitsLayout.addBoolean("Botton Limit", this::isAtBottomLimit).withPosition(1, 0);
   }
-
-  // ! this is porbably not correct but it gets the red line to go away
-  final MotionMagicVoltage m_request = new MotionMagicVoltage(0); 
   
   @Override
   public void periodic() {
@@ -166,14 +162,6 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   public double getElevatorPosition() {
     return motorPositionToMeters(elevatorLeader.getRotorPosition().getValueAsDouble());
   }
-
-  /**
-   * Gets the position of the elevator top / first stage, where the Limelight is mounted.
-   * This moves slower than the wrist / second stage.
-   */
-  public double getElevatorTopPosition() {
-    return getElevatorPosition() * .489;
-  }
   
   /**
    * Moves the elevator to the park/transit position.
@@ -203,14 +191,6 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
   public boolean isAtTopLimit() {
     return !topLimitSwitch.get();
-  }
-
-  private double getElevatorAnalogRawPosition() {
-    return 4096 - analogSensor.getValue(); // Invert sensor so up is positive
-  }
-
-  private double getElevatorAnalogPositionMeters() {
-    return (getElevatorAnalogRawPosition() - ANALOG_BOTTOM) * ANALOG_SENSOR_COEFFICIENT;
   }
 
   static double motorPositionToMeters(double motorPosition) {
