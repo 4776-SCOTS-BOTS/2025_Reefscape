@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -18,8 +18,8 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 import com.ctre.phoenix6.SignalLogger;
+
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -92,11 +92,6 @@ public class MoveRobot extends Command {
     pidControllerX.setSetpoint(setpointX);
     pidControllerY.setSetpoint(setpointY);
     pidControllerRot.setSetpoint(setpointRot);
-
-
-
-
-
   }
 
   // Called every time the scheduler runs while the command is scheduled.
