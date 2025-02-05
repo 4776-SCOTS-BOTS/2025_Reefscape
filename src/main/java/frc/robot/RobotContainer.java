@@ -54,7 +54,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     //subsytems
-    private boolean hasElevator = true;
+    private boolean hasElevator = false;
     private ElevatorAssembly elevator;
 
     private boolean hasClimber = false;
