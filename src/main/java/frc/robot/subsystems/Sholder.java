@@ -23,8 +23,7 @@ public class Sholder extends SubsystemBase {
   /** Creates a new Sholder. */
   public Sholder() {
     FeedbackConfigs fdb = talonFXConfigs.Feedback;
-    fdb.SensorToMechanismRatio = 100; // TODO:FeedbackConfigs fdb = cfg.Feedback;
-    fdb.SensorToMechanismRatio = 12.8; find the right gear ratio
+    fdb.SensorToMechanismRatio = 100; // TODO: find the right gear ratio
 
     slot0.kS = 0.25; // Add 0.25 V output to overcome static friction
     slot0.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
