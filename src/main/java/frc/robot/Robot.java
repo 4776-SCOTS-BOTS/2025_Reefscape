@@ -60,7 +60,7 @@ public class Robot extends TimedRobot {
     musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(2).getSteerMotor());
     musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(3).getDriveMotor());
     musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(3).getSteerMotor());
-    musicMotors.loadMusic("src/main/deploy/output.chrp");
+    musicMotors.loadMusic("output.chrp"); // I think that's it
     musicMotors.play();
 
     if (m_autonomousCommand != null) {
