@@ -29,7 +29,9 @@ public class Robot extends TimedRobot {
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    m_robotContainer.drivetrain.standyLimelightUpdate("limelight-front");
+  }
 
   @Override
   public void disabledExit() {}
@@ -51,21 +53,24 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    Orchestra musicMotors = new Orchestra();
-    musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(0).getDriveMotor());
-    musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(0).getSteerMotor());
-    musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(1).getDriveMotor());
-    musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(1).getSteerMotor());
-    musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(2).getDriveMotor());
-    musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(2).getSteerMotor());
-    musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(3).getDriveMotor());
-    musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(3).getSteerMotor());
-    musicMotors.loadMusic("output.chrp"); // I think that's it
-    musicMotors.play();
+    // Orchestra musicMotors = new Orchestra();
+    // musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(0).getDriveMotor());
+    // musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(0).getSteerMotor());
+    // musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(1).getDriveMotor());
+    // musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(1).getSteerMotor());
+    // musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(2).getDriveMotor());
+    // musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(2).getSteerMotor());
+    // musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(3).getDriveMotor());
+    // musicMotors.addInstrument(m_robotContainer.drivetrain.getModule(3).getSteerMotor());
+    // musicMotors.loadMusic("/home/lvuser/deploy/output.chrp"); // I think that's it
+    // musicMotors.play();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    // Switch Limelight Megatag2 mode to internal IMU
+    m_robotContainer.drivetrain.activeLimelightUpdate("limelight-front");
   }
 
   @Override

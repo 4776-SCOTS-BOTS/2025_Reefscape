@@ -16,18 +16,23 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
+import frc.robot.LimelightHelpers;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -38,6 +43,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
+
+    private final Field2d field2d = new Field2d();
+    ShuffleboardTab tab = Shuffleboard.getTab("Field Map");
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -286,6 +294,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
+
+        field2d.setRobotPose(getState().Pose);
     }
 
     private void startSimThread() {
@@ -336,4 +346,82 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     ) {
         super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds), visionMeasurementStdDevs);
     }
+
+    /**Get Turn Rate */
+    public double getTurnRate(){
+        return Math.toDegrees(getPigeon2().getAngularVelocityZWorld().getValueAsDouble());
+    }
+
+    /** Updates the field relative position of the robot. */
+    public void updateOdometryFromLL(String limelightName) {
+        boolean useMegaTag2 = true; // set to false to use MegaTag1
+        boolean doRejectUpdate = false;
+        // String limelightName = "limelight-front";
+        if (useMegaTag2 == false) {
+            LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
+
+            if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
+                if (mt1.rawFiducials[0].ambiguity > .7) {
+                    doRejectUpdate = true;
+                }
+                if (mt1.rawFiducials[0].distToCamera > 3) {
+                    doRejectUpdate = true;
+                }
+            }
+            if (mt1.tagCount == 0) {
+                doRejectUpdate = true;
+            }
+
+            if (!doRejectUpdate) {
+                super.setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
+                addVisionMeasurement(
+                        mt1.pose,
+                        mt1.timestampSeconds);
+            }
+        } else if (useMegaTag2 == true) {
+
+            LimelightHelpers.SetRobotOrientation(limelightName,
+                    getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+            LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+            if (Math.abs(getTurnRate()) > 720) // if our angular velocity is greater than 720 degrees per second,
+                                               // ignore vision updates
+            {
+                doRejectUpdate = true;
+            }
+            if (mt2.tagCount == 0) {
+                doRejectUpdate = true;
+            }
+            if (!doRejectUpdate) {
+                super.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+                addVisionMeasurement(
+                        mt2.pose,
+                        mt2.timestampSeconds);
+            }
+        }
+    }
+
+    /** Force Pose Update from Limelight */
+    public void forcePoseUpdate(String limelightName){
+        LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
+        resetPose(mt1.pose);
+    }
+
+    /** Standby Limelight IMU Updates */
+    public void standyLimelightUpdate(String limelightName) {
+        LimelightHelpers.SetRobotOrientation(limelightName,
+                getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        LimelightHelpers.SetIMUMode(limelightName, 1);
+    }
+
+    /** Active Limelight IMU nUpdates */
+    public void activeLimelightUpdate(String limelightName) {
+        LimelightHelpers.SetIMUMode(limelightName, 2);
+    }
+
+    public void zeroFieldCentric(){
+        seedFieldCentric();
+        standyLimelightUpdate("limelight-front");
+        activeLimelightUpdate("limelight-front");
+    }
+
 }

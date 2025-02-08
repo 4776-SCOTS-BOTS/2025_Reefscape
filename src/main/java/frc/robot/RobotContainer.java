@@ -136,28 +136,37 @@ public class RobotContainer {
                     rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
                 }));
 
-        // brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
-        // driverCommandController.y().whileTrue(drivetrain.applyRequest(() ->
-        //     point.withModuleDirection(new Rotation2d(-driverCommandController.getLeftY(), -driverCommandController.getLeftX()))
-        // ));
-
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
-        driverCommandController.povRight().onTrue(new InstantCommand(() -> SignalLogger.start()));
-        driverCommandController.povLeft().onTrue(new InstantCommand(() -> SignalLogger.stop()));
+        // driverCommandController.povRight().onTrue(new InstantCommand(() -> SignalLogger.start()));
+        // driverCommandController.povLeft().onTrue(new InstantCommand(() -> SignalLogger.stop()));
 
-        driverCommandController.back().and(driverCommandController.b()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        driverCommandController.back().and(driverCommandController.a()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        driverCommandController.start().and(driverCommandController.b()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        driverCommandController.start().and(driverCommandController.a()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        // driverCommandController.back().and(driverCommandController.b()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        // driverCommandController.back().and(driverCommandController.a()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        // driverCommandController.start().and(driverCommandController.b()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        // driverCommandController.start().and(driverCommandController.a()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-        driverCommandController.x().onTrue(new MoveRobot(drivetrain, 1, 0, 0))
-            .onFalse(new InstantCommand(driveRunnable, drivetrain));
+
+        // Module pointing controller ... not useful for actuall driving?
+        // driverCommandController.y().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(
+        //     new Rotation2d(-driverCommandController.getLeftY(), -driverCommandController.getLeftX()))));
+
+        
+        brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
+
+
 
         // reset the field-centric heading on left bumper press
-        resetGyro.onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        resetGyro.onTrue(drivetrain.runOnce(drivetrain::zeroFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+
+        // Development Commands
+        driverCommandController.a().onTrue(new MoveRobot(drivetrain, 1, 0, 0))
+        .onFalse(new InstantCommand(driveRunnable, drivetrain));
+        driverCommandController.b().onTrue(new InstantCommand(() -> drivetrain.forcePoseUpdate("limelight-front")));
+
+
 
         if (hasElevator) {
             manipCommandController.b().whileTrue(new InstantCommand(elevator.intake::intakeIn))
