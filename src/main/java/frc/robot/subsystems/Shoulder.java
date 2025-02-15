@@ -4,26 +4,44 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Sholder extends SubsystemBase {
-  TalonFX sholderMotor = new TalonFX(0); //TODO: get device id
+public class Shoulder extends SubsystemBase {
+  TalonFX shoulderMotor = new TalonFX(0); //TODO: get device id
   TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
   Slot0Configs slot0 = talonFXConfigs.Slot0;
+  CANcoder cancoder;
   final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
   /** Creates a new Sholder. */
-  public Sholder() {
+  public Shoulder() {
+    /* Configure CANcoder to zero the magnet appropriately */
+    CANcoderConfiguration cc_cfg = new CANcoderConfiguration();
+    cc_cfg.MagnetSensor.AbsoluteSensorDiscontinuityPoint
+    cc_cfg.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+    cc_cfg.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+    cc_cfg.MagnetSensor.withMagnetOffset(Rotations.of(0.4));
+    cancoder.getConfigurator().apply(cc_cfg);
+
     FeedbackConfigs fdb = talonFXConfigs.Feedback;
-    fdb.SensorToMechanismRatio = 100; // TODO: find the right gear ratio
+    fdb.FeedbackRemoteSensorID = 42; // CANID of CANCODER
+    fdb.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+    fdb.SensorToMechanismRatio = 1; // Cancoder directly measures the arm
+    fdb.RotorToSensorRatio = 100;
+
+
 
     slot0.kS = 0.25; // Add 0.25 V output to overcome static friction
     slot0.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
@@ -38,7 +56,7 @@ public class Sholder extends SubsystemBase {
     motionMagicConfigs.MotionMagicAcceleration = 1; // Target acceleration of 160 rps/s (0.5 seconds)
     motionMagicConfigs.MotionMagicJerk = 1; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
-    sholderMotor.getConfigurator().apply(talonFXConfigs);
+    shoulderMotor.getConfigurator().apply(talonFXConfigs);
   }
 
   @Override
@@ -47,10 +65,10 @@ public class Sholder extends SubsystemBase {
   }
 
   public void moveSholderTo(double position){
-    sholderMotor.setControl(m_request.withPosition(position));
+    shoulderMotor.setControl(m_request.withPosition(position));
   }
   
   public void moveSholder(double speed) {
-    sholderMotor.set(speed);
+    shoulderMotor.set(speed);
   }
 }

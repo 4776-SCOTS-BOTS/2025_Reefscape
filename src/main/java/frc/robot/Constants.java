@@ -54,11 +54,21 @@ public final class Constants {
     public static final int wristMotorCANID = 21;
   }
 
+  public static final class ShoulderConstants {
+    public static final int intakeMotorCANID = 25;
+    public static final int wristMotorCANID = 26;
+  }
+
   public static final class ElevatorConstants {
     public static final double ELEVATOR_PARK_HEIGHT = 0.0;
 
     public static final int ELEVATOR_LEADER_ID = 28;
     public static final int ELEVATOR_FOLLOWER_ID = 29;
+  }
+
+  public static final class ClimberConstants {
+    public static final int climberMotorCANID = 30;
+    public static final int tiltMotorCANID = 31;
   }
 
   
