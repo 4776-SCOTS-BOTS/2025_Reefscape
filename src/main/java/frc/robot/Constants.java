@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import com.fasterxml.jackson.databind.jsontype.impl.StdSubtypeResolver;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -55,8 +53,9 @@ public final class Constants {
   }
 
   public static final class ShoulderConstants {
-    public static final int intakeMotorCANID = 25;
-    public static final int wristMotorCANID = 26;
+    public static final int shoulderMotorCANID = 25;
+    public static final int shoudlderCANcoderID = 26;
+    public static final double zeroOffset = 0; //TODO: needs update
   }
 
   public static final class ElevatorConstants {
@@ -72,35 +71,7 @@ public final class Constants {
   }
 
   
-  
-  public static final class ShooterConstants {
-    //Rename or remove. Keeping for reference for now.
-    public static final int motor1CANID = 58;
-    public static final int motor2CANID = 59;
-    public static final int feederCANID = 57;
-    public static final int leftAngleCAN = 55;
-    public static final int rightAngleCAN = 56;
-    public static final int cancoder = 50;
-
-    public static final double cancoderOffset = +0.039;
-
-
-    public static final double kP = 0.0003; // 0.0005
-    public static final double kI = 0; //1
-    public static final double kD = 0.00000;
-    public static final double kIz = 0;
-    public static final double kFF = 0.0002;
-    public static final double kMaxOutput = 1;
-    public static final double kMinOutput = -0.5;
-    public static final double kmaxRPM = 5500;
-    public static final double kTypRPM = 4750;
-
-  }
-
-
-
-
-  public static final class DriveConstants {
+    public static final class DriveConstants {
     // Any constants that are not final can and should be update in
     // GenerateConstants
     // Non-final constants are initialized with the values of the practice bot
