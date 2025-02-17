@@ -145,7 +145,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             startSimThread();
         }
 
-        configureAutoBuilder();
+        // configureAutoBuilder();
 
         SmartDashboard.putData(field2d);
         tab.add("Field", field2d).withPosition(0, 0).withSize(10, 5);

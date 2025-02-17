@@ -13,7 +13,7 @@ public class ElevatorAssembly extends SubsystemBase {
   public Intake intake;
   public ElevatorControlSubsystem elevatorControl;
   public ElevatorAssembly() {
-    intake = new Intake();
+    // intake = new Intake();
     elevatorControl = new ElevatorControlSubsystem();
   }
 

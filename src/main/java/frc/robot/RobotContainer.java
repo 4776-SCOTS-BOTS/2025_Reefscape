@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.ExponentialProfile.ProfileTiming;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -54,7 +55,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     //subsytems
-    private boolean hasElevator = false;
+    private boolean hasElevator = true;
     private ElevatorAssembly elevator;
 
     private boolean hasClimber = false;
@@ -62,6 +63,8 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     //Controls
+
+    
     private final CommandXboxController driverCommandController = new CommandXboxController(Constants.Controllers.kDriverControllerPort);
     XboxController m_driverController = new XboxController(Constants.Controllers.kDriverControllerPort);
 
@@ -104,6 +107,13 @@ public class RobotContainer {
             // driveCommand()
             new RunCommand(driveRunnable, drivetrain)
         );
+
+        // if (hasElevator) {
+        //     elevator.setDefaultCommand(
+        //             new RunCommand(
+        //                     () -> elevator.elevatorControl.moveElevator(-manipCommandController.getLeftY()),
+        //                     elevator));
+        // }
 
        
         driverCommandController.leftBumper().onTrue(setFieldCent());
@@ -166,12 +176,15 @@ public class RobotContainer {
         .onFalse(new InstantCommand(driveRunnable, drivetrain));
         driverCommandController.b().onTrue(new InstantCommand(() -> drivetrain.forcePoseUpdate("limelight-front")));
 
+        manipCommandController.y().onTrue(new InstantCommand(() -> elevator.elevatorControl.moveToPosition(1)));
+        manipCommandController.a().onTrue(new InstantCommand(() -> elevator.elevatorControl.moveToPosition(elevator.elevatorControl.ELEVATOR_BASE_HEIGHT.in(Meters))));
+        manipCommandController.x().onTrue(new InstantCommand(() -> elevator.elevatorControl.moveToPosition(1.5)));
 
 
-        if (hasElevator) {
-            manipCommandController.b().whileTrue(new InstantCommand(elevator.intake::intakeIn))
-                    .onFalse(new InstantCommand(elevator.intake::intakeIn));
-        }
+        // if (hasElevator) {
+        //     manipCommandController.b().whileTrue(new InstantCommand(elevator.intake::intakeIn))
+        //             .onFalse(new InstantCommand(elevator.intake::intakeIn));
+        // }
 
 
     }
