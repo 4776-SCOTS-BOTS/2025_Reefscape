@@ -52,6 +52,15 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   private final double MAX_ROT_SPEED = MAX_LINEAR_SPEED/ MOTOR_ENCODER_POSITION_COEFFICIENT; // rot / s
   private final double MAX_ROT_ACCEL = MAX_LINEAR_ACCEL / MOTOR_ENCODER_POSITION_COEFFICIENT;// rot /s^2
 
+  public enum ElevatorMode {
+    RUN_TO_POSITION,
+    MANUAL
+  }
+
+  public ElevatorMode elevatorMode = ElevatorMode.MANUAL;
+
+  public boolean useLeader = true;
+
 
   private final TalonFX elevatorLeader;
   private final TalonFX elevatorFollower;
@@ -118,18 +127,27 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     follower_cfg.CurrentLimits.StatorCurrentLimit = 60; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
     follower_cfg.CurrentLimits.StatorCurrentLimitEnable = true;
 
+    if(!useLeader){
+      follower_cfg.MotionMagic = leader_cfg.MotionMagic;
+      follower_cfg.Slot0 = leader_cfg.Slot0;
+    }
+
     elevatorFollower.getConfigurator().apply(follower_cfg);
     
-    elevatorFollower.setControl(new StrictFollower(elevatorLeader.getDeviceID()));
+    if (useLeader) {
+      // StricFollower seemed to have issues.
+      // elevatorFollower.setControl(new StrictFollower(elevatorLeader.getDeviceID()));
+      
+      elevatorFollower.setControl(new Follower(elevatorLeader.getDeviceID(), false));
+    }
 
   }
 
   public void addDashboardWidgets(ShuffleboardLayout layout) {
-    layout.withProperties(Map.of("Number of columns", 1, "Number of rows", 4));
+    layout.withProperties(Map.of("Number of columns", 1, "Number of rows", 3));
     layout.addNumber("Position Raw", () -> elevatorLeader.getRotorPosition().getValueAsDouble()).withPosition(0, 0);
     layout.addNumber("Position Meters", this::getElevatorPosition).withPosition(0, 1);
     layout.addNumber("Target Position Meters", () -> targetPosition).withPosition(0, 2);
-    layout.addNumber("MOTOR_ENCODER_POSITION_COEFFICIENT", () -> MOTOR_ENCODER_POSITION_COEFFICIENT).withPosition(0, 3);
     // var limitsLayout = layout.getLayout("Limits", BuiltInLayouts.kGrid)
     //     .withProperties(Map.of("Number of columns", 2, "Number of rows", 1)).withPosition(0, 3).withSize(2,1);
     // limitsLayout.addBoolean("Top Limit", this::isAtTopLimit).withPosition(0, 0);
@@ -151,8 +169,12 @@ public class ElevatorControlSubsystem extends SubsystemBase {
    * @param speed duty cycle [-1, 1]
    */
   public void moveElevator(double speed) {
-    targetPosition = 0;
-    elevatorLeader.set(speed / 2);
+        elevatorLeader.set(speed / 2);
+        if(!useLeader){
+          elevatorFollower.set(speed / 2);
+        }
+        elevatorMode = ElevatorMode.MANUAL;
+        targetPosition = getElevatorPosition();
   }
 
   /**
@@ -167,6 +189,10 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     }
     targetPosition = meters;
     elevatorLeader.setControl(m_request.withPosition(metersToMotorPosition(meters)));
+    if(!useLeader){
+      elevatorFollower.setControl(m_request.withPosition(metersToMotorPosition(meters)));
+    }
+    elevatorMode = ElevatorMode.RUN_TO_POSITION;
   }
   
   /**
@@ -197,6 +223,9 @@ public class ElevatorControlSubsystem extends SubsystemBase {
    */
   public void stop() {
     elevatorLeader.stopMotor();
+    if(!useLeader){
+      elevatorFollower.stopMotor();
+    }
   }
 
   public boolean isAtBottomLimit() {
@@ -205,6 +234,10 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
   public boolean isAtTopLimit() {
     return !topLimitSwitch.get();
+  }
+
+  public ElevatorMode getMode(){
+    return elevatorMode;
   }
 
   public double motorPositionToMeters(double motorPosition) {

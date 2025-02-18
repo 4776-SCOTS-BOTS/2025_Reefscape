@@ -10,6 +10,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -34,6 +35,7 @@ import frc.robot.commands.MoveRobot;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorAssembly;
+import frc.robot.subsystems.ElevatorControlSubsystem.ElevatorMode;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -108,12 +110,14 @@ public class RobotContainer {
             new RunCommand(driveRunnable, drivetrain)
         );
 
-        // if (hasElevator) {
-        //     elevator.setDefaultCommand(
-        //             new RunCommand(
-        //                     () -> elevator.elevatorControl.moveElevator(-manipCommandController.getLeftY()),
-        //                     elevator));
-        // }
+        if (hasElevator) {
+            elevator.setDefaultCommand(
+                    new RunCommand(elevatorRunnable, elevator));
+
+            manipCommandController.pov(90).onTrue(new InstantCommand(() -> elevator.elevatorControl.moveToPosition(1), elevator));
+            manipCommandController.pov(180).onTrue(new InstantCommand(() -> elevator.elevatorControl.parkElevator(), elevator));
+            manipCommandController.pov(0).onTrue(new InstantCommand(() -> elevator.elevatorControl.moveToPosition(1.5), elevator));
+        }
 
        
         driverCommandController.leftBumper().onTrue(setFieldCent());
@@ -176,9 +180,7 @@ public class RobotContainer {
         .onFalse(new InstantCommand(driveRunnable, drivetrain));
         driverCommandController.b().onTrue(new InstantCommand(() -> drivetrain.forcePoseUpdate("limelight-front")));
 
-        manipCommandController.y().onTrue(new InstantCommand(() -> elevator.elevatorControl.moveToPosition(1)));
-        manipCommandController.a().onTrue(new InstantCommand(() -> elevator.elevatorControl.moveToPosition(elevator.elevatorControl.ELEVATOR_BASE_HEIGHT.in(Meters))));
-        manipCommandController.x().onTrue(new InstantCommand(() -> elevator.elevatorControl.moveToPosition(1.5)));
+
 
 
         // if (hasElevator) {
@@ -193,6 +195,7 @@ public class RobotContainer {
         return Commands.print("No autonomous command configured");
     }
 
+    // Default Runnables
     Runnable driveRunnable = () -> {
         // System.out.println(fieldCentric);
         
@@ -210,9 +213,15 @@ public class RobotContainer {
 
     };
 
-    // public Command driveDummy(){
-    //     return drivetrain.runOnce(() -> dummyVar = 0);
-    // }
+    Runnable elevatorRunnable = () ->{
+        double elevatorStick = MathUtil.applyDeadband(-manipCommandController.getLeftY(), 0.03);
+
+        if(elevatorStick == 0 && elevator.elevatorControl.getMode() != ElevatorMode.RUN_TO_POSITION){
+            elevator.elevatorControl.stop();
+        } else {
+            elevator.elevatorControl.moveElevator(elevatorStick);
+        }
+    };
 
     private Command setFieldCent(){
         return drivetrain.runOnce(() -> fieldCentric = true);
