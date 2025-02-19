@@ -54,7 +54,7 @@ public final class Constants {
 
   public static final class ShoulderConstants {
     public static final int shoulderMotorCANID = 25;
-    public static final int shoudlderCANcoderID = 26;
+    // public static final int shoudlderCANcoderID = 26;
     public static final double zeroOffset = 0; //TODO: needs update
   }
 
