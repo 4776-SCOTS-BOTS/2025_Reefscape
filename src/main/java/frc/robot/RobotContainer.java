@@ -217,10 +217,11 @@ public class RobotContainer {
         double elevatorStick = MathUtil.applyDeadband(-manipCommandController.getLeftY(), 0.03);
 
         if(elevatorStick == 0 && elevator.elevatorControl.getMode() != ElevatorMode.RUN_TO_POSITION){
-            elevator.elevatorControl.stop();
-        } else {
+            elevator.elevatorControl.moveElevator(0);
+        } else if (elevatorStick !=0) {
             elevator.elevatorControl.moveElevator(elevatorStick);
         }
+
     };
 
     private Command setFieldCent(){

@@ -18,9 +18,11 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -47,7 +49,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
                                                                     / (MOTOR_TOP - MOTOR_BOTTOM); // m/rot
 
   // Convert Elevator Speed and Acceleration to rotations
-  private final double MAX_LINEAR_SPEED = 0.2; // m/s
+  private final double MAX_LINEAR_SPEED = 0.5; // m/s
   private final double MAX_LINEAR_ACCEL = 1; // m / s^2
   private final double MAX_ROT_SPEED = MAX_LINEAR_SPEED/ MOTOR_ENCODER_POSITION_COEFFICIENT; // rot / s
   private final double MAX_ROT_ACCEL = MAX_LINEAR_ACCEL / MOTOR_ENCODER_POSITION_COEFFICIENT;// rot /s^2
@@ -59,7 +61,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
   public ElevatorMode elevatorMode = ElevatorMode.MANUAL;
 
-  public boolean useLeader = true;
+  public boolean useLeader = false;
 
 
   private final TalonFX elevatorLeader;
@@ -101,10 +103,10 @@ public class ElevatorControlSubsystem extends SubsystemBase {
       .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(MAX_ROT_SPEED * 10)); // Take approximately 0.1 seconds to reach max accel 
 
     Slot0Configs slot0 = leader_cfg.Slot0;
-    slot0.kS = 0.0; // Add 0.25 V output to overcome static friction
-    slot0.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
-    slot0.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
-    slot0.kP = 30; // A position error of 0.2 rotations results in 12 V output
+    slot0.kS = 0.05; // Add 0.25 V output to overcome static friction
+    slot0.kV = 0.05; // A velocity target of 1 rps results in 0.12 V output
+    slot0.kA = 0.1; // An acceleration of 1 rps/s requires 0.01 V output
+    slot0.kP = 10; // A position error of 0.2 rotations results in 12 V output
     slot0.kI = 0; // No output for integrated error
     slot0.kD = 0; // A velocity error of 1 rps results in 0.5 V output
     slot0.GravityType = GravityTypeValue.Elevator_Static;
@@ -112,7 +114,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
     MotorOutputConfigs leader_mo = leader_cfg.MotorOutput;
     leader_mo.Inverted = InvertedValue.Clockwise_Positive;
-    leader_mo.NeutralMode = NeutralModeValue.Brake;
+    leader_mo.NeutralMode = NeutralModeValue.Coast;
 
     leader_cfg.CurrentLimits.StatorCurrentLimit = 60; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
     leader_cfg.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -122,7 +124,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     //Setup Follower
     MotorOutputConfigs follower_mo = follower_cfg.MotorOutput;
     follower_mo.Inverted = InvertedValue.Clockwise_Positive;
-    follower_mo.NeutralMode = NeutralModeValue.Brake;
+    follower_mo.NeutralMode = NeutralModeValue.Coast;
 
     follower_cfg.CurrentLimits.StatorCurrentLimit = 60; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
     follower_cfg.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -166,15 +168,19 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
   /**
    * Moves the elevator using duty cycle
+   * 
    * @param speed duty cycle [-1, 1]
    */
   public void moveElevator(double speed) {
-        elevatorLeader.set(speed / 2);
-        if(!useLeader){
-          elevatorFollower.set(speed / 2);
-        }
-        elevatorMode = ElevatorMode.MANUAL;
-        targetPosition = getElevatorPosition();
+
+    speed = limitPower(speed);
+
+    elevatorLeader.set(speed / 2);
+    if (!useLeader) {
+      elevatorFollower.set(speed / 2);
+    }
+    elevatorMode = ElevatorMode.MANUAL;
+    targetPosition = getElevatorPosition();
   }
 
   /**
@@ -246,6 +252,45 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
   public double metersToMotorPosition(double positionMeters) {
     return ((positionMeters - ELEVATOR_BASE_HEIGHT.in(Meters)) / MOTOR_ENCODER_POSITION_COEFFICIENT);
+  }
+
+  public double limitPower(double power) {
+    double slow = 0.3;
+    double min = ELEVATOR_BASE_HEIGHT.in(Meters);
+    double minSlow = ELEVATOR_BASE_HEIGHT.in(Meters) + 0.1;
+    double max = ELEVATOR_HEIGHT.in(Meters);
+    double maxSlow = ELEVATOR_HEIGHT.in(Meters) - 0.1;
+
+    double pos = getElevatorPosition();
+
+    // System.out.print("speed = " + power + " pos = " + pos + " | " + min + "/" + minSlow);
+    // String output;
+
+    if ((power >= 0) && isInRange(pos, maxSlow, max)) {
+      // output = " | Max Slow";
+      // System.out.println(output);
+      return power * slow;
+    } else if ((power >= 0) && (pos >= max)) {
+      // output = " | @Max";
+      // System.out.println(output);
+      return 0;
+    } else if ((power < 0) && isInRange(pos, min, minSlow)) {
+      // output = " | Min Slow";
+      // System.out.println(output);
+      return power * slow;
+    } else if ((power < 0) && (pos <= min)) {
+      // output = " | @Min";
+      // System.out.println(output);
+      return 0;
+    } else {
+      // output = " | Normal";
+      // System.out.println(output);
+      return power;
+    }
+  }
+
+  public boolean isInRange(double val, double min, double max) {
+    return (val >= min) && (val <= max);
   }
   
 }
