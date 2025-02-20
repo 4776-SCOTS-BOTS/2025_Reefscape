@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -65,12 +66,11 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     //Controls
-
-    
     private final CommandXboxController driverCommandController = new CommandXboxController(Constants.Controllers.kDriverControllerPort);
     XboxController m_driverController = new XboxController(Constants.Controllers.kDriverControllerPort);
 
-    private final CommandXboxController manipCommandController = new CommandXboxController(Constants.Controllers.kManipulatorControllerPort);
+    //private final CommandXboxController manipCommandController = new CommandXboxController(Constants.Controllers.kManipulatorControllerPort);
+    private final CommandGenericHID manipCommandController = new CommandGenericHID(Constants.Controllers.kManipulatorControllerPort);
 
     JoystickButton brakeButton = new JoystickButton(m_driverController, XboxController.Button.kX.value);
     POVButton resetGyro = new POVButton(m_driverController, 0); // Up on the D-Pad
@@ -184,7 +184,7 @@ public class RobotContainer {
 
 
         // if (hasElevator) {
-        //     manipCommandController.b().whileTrue(new InstantCommand(elevator.intake::intakeIn))
+        //     manipCommandController.button(Constants.rightButton).whileTrue(new InstantCommand(elevator.intake::intakeIn))
         //             .onFalse(new InstantCommand(elevator.intake::intakeIn));
         // }
 
@@ -214,7 +214,7 @@ public class RobotContainer {
     };
 
     Runnable elevatorRunnable = () ->{
-        double elevatorStick = MathUtil.applyDeadband(-manipCommandController.getLeftY(), 0.03);
+        double elevatorStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.leftStickY), 0.03);
 
         if(elevatorStick == 0 && elevator.elevatorControl.getMode() != ElevatorMode.RUN_TO_POSITION){
             elevator.elevatorControl.moveElevator(0);
