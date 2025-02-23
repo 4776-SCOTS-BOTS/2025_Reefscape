@@ -28,7 +28,7 @@ public class Shoulder extends SubsystemBase {
 
   boolean useMotionMagic = false;
   TalonFX shoulderMotor = new TalonFX(Constants.ShoulderConstants.shoulderMotorCANID, "rio");
-  CANcoder cancoder = new CANcoder(Constants.ShoulderConstants.shoudlderCANcoderID, "rio");
+  CANcoder cancoder; //= new CANcoder(Constants.ShoulderConstants.shoudlderCANcoderID, "rio");
   final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
   /** Creates a new Sholder. */

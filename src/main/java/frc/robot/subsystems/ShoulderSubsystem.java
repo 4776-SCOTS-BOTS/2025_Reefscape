@@ -14,6 +14,7 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -36,7 +37,11 @@ import frc.robot.customClass.ShoulderFeedFowardController;
 /** A robot arm subsystem that moves with a motion profile. */
 public class ShoulderSubsystem extends SubsystemBase {
   private SparkMax shoulderMotor = new SparkMax(Constants.ShoulderConstants.shoulderMotorCANID, MotorType.kBrushless);
+  SparkClosedLoopController controller = shoulderMotor.getClosedLoopController();
   private SparkAbsoluteEncoder shoulderEncoder = shoulderMotor.getAbsoluteEncoder();
+
+  private double minRot = 0.125;
+  private double maxRot = 0.875;
 
   private static double kDt = 0.02;
 
@@ -68,7 +73,6 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   /** Create a new ArmSubsystem. */
   public ShoulderSubsystem() {
-    SparkClosedLoopController controller = shoulderMotor.getClosedLoopController();
 
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     
@@ -91,48 +95,48 @@ public class ShoulderSubsystem extends SubsystemBase {
     .d(0)
     .outputRange(-0.5, 0.5);
 
-    motorConfig.closedLoop.maxMotion
-    // Set MAXMotion parameters for position control. We don't need to pass
-    // a closed loop slot, as it will default to slot 0.
-    // Won't use this if we use trap profile
-    .maxVelocity(60)
-    .maxAcceleration(300)
-    .allowedClosedLoopError(0.01)
-    .positionMode(null);
+    // motorConfig.closedLoop.maxMotion
+    // // Set MAXMotion parameters for position control. We don't need to pass
+    // // a closed loop slot, as it will default to slot 0.
+    // // Won't use this if we use trap profile
+    // .maxVelocity(60)
+    // .maxAcceleration(300)
+    // .allowedClosedLoopError(0.01)
+    // .positionMode(null);
 
     shoulderMotor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
   }
 
   @Override
-  public void periodic(){
+  public void periodic() {
     // This method will be called once per scheduler run
-    
-    // Retrieve the profiled setpoint for the next timestep. This setpoint moves
-    // toward the goal while obeying the constraints.
-    m_setpoint = m_profile.calculate(kDt, m_setpoint, m_goal);
-    m_feedforward.calculateWithVelocities(
-        2*Math.PI*getCurrentPosition(),
-        2*Math.PI*getCurrentVelocity(),
-        m_setpoint.velocity);
 
-    // Send setpoint to offboard controller PID
-    shoulderMotor.setSetpoint(
+    if ((shoulderMode == ShoulderMode.RUN_TO_POSITION) && isValidGoal(m_goal)) {
+      // Retrieve the profiled setpoint for the next timestep. This setpoint moves
+      // toward the goal while obeying the constraints.
+      m_setpoint = m_profile.calculate(kDt, m_setpoint, m_goal);
 
-
-
-    
-        ExampleSmartMotorController.PIDMode.kPosition,
-        m_setpoint.position,
-        m_feedforward.calculate(m_setpoint.velocity) / 12.0);
-  }
-
-
+      // Send setpoint to offboard controller PID
+      controller.setReference(m_setpoint.position, ControlType.kPosition, ClosedLoopSlot.kSlot0,
+          m_feedforward.calculateWithVelocities(
+              2 * Math.PI * getCurrentPosition(),
+              2 * Math.PI * getCurrentVelocity(),
+              m_setpoint.velocity));
+    }
   }
 
 
   public Command setArmGoalCommand(double goal) {
-    return Commands.runOnce(() -> setGoal(goal), this);
+    m_goal = new TrapezoidProfile.State(goal, 0);
+    if ((shoulderMode == ShoulderMode.RUN_TO_POSITION) && isValidGoal(m_goal)) {
+      return Commands.runOnce(() -> {
+        m_goal = new TrapezoidProfile.State(goal, 0);
+        shoulderMode = ShoulderMode.RUN_TO_POSITION;
+      }, this);
+    } else {
+      return Commands.none();
+    }
   }
 
   public Command holdArmPositionCommand() {
@@ -142,8 +146,9 @@ public class ShoulderSubsystem extends SubsystemBase {
   }
 
   public void holdArmPosition() {
-    setGoal(jointEncoder.getPosition());
-    enable();
+    double goal = shoulderEncoder.getPosition();
+    shoulderMode = ShoulderMode.RUN_TO_POSITION;
+    m_goal = new TrapezoidProfile.State(goal, 0);
   }
 
   public double getOffset() {
@@ -162,6 +167,14 @@ public class ShoulderSubsystem extends SubsystemBase {
   public double getCurrentVelocity(){
     //Returns units of rotations
     return shoulderEncoder.getVelocity();
+  }
+
+  public boolean isInRange(double val, double min, double max) {
+    return (val >= min) && (val <= max);
+  }
+
+  public boolean isValidGoal(TrapezoidProfile.State goalState){
+    return isInRange(goalState.position, minRot, maxRot);
   }
 
 }
