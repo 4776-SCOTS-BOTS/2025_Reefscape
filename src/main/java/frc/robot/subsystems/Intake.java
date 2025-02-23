@@ -6,9 +6,11 @@ package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -25,8 +27,22 @@ public class Intake extends SubsystemBase {
   public SparkMax intakeMotor, wristMotor;
   LinearFilter filter = LinearFilter.movingAverage(4);
   private SparkMaxConfig motorConfig;
-  private SparkClosedLoopController closedLoopController;
+  private SparkClosedLoopController wristControl;
   private RelativeEncoder encoder;
+
+  public boolean hasCoral = false;
+  public double rawCurrent;
+  public double filteredCurrent;
+
+  public double pickupPos = 0;
+  public double deliverPos = 0.25;
+
+  public enum WRIST_POSTION{
+    PICKUP,
+    DELIVER
+  }
+
+  public WRIST_POSTION wristPos = WRIST_POSTION.PICKUP;
 
   
   public Intake() {
@@ -38,7 +54,7 @@ public class Intake extends SubsystemBase {
      * Initialize the SPARK MAX and get its encoder and closed loop controller
      * objects for later use.
      */
-    closedLoopController = wristMotor.getClosedLoopController();
+    wristControl = wristMotor.getClosedLoopController();
     encoder = wristMotor.getEncoder();
 
     /*
@@ -54,8 +70,8 @@ public class Intake extends SubsystemBase {
      * factors.
      */
     motorConfig.encoder
-        .positionConversionFactor(1/125)
-        .velocityConversionFactor(1/125);
+        .positionConversionFactor(1 / 125)
+        .velocityConversionFactor(1 / 125);
 
     /*
      * Configure the closed loop controller. We want to make sure we set the
@@ -77,6 +93,10 @@ public class Intake extends SubsystemBase {
         .maxAcceleration(300)
         .allowedClosedLoopError(0.01);
 
+    motorConfig
+      .idleMode(IdleMode.kBrake)
+      .inverted(false);
+
     /*
      * Apply the configuration to the SPARK MAX.
      *
@@ -96,11 +116,16 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic(){
-    if(filter.calculate(intakeMotor.getOutputCurrent()) > 1){ //! number is temporary
-      Timer.delay(0.5);
-      intakeOff();
-    }
+    rawCurrent = intakeMotor.getOutputCurrent();
+    filteredCurrent = filter.calculate(rawCurrent);
+    
+    // if(filter.calculate(intakeMotor.getOutputCurrent()) > 5){ //! number is temporary
+    //   Timer.delay(0.5);
+    //   intakeOff();
+    // }
     // This method will be called once per scheduler run
+
+   
   }
 
 
@@ -114,4 +139,27 @@ public class Intake extends SubsystemBase {
   public void intakeOff(){
     intakeMotor.set(0);
   }
+
+  public void wristPickup(){
+    wristControl.setReference(pickupPos, ControlType.kMAXMotionPositionControl);
+    wristPos = WRIST_POSTION.PICKUP;
+  }
+
+  public void wristDeliver(){
+    wristControl.setReference(deliverPos, ControlType.kMAXMotionPositionControl);
+    wristPos = WRIST_POSTION.DELIVER;
+  }
+
+  public double getFilteredCurent(){
+    return filteredCurrent;
+  }
+
+  public void toggleWrist(){
+    if(wristPos == WRIST_POSTION.PICKUP){
+      wristDeliver();
+    } else {
+      wristPickup();
+    }
+  }
+
 }

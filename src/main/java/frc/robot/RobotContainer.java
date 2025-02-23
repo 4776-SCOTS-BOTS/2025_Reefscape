@@ -10,10 +10,12 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.ExponentialProfile.ProfileTiming;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -24,15 +26,22 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.MoveRobot;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorAssembly;
+import frc.robot.subsystems.ElevatorControlSubsystem;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.ShoulderSubsystem;
+import frc.robot.subsystems.ElevatorControlSubsystem.ElevatorMode;
+import frc.robot.subsystems.ShoulderSubsystem.ShoulderMode;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -54,8 +63,14 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     //subsytems
-    private boolean hasElevator = false;
-    private ElevatorAssembly elevator;
+    private boolean hasElevator = true;
+    private ElevatorControlSubsystem elevator;
+
+    private boolean hasShoulder = true;
+    private ShoulderSubsystem shoulder;
+
+    private boolean hasIntake = true;
+    private Intake intake;
 
     private boolean hasClimber = false;
 
@@ -65,13 +80,17 @@ public class RobotContainer {
     private final CommandXboxController driverCommandController = new CommandXboxController(Constants.Controllers.kDriverControllerPort);
     XboxController m_driverController = new XboxController(Constants.Controllers.kDriverControllerPort);
 
-    private final CommandXboxController manipCommandController = new CommandXboxController(Constants.Controllers.kManipulatorControllerPort);
+    //private final CommandXboxController manipCommandController = new CommandXboxController(Constants.Controllers.kManipulatorControllerPort);
+    private final CommandGenericHID manipCommandController = new CommandGenericHID(Constants.Controllers.kManipulatorControllerPort);
 
+    //Driver Controls
     JoystickButton brakeButton = new JoystickButton(m_driverController, XboxController.Button.kX.value);
     POVButton resetGyro = new POVButton(m_driverController, 0); // Up on the D-Pad
     Trigger lowSpeedTrigger = driverCommandController.rightTrigger(0.5);
     Trigger reallylowSpeedTrigger = driverCommandController.leftTrigger(0.5);
     JoystickButton sprintTrigger = new JoystickButton(m_driverController, XboxController.Button.kRightStick.value);
+
+
 
     //Shuffleboard
     ShuffleboardLayout elevatorLayout;
@@ -79,11 +98,23 @@ public class RobotContainer {
     public RobotContainer() {
         //Setup Elevator if present
         if(hasElevator){
-            elevator = new ElevatorAssembly();
+            elevator = new ElevatorControlSubsystem();
             elevatorLayout = Shuffleboard.getTab("Elevator Assembly").getLayout("ElevatorControl", BuiltInLayouts.kList);
-            elevator.elevatorControl.addDashboardWidgets(elevatorLayout);
+            elevator.addDashboardWidgets(elevatorLayout);
         } else {
             elevator = null;
+        }
+
+        if(hasShoulder){
+            shoulder = new ShoulderSubsystem();
+        } else {
+            shoulder = null;
+        }
+
+        if(hasIntake){
+            intake = new Intake();
+        } else {
+            intake = null;
         }
 
         //Setup Climber if present
@@ -104,6 +135,29 @@ public class RobotContainer {
             // driveCommand()
             new RunCommand(driveRunnable, drivetrain)
         );
+
+        if (hasElevator) {
+            elevator.setDefaultCommand(
+                    new RunCommand(elevatorRunnable, elevator));
+
+            manipCommandController.pov(90).onTrue(new InstantCommand(() -> elevator.moveToPosition(1), elevator));
+            manipCommandController.pov(180).onTrue(new InstantCommand(() -> elevator.parkElevator(), elevator));
+            manipCommandController.pov(0).onTrue(new InstantCommand(() -> elevator.moveToPosition(1.5), elevator));
+        }
+
+        if (hasShoulder){
+            shoulder.setDefaultCommand(
+                new RunCommand(shoulderRunnable, shoulder));
+
+            
+        }
+
+        if (hasIntake){
+            manipCommandController.button(Constants.leftButton).onTrue(new IntakeCoral(intake));
+            manipCommandController.button(Constants.rightButton).onTrue(new InstantCommand(intake::intakeOut));
+            manipCommandController.button(Constants.bottomButton).onTrue(new InstantCommand(intake::intakeOff));
+            manipCommandController.button(Constants.topButton).onTrue(new InstantCommand(intake::toggleWrist));
+        }
 
        
         driverCommandController.leftBumper().onTrue(setFieldCent());
@@ -147,7 +201,7 @@ public class RobotContainer {
         // driverCommandController.start().and(driverCommandController.a()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
 
-        // Module pointing controller ... not useful for actuall driving?
+        // Module pointing controller ... not useful for actual driving?
         // driverCommandController.y().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(
         //     new Rotation2d(-driverCommandController.getLeftY(), -driverCommandController.getLeftX()))));
 
@@ -162,16 +216,17 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
 
         // Development Commands
-        driverCommandController.a().onTrue(new MoveRobot(drivetrain, 1, 0, 0))
-        .onFalse(new InstantCommand(driveRunnable, drivetrain));
-        driverCommandController.b().onTrue(new InstantCommand(() -> drivetrain.forcePoseUpdate("limelight-front")));
+        // driverCommandController.a().onTrue(new MoveRobot(drivetrain, 1, 0, 0))
+        // .onFalse(new InstantCommand(driveRunnable, drivetrain));
+        // driverCommandController.b().onTrue(new InstantCommand(() -> drivetrain.forcePoseUpdate("limelight-front")));
 
 
 
-        if (hasElevator) {
-            manipCommandController.b().whileTrue(new InstantCommand(elevator.intake::intakeIn))
-                    .onFalse(new InstantCommand(elevator.intake::intakeIn));
-        }
+
+        // if (hasElevator) {
+        //     manipCommandController.button(Constants.rightButton).whileTrue(new InstantCommand(elevator.intake::intakeIn))
+        //             .onFalse(new InstantCommand(elevator.intake::intakeIn));
+        // }
 
 
     }
@@ -180,6 +235,7 @@ public class RobotContainer {
         return Commands.print("No autonomous command configured");
     }
 
+    // Default Runnables
     Runnable driveRunnable = () -> {
         // System.out.println(fieldCentric);
         
@@ -197,9 +253,26 @@ public class RobotContainer {
 
     };
 
-    // public Command driveDummy(){
-    //     return drivetrain.runOnce(() -> dummyVar = 0);
-    // }
+    Runnable elevatorRunnable = () ->{
+        double elevatorStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.leftStickY), 0.03);
+
+        if(elevatorStick == 0 && elevator.getMode() != ElevatorMode.RUN_TO_POSITION){
+            elevator.moveElevator(0);
+        } else if (elevatorStick !=0) {
+            elevator.moveElevator(elevatorStick);
+        }
+
+    };
+
+    Runnable shoulderRunnable = () -> {
+    double shoulderStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.rightStickX), 0.03);
+
+    if ((Math.abs(shoulderStick) < 0.1) && shoulder.shoulderMode == ShoulderMode.MANUAL){
+      shoulder.runMotor(0);
+    } else if (Math.abs(shoulderStick) >= 0.5) {
+      shoulder.runMotor(shoulderStick * 0.5);
+    }
+  };
 
     private Command setFieldCent(){
         return drivetrain.runOnce(() -> fieldCentric = true);

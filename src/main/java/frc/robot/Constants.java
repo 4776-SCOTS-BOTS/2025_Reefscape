@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import com.fasterxml.jackson.databind.jsontype.impl.StdSubtypeResolver;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -48,10 +46,21 @@ public final class Constants {
   public static final CRGB kRGB_boaz = new CRGB(0, 59, 111);
   public static final CRGB kRGB_greenLow = new CRGB(0, 20, 0);
   public static final CRGB kRGB_black = new CRGB(0, 0, 0);
+
+  public static int topButton, rightButton, bottomButton, leftButton, leftBumper, rightBumper, leftTrigger, 
+  rightTrigger, leftStickButton, rightStickButton, dpadUp, dpadRight, dpadDown, dpadLeft, 
+  PS5MuteButton, PS5HomeButton, leftMenuButton, rightMenuButton, PS5TouchpadButton, leftStickX, 
+  leftStickY, rightStickX, rightStickY;
   
   public static final class IntakeConstants {
     public static final int intakeMotorCANID = 20;
     public static final int wristMotorCANID = 21;
+  }
+
+  public static final class ShoulderConstants {
+    public static final int shoulderMotorCANID = 25;
+    // public static final int shoudlderCANcoderID = 26;
+    public static final double zeroOffset = 0; //TODO: needs update
   }
 
   public static final class ElevatorConstants {
@@ -61,36 +70,13 @@ public final class Constants {
     public static final int ELEVATOR_FOLLOWER_ID = 29;
   }
 
-  
-  
-  public static final class ShooterConstants {
-    //Rename or remove. Keeping for reference for now.
-    public static final int motor1CANID = 58;
-    public static final int motor2CANID = 59;
-    public static final int feederCANID = 57;
-    public static final int leftAngleCAN = 55;
-    public static final int rightAngleCAN = 56;
-    public static final int cancoder = 50;
-
-    public static final double cancoderOffset = +0.039;
-
-
-    public static final double kP = 0.0003; // 0.0005
-    public static final double kI = 0; //1
-    public static final double kD = 0.00000;
-    public static final double kIz = 0;
-    public static final double kFF = 0.0002;
-    public static final double kMaxOutput = 1;
-    public static final double kMinOutput = -0.5;
-    public static final double kmaxRPM = 5500;
-    public static final double kTypRPM = 4750;
-
+  public static final class ClimberConstants {
+    public static final int climberMotorCANID = 30;
+    public static final int tiltMotorCANID = 31;
   }
 
-
-
-
-  public static final class DriveConstants {
+  
+    public static final class DriveConstants {
     // Any constants that are not final can and should be update in
     // GenerateConstants
     // Non-final constants are initialized with the values of the practice bot
@@ -110,6 +96,63 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
     public static final int kManipulatorControllerPort = 1;
   }
+
+  public static void controllerConstants() {
+
+    if (DriverStation.getJoystickType(Constants.Controllers.kManipulatorControllerPort) == 21) {
+      //PS5 Controller
+      topButton = 4;
+      rightButton = 3;
+      bottomButton = 2;
+      leftButton = 1;
+      leftBumper = 5;
+      rightBumper = 6;
+      leftTrigger = 7;
+      rightTrigger = 8;
+      leftStickButton = 11;
+      rightStickButton = 12;
+      dpadUp = 0;
+      dpadRight = 90;
+      dpadDown = 180;
+      dpadLeft = 270;
+      PS5MuteButton = 15;
+      PS5HomeButton = 13;
+      leftMenuButton = 9;
+      rightMenuButton = 10;
+      PS5TouchpadButton = 14;
+
+      leftStickX = 0; //Axis
+      leftStickY = 1; //Axis
+      rightStickX = 2; //Axis
+      rightStickY = 5; //Axis
+    } else {
+      //Xbox Controller
+      topButton = 4;
+      rightButton = 2;
+      bottomButton = 1;
+      leftButton = 3;
+      leftBumper = 5;
+      rightBumper = 6;
+      leftTrigger = 2; //Axis, 0 or 1
+      rightTrigger = 3; //Axis, 0 or 1
+      leftStickButton = 9;
+      rightStickButton = 10;
+      dpadUp = 0;
+      dpadRight = 90;
+      dpadDown = 180;
+      dpadLeft = 270;
+      //PS5MuteButton = null;
+      //PS5HomeButton = null;
+      leftMenuButton = 7;
+      rightMenuButton = 8;
+      //PS5TouchpadButton = null;
+      
+      leftStickX = 0; //Axis
+      leftStickY = 1; //Axis
+      rightStickX = 4; //Axis
+      rightStickY = 5; //Axis
+    }
+}
 
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 4.0;// was 3
