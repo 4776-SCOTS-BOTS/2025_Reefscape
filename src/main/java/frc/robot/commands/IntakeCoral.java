@@ -39,8 +39,11 @@ public class IntakeCoral extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    hasCoral = (intake.getFilteredCurent() > 20) ? true : false;
-    if (hasCoral && timer.hasElapsed(0.5)) {
+    System.out.println(intake.getFilteredCurent());
+    if (!hasCoral) {
+      hasCoral = (intake.getFilteredCurent() > 1) ? true : false;
+    }
+    if (hasCoral && timer.hasElapsed(0.25)) {
       isCompleted = true;
     }
 

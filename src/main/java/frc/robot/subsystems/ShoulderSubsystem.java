@@ -80,11 +80,11 @@ public class ShoulderSubsystem extends SubsystemBase {
     motorConfig
       .smartCurrentLimit(50, 30)
       .inverted(true)
-      .idleMode(IdleMode.kCoast); // Coast will be safer for tuning.  Eventually use brake
+      .idleMode(IdleMode.kBrake); // Coast will be safer for tuning.  Eventually use brake
 
     motorConfig.absoluteEncoder
     .zeroOffset(Constants.ShoulderConstants.zeroOffset)
-    .inverted(true)
+    .inverted(false)
     .positionConversionFactor(1)
     .velocityConversionFactor(1);
 
@@ -116,6 +116,8 @@ public class ShoulderSubsystem extends SubsystemBase {
     if(shoulderMode == ShoulderMode.MANUAL){
       m_setpoint = new TrapezoidProfile.State(getCurrentPosition(), getCurrentVelocity());
     }
+
+    // System.out.println("Arm Position" + getCurrentPosition());
 
 
 
@@ -204,6 +206,7 @@ public class ShoulderSubsystem extends SubsystemBase {
   }
 
   public void runMotor(double speed){
+    speed = limitPower(speed);
     shoulderMotor.set(speed);
     shoulderMode = ShoulderMode.MANUAL;
   }

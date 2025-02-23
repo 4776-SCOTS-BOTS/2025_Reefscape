@@ -60,7 +60,7 @@ public final class Constants {
   public static final class ShoulderConstants {
     public static final int shoulderMotorCANID = 25;
     // public static final int shoudlderCANcoderID = 26;
-    public static final double zeroOffset = 0; //TODO: needs update
+    public static final double zeroOffset = 1-0.90; //TODO: needs update
   }
 
   public static final class ElevatorConstants {
@@ -85,7 +85,7 @@ public final class Constants {
     public static final double driveNormalPercentScale = 0.8;
     public static final double rotNormalRateModifier = 0.8;
     public static final double driveLowPercentScale = 0.45;
-    public static final double rotLowRateModifier = 0.75;
+    public static final double rotLowRateModifier = 0.6;
 
     public static double drivePercentScale = driveNormalPercentScale;
     public static double rotRateModifier = rotNormalRateModifier;

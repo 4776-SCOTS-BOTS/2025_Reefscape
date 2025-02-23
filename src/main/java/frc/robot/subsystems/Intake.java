@@ -8,6 +8,9 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import java.util.Map;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -18,6 +21,8 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -35,7 +40,7 @@ public class Intake extends SubsystemBase {
   public double filteredCurrent;
 
   public double pickupPos = 0;
-  public double deliverPos = 0.25;
+  public double deliverPos = 0.20;
 
   public enum WRIST_POSTION{
     PICKUP,
@@ -70,8 +75,8 @@ public class Intake extends SubsystemBase {
      * factors.
      */
     motorConfig.encoder
-        .positionConversionFactor(1 / 125)
-        .velocityConversionFactor(1 / 125);
+        .positionConversionFactor(125)
+        .velocityConversionFactor(125);
 
     /*
      * Configure the closed loop controller. We want to make sure we set the
@@ -109,8 +114,9 @@ public class Intake extends SubsystemBase {
      */
     wristMotor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
-
-
+     SparkMaxConfig intakeConfig = new SparkMaxConfig();
+    intakeConfig.idleMode(IdleMode.kBrake);
+    intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     
   }
 
@@ -134,24 +140,28 @@ public class Intake extends SubsystemBase {
   }
 
   public void intakeOut(){
-    intakeMotor.set(-.5);
+    intakeMotor.set(-.25);
   }
   public void intakeOff(){
     intakeMotor.set(0);
   }
 
   public void wristPickup(){
-    wristControl.setReference(pickupPos, ControlType.kMAXMotionPositionControl);
+    wristControl.setReference(pickupPos, ControlType.kPosition);
     wristPos = WRIST_POSTION.PICKUP;
   }
 
   public void wristDeliver(){
-    wristControl.setReference(deliverPos, ControlType.kMAXMotionPositionControl);
+    wristControl.setReference(deliverPos, ControlType.kPosition);
     wristPos = WRIST_POSTION.DELIVER;
   }
 
   public double getFilteredCurent(){
     return filteredCurrent;
+  }
+
+  public double getRawCurent(){
+    return intakeMotor.getOutputCurrent();
   }
 
   public void toggleWrist(){
@@ -160,6 +170,18 @@ public class Intake extends SubsystemBase {
     } else {
       wristPickup();
     }
+  }
+
+  public void runWrist(double speed){
+    wristMotor.set(speed);
+  }
+
+    public void addDashboardWidgets(ShuffleboardLayout layout) {
+    layout.withProperties(Map.of("Number of columns", 1, "Number of rows", 3));
+    layout.addNumber("Filtered Current", this::getFilteredCurent).withPosition(0, 0);
+    layout.addNumber("Raw Current", this::getFilteredCurent).withPosition(0, 2);
+    // layout.addNumber("Position Meters", this::getElevatorPosition).withPosition(0, 1);
+    // layout.addNumber("Target Position Meters", () -> targetPosition).withPosition(0, 2);
   }
 
 }

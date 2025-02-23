@@ -114,7 +114,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
     MotorOutputConfigs leader_mo = leader_cfg.MotorOutput;
     leader_mo.Inverted = InvertedValue.Clockwise_Positive;
-    leader_mo.NeutralMode = NeutralModeValue.Coast;
+    leader_mo.NeutralMode = NeutralModeValue.Brake;
 
     leader_cfg.CurrentLimits.StatorCurrentLimit = 60; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
     leader_cfg.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -124,7 +124,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     //Setup Follower
     MotorOutputConfigs follower_mo = follower_cfg.MotorOutput;
     follower_mo.Inverted = InvertedValue.Clockwise_Positive;
-    follower_mo.NeutralMode = NeutralModeValue.Coast;
+    follower_mo.NeutralMode = NeutralModeValue.Brake;
 
     follower_cfg.CurrentLimits.StatorCurrentLimit = 60; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
     follower_cfg.CurrentLimits.StatorCurrentLimitEnable = true;

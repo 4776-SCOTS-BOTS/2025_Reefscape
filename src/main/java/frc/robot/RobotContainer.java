@@ -94,6 +94,7 @@ public class RobotContainer {
 
     //Shuffleboard
     ShuffleboardLayout elevatorLayout;
+    ShuffleboardLayout intakeLayout;
 
     public RobotContainer() {
         //Setup Elevator if present
@@ -113,6 +114,8 @@ public class RobotContainer {
 
         if(hasIntake){
             intake = new Intake();
+            intakeLayout = Shuffleboard.getTab("Intake").getLayout("Intake", BuiltInLayouts.kList);
+            intake.addDashboardWidgets(intakeLayout);
         } else {
             intake = null;
         }
@@ -152,11 +155,20 @@ public class RobotContainer {
             
         }
 
-        if (hasIntake){
+        if (hasIntake) {
             manipCommandController.button(Constants.leftButton).onTrue(new IntakeCoral(intake));
-            manipCommandController.button(Constants.rightButton).onTrue(new InstantCommand(intake::intakeOut));
-            manipCommandController.button(Constants.bottomButton).onTrue(new InstantCommand(intake::intakeOff));
-            manipCommandController.button(Constants.topButton).onTrue(new InstantCommand(intake::toggleWrist));
+            manipCommandController.button(Constants.rightButton).onTrue(new InstantCommand(intake::intakeOut, intake));
+            manipCommandController.button(Constants.bottomButton).onTrue(new InstantCommand(intake::intakeOff, intake));
+            // manipCommandController.button(Constants.topButton).onTrue(new InstantCommand(intake::wristDeliver, intake));
+
+            manipCommandController.button(Constants.rightBumper)
+                    .onTrue(new InstantCommand(() -> intake.runWrist(0.35)))
+                    .onFalse(new InstantCommand(() -> intake.runWrist(0)));
+
+            manipCommandController.button(Constants.leftBumper)
+                    .onTrue(new InstantCommand(() -> intake.runWrist(-0.35)))
+                    .onFalse(new InstantCommand(() -> intake.runWrist(0)));
+
         }
 
        
@@ -174,7 +186,7 @@ public class RobotContainer {
 
         reallylowSpeedTrigger.onTrue(new InstantCommand(() -> {
             speedMultiplier = Constants.DriveConstants.driveLowPercentScale * 0.5;
-            rotMultiplier = Constants.DriveConstants.rotLowRateModifier;
+            rotMultiplier = Constants.DriveConstants.rotLowRateModifier*0.6;
         }))
                 .onFalse(new InstantCommand(() -> {
                     speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
@@ -265,11 +277,11 @@ public class RobotContainer {
     };
 
     Runnable shoulderRunnable = () -> {
-    double shoulderStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.rightStickX), 0.03);
+    double shoulderStick = MathUtil.applyDeadband(manipCommandController.getRawAxis(Constants.rightStickX), 0.03);
 
-    if ((Math.abs(shoulderStick) < 0.1) && shoulder.shoulderMode == ShoulderMode.MANUAL){
+    if ((Math.abs(shoulderStick) < 0.03) && shoulder.shoulderMode == ShoulderMode.MANUAL){
       shoulder.runMotor(0);
-    } else if (Math.abs(shoulderStick) >= 0.5) {
+    } else if (Math.abs(shoulderStick) >= 0.03) {
       shoulder.runMotor(shoulderStick * 0.5);
     }
   };
