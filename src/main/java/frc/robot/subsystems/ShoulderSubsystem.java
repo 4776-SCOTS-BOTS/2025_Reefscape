@@ -24,15 +24,13 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
-import frc.robot.customClass.ArmJointConstants;
-import frc.robot.customClass.ShoulderFeedFowardController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** A robot arm subsystem that moves with a motion profile. */
 public class ShoulderSubsystem extends SubsystemBase {
@@ -45,15 +43,16 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   private static double kDt = 0.02;
 
-  private double kS = 0;
-  private double kG = 0;
-  private double kV = 0;
+  private double kS = 0;//0.27
+  private double kG = 0.17;
+  private double kV = 2;//1.5 - 4.77
 
   private final ArmFeedforward m_feedforward = new ArmFeedforward(kS, kG, kV, kDt);
 
     // Create a motion profile with the given maximum velocity and maximum
-  // acceleration constraints for the next setpoint.
-  private final TrapezoidProfile m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(60, 60));
+  // acceleration constraints for the next setpoint. Values are rotations / s
+  // Max speed is about 0.4 rev/s at 225:1
+  private final TrapezoidProfile m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(0.4, 1));
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
@@ -76,13 +75,16 @@ public class ShoulderSubsystem extends SubsystemBase {
 
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     
-    motorConfig.signals.absoluteEncoderPositionPeriodMs(20);
+    motorConfig.signals.absoluteEncoderPositionPeriodMs((int)(kDt*1000));
 
     motorConfig
+      .smartCurrentLimit(50, 30)
+      .inverted(true)
       .idleMode(IdleMode.kCoast); // Coast will be safer for tuning.  Eventually use brake
 
     motorConfig.absoluteEncoder
     .zeroOffset(Constants.ShoulderConstants.zeroOffset)
+    .inverted(true)
     .positionConversionFactor(1)
     .velocityConversionFactor(1);
 
@@ -90,10 +92,10 @@ public class ShoulderSubsystem extends SubsystemBase {
     .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
     // Set PID values for position control. We don't need to pass a closed
     // loop slot, as it will default to slot 0.
-    .p(1.0)
+    .p(3)
     .i(0)
     .d(0)
-    .outputRange(-0.5, 0.5);
+    .outputRange(-1, 1);
 
     // motorConfig.closedLoop.maxMotion
     // // Set MAXMotion parameters for position control. We don't need to pass
@@ -110,34 +112,58 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    // // This method will be called once per scheduler run
+    if(shoulderMode == ShoulderMode.MANUAL){
+      m_setpoint = new TrapezoidProfile.State(getCurrentPosition(), getCurrentVelocity());
+    }
+
+
 
     if ((shoulderMode == ShoulderMode.RUN_TO_POSITION) && isValidGoal(m_goal)) {
       // Retrieve the profiled setpoint for the next timestep. This setpoint moves
       // toward the goal while obeying the constraints.
       m_setpoint = m_profile.calculate(kDt, m_setpoint, m_goal);
+      double arbFF = m_feedforward.calculate(2 * Math.PI * getCurrentPosition() - Math.PI / 2, 2 * Math.PI * getCurrentVelocity());
+      
+      
+      // m_feedforward.calculateWithVelocities(
+      //     2 * Math.PI * getCurrentPosition() - Math.PI / 2,
+      //     2 * Math.PI * getCurrentVelocity(),
+      //     m_setpoint.velocity);
 
       // Send setpoint to offboard controller PID
       controller.setReference(m_setpoint.position, ControlType.kPosition, ClosedLoopSlot.kSlot0,
-          m_feedforward.calculateWithVelocities(
-              2 * Math.PI * getCurrentPosition(),
-              2 * Math.PI * getCurrentVelocity(),
-              m_setpoint.velocity));
+      arbFF);
+
+      // output arbFF, m_goal.position, m_setpoint.position
+      SmartDashboard.putNumber("arbFF", arbFF);
+      SmartDashboard.putNumber("m_goal.position", m_goal.position);
+      SmartDashboard.putNumber("m_setpoint.position", m_setpoint.position);
+      SmartDashboard.putNumber("Current Pos", getCurrentPosition());
+      SmartDashboard.putNumber("m_setpoint.velocity", m_setpoint.velocity);
+
+
     }
   }
 
 
   public Command setArmGoalCommand(double goal) {
-    m_goal = new TrapezoidProfile.State(goal, 0);
-    if ((shoulderMode == ShoulderMode.RUN_TO_POSITION) && isValidGoal(m_goal)) {
+    // System.out.println("goal: " + goal);
+    // if ((shoulderMode == ShoulderMode.RUN_TO_POSITION) && isValidGoal(m_goal)) {
+    //   System.out.println("True");
       return Commands.runOnce(() -> {
         m_goal = new TrapezoidProfile.State(goal, 0);
         shoulderMode = ShoulderMode.RUN_TO_POSITION;
       }, this);
-    } else {
-      return Commands.none();
-    }
-  }
+  //   } else {
+  //     return Commands.none();
+  //   }
+   }
+
+   public void setArmGoal(double goal) {
+     m_goal = new TrapezoidProfile.State(goal, 0);
+     shoulderMode = ShoulderMode.RUN_TO_POSITION;
+   }
 
   public Command holdArmPositionCommand() {
     return Commands.runOnce(() -> {
@@ -175,6 +201,46 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   public boolean isValidGoal(TrapezoidProfile.State goalState){
     return isInRange(goalState.position, minRot, maxRot);
+  }
+
+  public void runMotor(double speed){
+    shoulderMotor.set(speed);
+    shoulderMode = ShoulderMode.MANUAL;
+  }
+
+  public double limitPower(double power) {
+    double slow = 0.3;
+    double min = minRot;
+    double minSlow = minRot + 0.1;
+    double max = maxRot;
+    double maxSlow = maxRot - 0.1;
+
+    double pos = getCurrentPosition();
+
+    // System.out.print("speed = " + power + " pos = " + pos + " | " + min + "/" + minSlow);
+    // String output;
+
+    if ((power >= 0) && isInRange(pos, maxSlow, max)) {
+      // output = " | Max Slow";
+      // System.out.println(output);
+      return power * slow;
+    } else if ((power >= 0) && (pos >= max)) {
+      // output = " | @Max";
+      // System.out.println(output);
+      return 0;
+    } else if ((power < 0) && isInRange(pos, min, minSlow)) {
+      // output = " | Min Slow";
+      // System.out.println(output);
+      return power * slow;
+    } else if ((power < 0) && (pos <= min)) {
+      // output = " | @Min";
+      // System.out.println(output);
+      return 0;
+    } else {
+      // output = " | Normal";
+      // System.out.println(output);
+      return power;
+    }
   }
 
 }
