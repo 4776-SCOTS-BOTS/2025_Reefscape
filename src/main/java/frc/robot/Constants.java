@@ -46,6 +46,11 @@ public final class Constants {
   public static final CRGB kRGB_boaz = new CRGB(0, 59, 111);
   public static final CRGB kRGB_greenLow = new CRGB(0, 20, 0);
   public static final CRGB kRGB_black = new CRGB(0, 0, 0);
+
+  public static int topButton, rightButton, bottomButton, leftButton, leftBumper, rightBumper, leftTrigger, 
+  rightTrigger, leftStickButton, rightStickButton, dpadUp, dpadRight, dpadDown, dpadLeft, 
+  PS5MuteButton, PS5HomeButton, leftMenuButton, rightMenuButton, PS5TouchpadButton, leftStickX, 
+  leftStickY, rightStickX, rightStickY;
   
   public static final class IntakeConstants {
     public static final int intakeMotorCANID = 20;
@@ -91,6 +96,63 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
     public static final int kManipulatorControllerPort = 1;
   }
+
+  public static void controllerConstants() {
+
+    if (DriverStation.getJoystickType(Constants.Controllers.kManipulatorControllerPort) == 21) {
+      //PS5 Controller
+      topButton = 4;
+      rightButton = 3;
+      bottomButton = 2;
+      leftButton = 1;
+      leftBumper = 5;
+      rightBumper = 6;
+      leftTrigger = 7;
+      rightTrigger = 8;
+      leftStickButton = 11;
+      rightStickButton = 12;
+      dpadUp = 0;
+      dpadRight = 90;
+      dpadDown = 180;
+      dpadLeft = 270;
+      PS5MuteButton = 15;
+      PS5HomeButton = 13;
+      leftMenuButton = 9;
+      rightMenuButton = 10;
+      PS5TouchpadButton = 14;
+
+      leftStickX = 0; //Axis
+      leftStickY = 1; //Axis
+      rightStickX = 2; //Axis
+      rightStickY = 5; //Axis
+    } else {
+      //Xbox Controller
+      topButton = 4;
+      rightButton = 2;
+      bottomButton = 1;
+      leftButton = 3;
+      leftBumper = 5;
+      rightBumper = 6;
+      leftTrigger = 2; //Axis, 0 or 1
+      rightTrigger = 3; //Axis, 0 or 1
+      leftStickButton = 9;
+      rightStickButton = 10;
+      dpadUp = 0;
+      dpadRight = 90;
+      dpadDown = 180;
+      dpadLeft = 270;
+      //PS5MuteButton = null;
+      //PS5HomeButton = null;
+      leftMenuButton = 7;
+      rightMenuButton = 8;
+      //PS5TouchpadButton = null;
+      
+      leftStickX = 0; //Axis
+      leftStickY = 1; //Axis
+      rightStickX = 4; //Axis
+      rightStickY = 5; //Axis
+    }
+}
 
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 4.0;// was 3
