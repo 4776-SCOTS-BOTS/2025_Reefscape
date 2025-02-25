@@ -32,8 +32,9 @@ public class IntakeCoral extends Command {
     timeoutTimer.restart();
     intake.intakeIn();
     isCompleted = false;
-    timerStarted = false;
+    timerStarted = true;
     hasCoral = false;
+    timer.restart();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -41,9 +42,9 @@ public class IntakeCoral extends Command {
   public void execute() {
     System.out.println(intake.getFilteredCurent());
     if (!hasCoral) {
-      hasCoral = (intake.getFilteredCurent() > 1) ? true : false;
+      hasCoral = (intake.getFilteredCurent() > 14) ? true : false;
     }
-    if (hasCoral && timer.hasElapsed(0.25)) {
+    if (hasCoral && timer.hasElapsed(1.0)) {
       isCompleted = true;
     }
 

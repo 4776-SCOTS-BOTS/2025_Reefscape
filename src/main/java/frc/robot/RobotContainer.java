@@ -159,15 +159,19 @@ public class RobotContainer {
             manipCommandController.button(Constants.leftButton).onTrue(new IntakeCoral(intake));
             manipCommandController.button(Constants.rightButton).onTrue(new InstantCommand(intake::intakeOut, intake));
             manipCommandController.button(Constants.bottomButton).onTrue(new InstantCommand(intake::intakeOff, intake));
-            // manipCommandController.button(Constants.topButton).onTrue(new InstantCommand(intake::wristDeliver, intake));
+            manipCommandController.button(Constants.topButton).onTrue(new InstantCommand(intake::wristPickup, intake));
+            manipCommandController.button(Constants.leftBumper).onTrue(new InstantCommand(intake::wristDeliver1, intake));
+            manipCommandController.button(Constants.rightBumper).onTrue(new InstantCommand(intake::wristDeliver2, intake));
 
-            manipCommandController.button(Constants.rightBumper)
-                    .onTrue(new InstantCommand(() -> intake.runWrist(0.35)))
-                    .onFalse(new InstantCommand(() -> intake.runWrist(0)));
 
-            manipCommandController.button(Constants.leftBumper)
-                    .onTrue(new InstantCommand(() -> intake.runWrist(-0.35)))
-                    .onFalse(new InstantCommand(() -> intake.runWrist(0)));
+            // Manual Controls
+            // manipCommandController.button(Constants.rightBumper)
+            //         .onTrue(new InstantCommand(() -> intake.runWrist(0.35)))
+            //         .onFalse(new InstantCommand(() -> intake.runWrist(0)));
+
+            // manipCommandController.button(Constants.leftBumper)
+            //         .onTrue(new InstantCommand(() -> intake.runWrist(-0.35)))
+            //         .onFalse(new InstantCommand(() -> intake.runWrist(0)));
 
         }
 

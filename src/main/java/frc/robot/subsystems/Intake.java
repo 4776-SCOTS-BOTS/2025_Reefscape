@@ -30,8 +30,8 @@ public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
 
   public SparkMax intakeMotor, wristMotor;
-  LinearFilter filter = LinearFilter.movingAverage(4);
-  private SparkMaxConfig motorConfig;
+  LinearFilter filter = LinearFilter.movingAverage(6);
+  private SparkMaxConfig wristMotorConfig;
   private SparkClosedLoopController wristControl;
   private RelativeEncoder encoder;
 
@@ -40,7 +40,8 @@ public class Intake extends SubsystemBase {
   public double filteredCurrent;
 
   public double pickupPos = 0;
-  public double deliverPos = 0.20;
+  public double deliverPos1 = 0.20;
+  public double deliverPos2 = -0.20;
 
   public enum WRIST_POSTION{
     PICKUP,
@@ -66,7 +67,7 @@ public class Intake extends SubsystemBase {
      * Create a new SPARK MAX configuration object. This will store the
      * configuration parameters for the SPARK MAX that we will set below.
      */
-    motorConfig = new SparkMaxConfig();
+    wristMotorConfig = new SparkMaxConfig();
 
     /*
      * Configure the encoder. For this specific example, we are using the
@@ -74,31 +75,31 @@ public class Intake extends SubsystemBase {
      * needed, we can adjust values like the position or velocity conversion
      * factors.
      */
-    motorConfig.encoder
-        .positionConversionFactor(125)
-        .velocityConversionFactor(125);
+    wristMotorConfig.encoder
+        .positionConversionFactor(1.0/125)
+        .velocityConversionFactor(1.0/125);
 
     /*
      * Configure the closed loop controller. We want to make sure we set the
      * feedback sensor as the primary encoder.
      */
-    motorConfig.closedLoop
+    wristMotorConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         // Set PID values for position control. We don't need to pass a closed
         // loop slot, as it will default to slot 0.
         .p(1.0)
         .i(0)
         .d(0)
-        .outputRange(-0.75, 0.75);
+        .outputRange(-0.5, 0.5);
 
-    motorConfig.closedLoop.maxMotion
+    wristMotorConfig.closedLoop.maxMotion
         // Set MAXMotion parameters for position control. We don't need to pass
         // a closed loop slot, as it will default to slot 0.
         .maxVelocity(60)
         .maxAcceleration(300)
         .allowedClosedLoopError(0.01);
 
-    motorConfig
+    wristMotorConfig
       .idleMode(IdleMode.kBrake)
       .inverted(false);
 
@@ -112,9 +113,9 @@ public class Intake extends SubsystemBase {
      * the SPARK MAX loses power. This is useful for power cycles that may occur
      * mid-operation.
      */
-    wristMotor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    wristMotor.configure(wristMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-     SparkMaxConfig intakeConfig = new SparkMaxConfig();
+    SparkMaxConfig intakeConfig = new SparkMaxConfig();
     intakeConfig.idleMode(IdleMode.kBrake);
     intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     
@@ -147,12 +148,17 @@ public class Intake extends SubsystemBase {
   }
 
   public void wristPickup(){
-    wristControl.setReference(pickupPos, ControlType.kPosition);
+    wristControl.setReference(pickupPos, ControlType.kMAXMotionPositionControl);
     wristPos = WRIST_POSTION.PICKUP;
   }
 
-  public void wristDeliver(){
-    wristControl.setReference(deliverPos, ControlType.kPosition);
+  public void wristDeliver1(){
+    wristControl.setReference(deliverPos1, ControlType.kMAXMotionPositionControl);
+    wristPos = WRIST_POSTION.DELIVER;
+  }
+
+  public void wristDeliver2(){
+    wristControl.setReference(deliverPos2, ControlType.kMAXMotionPositionControl);
     wristPos = WRIST_POSTION.DELIVER;
   }
 
@@ -166,7 +172,7 @@ public class Intake extends SubsystemBase {
 
   public void toggleWrist(){
     if(wristPos == WRIST_POSTION.PICKUP){
-      wristDeliver();
+      wristDeliver1();
     } else {
       wristPickup();
     }
@@ -179,7 +185,7 @@ public class Intake extends SubsystemBase {
     public void addDashboardWidgets(ShuffleboardLayout layout) {
     layout.withProperties(Map.of("Number of columns", 1, "Number of rows", 3));
     layout.addNumber("Filtered Current", this::getFilteredCurent).withPosition(0, 0);
-    layout.addNumber("Raw Current", this::getFilteredCurent).withPosition(0, 2);
+    layout.addNumber("Raw Current", this::getRawCurent).withPosition(0, 2);
     // layout.addNumber("Position Meters", this::getElevatorPosition).withPosition(0, 1);
     // layout.addNumber("Target Position Meters", () -> targetPosition).withPosition(0, 2);
   }
