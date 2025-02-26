@@ -7,22 +7,35 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.ShoulderSubsystem;
 
-public class IntakeCoral extends Command {
+public class DeliverCoral extends Command {
   private Intake intake;
+  private ShoulderSubsystem shoulder;
+
   private Timer timer = new Timer();
   private Timer timeoutTimer = new Timer();
   private boolean isCompleted = false;
   private boolean timerStarted = false;
   public boolean hasCoral = false;
   private static double timeout = 4.0;
+  private double armStart;
 
-  /** Creates a new IntakeNote. */
-  public IntakeCoral(Intake intake) {
+  private double ARM_OFFSET = 0.15;
+
+  /** Creates a new IntakeNote. 
+   * @param clockwiseArm Shoulde be false for front delivery, true for back delivery
+  */
+  public DeliverCoral(Intake intake, ShoulderSubsystem shoulder, boolean clockwiseArm) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.intake = intake;
+    this.shoulder = shoulder;
 
-    addRequirements(intake);
+    if (!clockwiseArm) {
+      ARM_OFFSET = -0.1;
+    }
+
+    addRequirements(intake, shoulder);
   }
 
   // Called when the command is initially scheduled.
@@ -30,21 +43,21 @@ public class IntakeCoral extends Command {
   public void initialize() {
     timer.reset();
     timeoutTimer.restart();
-    intake.intakeIn();
+    armStart = shoulder.getCurrentPosition();
+    shoulder.setArmGoal(armStart + ARM_OFFSET);
     isCompleted = false;
     timerStarted = true;
-    hasCoral = false;
     timer.restart();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // System.out.println(intake.getFilteredCurent());
-    if (!hasCoral) {
-      hasCoral = (intake.getFilteredCurent() > 14) ? true : false;
+    if (timer.hasElapsed(0.4
+    )) {
+      intake.intakeOut();
     }
-    if (hasCoral && timer.hasElapsed(1.0)) {
+    if (timer.hasElapsed(1.0)) {
       isCompleted = true;
     }
 

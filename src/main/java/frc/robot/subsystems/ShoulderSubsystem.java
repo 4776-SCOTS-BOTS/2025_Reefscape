@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 import com.revrobotics.spark.SparkMax;
@@ -25,6 +26,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -44,8 +46,8 @@ public class ShoulderSubsystem extends SubsystemBase {
   private static double kDt = 0.02;
 
   private double kS = 0;//0.27
-  private double kG = 0.17;
-  private double kV = 2;//1.5 - 4.77
+  private double kG = 0.3; // was 0.17 from test arm
+  private double kV = 2.0;//1.5 - 4.77
 
   private final ArmFeedforward m_feedforward = new ArmFeedforward(kS, kG, kV, kDt);
 
@@ -55,6 +57,7 @@ public class ShoulderSubsystem extends SubsystemBase {
   private final TrapezoidProfile m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(0.4, 1));
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+  private double arbFF;
 
   
   // Need to treat straight down as zero in order to prevent movement through the bottom of rotation
@@ -69,6 +72,16 @@ public class ShoulderSubsystem extends SubsystemBase {
   }
 
   public ShoulderMode shoulderMode = ShoulderMode.MANUAL;
+
+  double intakeAngle = 0.68; //@Base elevator position
+  double intakeSafe = 0.64; //@Base elevator position
+
+  double deliverReadyL4 = 0.36; //@elvator = 1.768
+  double deliverFinalL4 = 0.30; //@elvator = 1.768
+
+  double deliverReadyL3 = 0.337; //@elvator = 1.149
+  double deliverFinalL3 = 0.28; //@elvator = 1.149
+
 
   /** Create a new ArmSubsystem. */
   public ShoulderSubsystem() {
@@ -92,7 +105,7 @@ public class ShoulderSubsystem extends SubsystemBase {
     .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
     // Set PID values for position control. We don't need to pass a closed
     // loop slot, as it will default to slot 0.
-    .p(3)
+    .p(4)
     .i(0)
     .d(0)
     .outputRange(-1, 1);
@@ -125,7 +138,7 @@ public class ShoulderSubsystem extends SubsystemBase {
       // Retrieve the profiled setpoint for the next timestep. This setpoint moves
       // toward the goal while obeying the constraints.
       m_setpoint = m_profile.calculate(kDt, m_setpoint, m_goal);
-      double arbFF = m_feedforward.calculate(2 * Math.PI * getCurrentPosition() - Math.PI / 2, 2 * Math.PI * getCurrentVelocity());
+      arbFF = m_feedforward.calculate(2 * Math.PI * getCurrentPosition() - Math.PI / 2, 2 * Math.PI * getCurrentVelocity());
       
       
       // m_feedforward.calculateWithVelocities(
@@ -138,11 +151,11 @@ public class ShoulderSubsystem extends SubsystemBase {
       arbFF);
 
       // output arbFF, m_goal.position, m_setpoint.position
-      SmartDashboard.putNumber("arbFF", arbFF);
-      SmartDashboard.putNumber("m_goal.position", m_goal.position);
-      SmartDashboard.putNumber("m_setpoint.position", m_setpoint.position);
-      SmartDashboard.putNumber("Current Pos", getCurrentPosition());
-      SmartDashboard.putNumber("m_setpoint.velocity", m_setpoint.velocity);
+      // SmartDashboard.putNumber("arbFF", arbFF);
+      // SmartDashboard.putNumber("m_goal.position", m_goal.position);
+      // SmartDashboard.putNumber("m_setpoint.position", m_setpoint.position);
+      // SmartDashboard.putNumber("Current Pos", getCurrentPosition());
+      // SmartDashboard.putNumber("m_setpoint.velocity", m_setpoint.velocity);
 
 
     }
@@ -244,6 +257,42 @@ public class ShoulderSubsystem extends SubsystemBase {
       // System.out.println(output);
       return power;
     }
+  }
+
+  public void setStraightBack(){
+    setArmGoal(0.75);
+  }
+
+  public void setStraightUp(){
+    setArmGoal(0.5);
+  }
+
+  public void setStraightForward(){
+    setArmGoal(0.25);
+  }
+
+  public void addDashboardWidgets(ShuffleboardLayout layout) {
+    layout.withProperties(Map.of("Number of columns", 1, "Number of rows", 4));
+    layout.addNumber("Current Position", this::getCurrentPosition).withPosition(0, 0);
+    layout.addNumber("Goal Setpoint", () -> {
+      return m_goal.position;
+    }).withPosition(0, 1);
+    layout.addNumber("Current Setpoint", () -> {
+      return m_setpoint.position;
+    }).withPosition(0, 2);
+    layout.addNumber("ArbFF", () -> {
+      return arbFF;
+    }).withPosition(0, 3);
+    // layout.addNumber("Position Meters",
+    // this::getElevatorPosition).withPosition(0, 1);
+    // layout.addNumber("Target Position Meters", () ->
+    // targetPosition).withPosition(0, 2);
+
+    // SmartDashboard.putNumber("arbFF", arbFF);
+    // SmartDashboard.putNumber("m_goal.position", m_goal.position);
+    // SmartDashboard.putNumber("m_setpoint.position", m_setpoint.position);
+    // SmartDashboard.putNumber("Current Pos", getCurrentPosition());
+    // SmartDashboard.putNumber("m_setpoint.velocity", m_setpoint.velocity);
   }
 
 }

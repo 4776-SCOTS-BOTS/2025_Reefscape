@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.DeliverCoral;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.MoveRobot;
 import frc.robot.generated.TunerConstants;
@@ -95,12 +96,13 @@ public class RobotContainer {
     //Shuffleboard
     ShuffleboardLayout elevatorLayout;
     ShuffleboardLayout intakeLayout;
+    ShuffleboardLayout shoulderLayout;
 
     public RobotContainer() {
         //Setup Elevator if present
         if(hasElevator){
             elevator = new ElevatorControlSubsystem();
-            elevatorLayout = Shuffleboard.getTab("Elevator Assembly").getLayout("ElevatorControl", BuiltInLayouts.kList);
+            elevatorLayout = Shuffleboard.getTab("Subsystems").getLayout("ElevatorControl", BuiltInLayouts.kList);
             elevator.addDashboardWidgets(elevatorLayout);
         } else {
             elevator = null;
@@ -108,13 +110,15 @@ public class RobotContainer {
 
         if(hasShoulder){
             shoulder = new ShoulderSubsystem();
+            shoulderLayout = Shuffleboard.getTab("Subsystems").getLayout("Shoulder", BuiltInLayouts.kList);
+            shoulder.addDashboardWidgets(shoulderLayout);
         } else {
             shoulder = null;
         }
 
         if(hasIntake){
             intake = new Intake();
-            intakeLayout = Shuffleboard.getTab("Intake").getLayout("Intake", BuiltInLayouts.kList);
+            intakeLayout = Shuffleboard.getTab("Subsystems").getLayout("Intake", BuiltInLayouts.kList);
             intake.addDashboardWidgets(intakeLayout);
         } else {
             intake = null;
@@ -152,6 +156,9 @@ public class RobotContainer {
             shoulder.setDefaultCommand(
                 new RunCommand(shoulderRunnable, shoulder));
 
+            manipCommandController.button(Constants.rightMenuButton).onTrue(new InstantCommand(() -> {shoulder.setStraightBack();}));
+            manipCommandController.button(Constants.leftMenuButton).onTrue(new InstantCommand(() -> {shoulder.setStraightUp();}));
+
             
         }
 
@@ -173,6 +180,10 @@ public class RobotContainer {
             //         .onTrue(new InstantCommand(() -> intake.runWrist(-0.35)))
             //         .onFalse(new InstantCommand(() -> intake.runWrist(0)));
 
+        }
+
+        if(hasIntake && hasShoulder){
+            manipCommandController.pov(270).onTrue(new DeliverCoral(intake, shoulder, false));
         }
 
        
