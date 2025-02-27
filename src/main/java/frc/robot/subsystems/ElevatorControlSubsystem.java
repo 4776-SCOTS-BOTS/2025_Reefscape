@@ -68,7 +68,6 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   final MotionMagicVoltage m_request = new MotionMagicVoltage(0); 
 
   // Limit switches - FALSE means at limit
-  private final DigitalInput topLimitSwitch = new DigitalInput(8); //TODO: Need to update.  Do we use?
   private final DigitalInput bottomLimitSwitch = new DigitalInput(9); //TODO: Need to update.  Do we use?
 
   private double targetPosition = Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters);
@@ -236,10 +235,6 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     return !bottomLimitSwitch.get();
   }
 
-  public boolean isAtTopLimit() {
-    return !topLimitSwitch.get();
-  }
-
   public ElevatorMode getMode(){
     return elevatorMode;
   }
@@ -289,6 +284,11 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
   public boolean isInRange(double val, double min, double max) {
     return (val >= min) && (val <= max);
+  }
+
+  public void resetPosition(){
+    elevatorLeader.setPosition(0);
+    elevatorFollower.setPosition(0);
   }
   
 }
