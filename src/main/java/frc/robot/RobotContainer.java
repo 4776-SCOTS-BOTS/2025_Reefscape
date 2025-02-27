@@ -38,6 +38,7 @@ import frc.robot.commands.DeliverCoral;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.MoveArmAndElevator;
 import frc.robot.commands.MoveRobot;
+import frc.robot.customClass.SystemPositions.Positions;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorAssembly;
@@ -56,15 +57,22 @@ public class RobotContainer {
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric driveFieldRel = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            // .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.RobotCentric driveRoboRel = new SwerveRequest.RobotCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            // .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
+
+    //Stick scaling factors
+    private double deadband = 0.05;
+    private double scaleFactor = 1/(1 - deadband);
+    private double offset = 1 - scaleFactor;
+    private double cubicWeight = 0.3;  
+
 
     //subsytems
     private boolean hasElevator = true;
@@ -278,12 +286,12 @@ public class RobotContainer {
         
         Command driveCom =
             drivetrain.applyRequest(fieldCentric ? 
-                () -> driveFieldRel.withVelocityX(-driverCommandController.getLeftY() * MaxSpeed * speedMultiplier) // Drive forward with negative Y (forward)
-                .withVelocityY(-driverCommandController.getLeftX() * MaxSpeed * speedMultiplier) // Drive left with negative X (left)
-                .withRotationalRate(-driverCommandController.getRightX() * MaxAngularRate * rotMultiplier) : // Drive counterclockwise with negative X (left)
-                () -> driveRoboRel.withVelocityX(-driverCommandController.getLeftY() * MaxSpeed * speedMultiplier) // Drive forward with negative Y (forward)
-                .withVelocityY(-driverCommandController.getLeftX() * MaxSpeed * speedMultiplier) // Drive left with negative X (left)
-                .withRotationalRate(-driverCommandController.getRightX() * MaxAngularRate * rotMultiplier) // Drive counterclockwise with negative X (left)
+                () -> driveFieldRel.withVelocityX(scaleStick(-driverCommandController.getLeftY(), cubicWeight) * MaxSpeed * speedMultiplier) // Drive forward with negative Y (forward)
+                .withVelocityY(scaleStick(-driverCommandController.getLeftX(), cubicWeight) * MaxSpeed * speedMultiplier) // Drive left with negative X (left)
+                .withRotationalRate(scaleStick(-driverCommandController.getRightX(), cubicWeight) * MaxAngularRate * rotMultiplier) : // Drive counterclockwise with negative X (left)
+                () -> driveRoboRel.withVelocityX(scaleStick(-driverCommandController.getLeftY(), cubicWeight) * MaxSpeed * speedMultiplier) // Drive forward with negative Y (forward)
+                .withVelocityY(scaleStick(-driverCommandController.getLeftX(), cubicWeight) * MaxSpeed * speedMultiplier) // Drive left with negative X (left)
+                .withRotationalRate(scaleStick(-driverCommandController.getRightX(), cubicWeight) * MaxAngularRate * rotMultiplier) // Drive counterclockwise with negative X (left)
             );
 
         CommandScheduler.getInstance().schedule(driveCom);
@@ -317,6 +325,19 @@ public class RobotContainer {
 
     private Command setRobotCent(){
         return drivetrain.runOnce(() -> fieldCentric = false);
+    }
+
+    private double scaleStick(double input, double weight) {
+        input = MathUtil.applyDeadband(input, deadband);
+        if (input != 0) {
+            input = Math.signum(input) * (scaleFactor * Math.abs(input) + offset);
+        }
+
+        double cubedInput = Math.pow(input, 3);
+        double remainingWeight = 1 - weight;
+
+        return (weight * cubedInput) + (remainingWeight * input);
+
     }
 
 

@@ -162,21 +162,21 @@ public final class Constants {
     }
 }
 
-  public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 4.0;// was 3
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;// was 3
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;// was Pi
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
-    public static final double kPickupSpeed = 1.5;// was 3
+public static final class AutoConstants {
+  public static final double kMaxSpeedMetersPerSecond = 4.0;// was 3
+  public static final double kMaxAccelerationMetersPerSecondSquared = 3;// was 3
+  public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;// was Pi
+  public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+  public static final double kPickupSpeed = 1.5;// was 3
 
-    public static final double kPXController = 1;
-    public static final double kPYController = 1;
-    public static final double kPThetaController = 1;
+  public static final double kPXController = 1;
+  public static final double kPYController = 1;
+  public static final double kPThetaController = 1;
 
-    // Constraint for the motion profilied robot angle controller
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
-        kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-  }
+  // Constraint for the motion profilied robot angle controller
+  public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
+      kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+}
 
  
   
