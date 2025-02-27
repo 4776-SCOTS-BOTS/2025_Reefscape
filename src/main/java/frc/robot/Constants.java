@@ -100,14 +100,13 @@ public final class Constants {
 
   public static final class Controllers {
     public static final int kDriverControllerPort = 0;
-    public static int kManipulatorControllerPort = 1;
-    public static final int kLogitechControllerPort = 2;
+    public static final int kManipulatorControllerPort = 1;
+    //public static final int kLogitechControllerPort = 2;
   }
 
   public static void controllerConstants() {
 
-    if (DriverStation.getJoystickType(Constants.Controllers.kManipulatorControllerPort) == 21 
-        && DriverStation.isJoystickConnected(Constants.Controllers.kManipulatorControllerPort)) {
+    if (DriverStation.getJoystickType(Constants.Controllers.kManipulatorControllerPort) == 21) {
       //PS5 Controller
       topButton = 4;
       rightButton = 3;
@@ -133,9 +132,8 @@ public final class Constants {
       leftStickY = 1; //Axis
       rightStickX = 2; //Axis
       rightStickY = 5; //Axis
-    } else if (DriverStation.getJoystickType(Constants.Controllers.kManipulatorControllerPort) == 1 
-                || DriverStation.getJoystickType(Constants.Controllers.kLogitechControllerPort) == 1) {
-      Controllers.kManipulatorControllerPort = Controllers.kLogitechControllerPort;
+    } else {
+      //Controllers.kManipulatorControllerPort = Controllers.kLogitechControllerPort;
       //Xbox Controller
       topButton = 4;
       rightButton = 2;
