@@ -4,14 +4,19 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.customClass.CRGB;
+
+import edu.wpi.first.units.measure.Distance.*;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -64,7 +69,8 @@ public final class Constants {
   }
 
   public static final class ElevatorConstants {
-    public static final double ELEVATOR_PARK_HEIGHT = 0.0;
+    public static final Distance ELEVATOR_BASE_HEIGHT = Inches.of(1.75 + 29.5);
+    public static final Distance ELEVATOR_MAX_HEIGHT = Inches.of(1.75 + 71.5);
 
     public static final int ELEVATOR_LEADER_ID = 28;
     public static final int ELEVATOR_FOLLOWER_ID = 29;

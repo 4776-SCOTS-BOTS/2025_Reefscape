@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 import frc.robot.Constants;
+import frc.robot.customClass.SystemPositions;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** A robot arm subsystem that moves with a motion profile. */
@@ -75,6 +76,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   double intakeAngle = 0.68; //@Base elevator position
   double intakeSafe = 0.64; //@Base elevator position
+  double test = SystemPositions.Positions.INTAKE_STATION.armPosition;
 
   double deliverReadyL4 = 0.36; //@elvator = 1.768
   double deliverFinalL4 = 0.30; //@elvator = 1.768

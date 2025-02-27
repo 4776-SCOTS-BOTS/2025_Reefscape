@@ -17,6 +17,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.pathplanner.lib.auto.AutoBuilder.TriFunction;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Distance;
@@ -25,7 +26,10 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 
 /**
@@ -37,15 +41,12 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   // 1.75in from bottom of frame to the ground
   // 29.5in from bottom of frame to Shoulder Pivot
 
-  public final Distance ELEVATOR_BASE_HEIGHT = Inches.of(1.75 + 29.5);
-  public final Distance ELEVATOR_HEIGHT = Inches.of(1.75 + 71.5);
-
   // Motor's encoder limits, in encoder ticks
-  private static final double MOTOR_BOTTOM = 0; //TODO: Need to update
-  private static final double MOTOR_TOP = 186.6; //TODO: Need to update
+  private static final double MOTOR_BOTTOM = 0;
+  private static final double MOTOR_TOP = 186.6;
 
   // Mutiply by sensor position to get meters
-  private final double MOTOR_ENCODER_POSITION_COEFFICIENT = (ELEVATOR_HEIGHT.in(Meters) - ELEVATOR_BASE_HEIGHT.in(Meters))
+  private final double MOTOR_ENCODER_POSITION_COEFFICIENT = (Constants.ElevatorConstants.ELEVATOR_MAX_HEIGHT.in(Meters) - Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters))
                                                                     / (MOTOR_TOP - MOTOR_BOTTOM); // m/rot
 
   // Convert Elevator Speed and Acceleration to rotations
@@ -70,10 +71,10 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   final MotionMagicVoltage m_request = new MotionMagicVoltage(0); 
 
   // Limit switches - FALSE means at limit
-  private final DigitalInput topLimitSwitch = new DigitalInput(8); //TODO: Need to update.  Do we use?
   private final DigitalInput bottomLimitSwitch = new DigitalInput(9); //TODO: Need to update.  Do we use?
+  private final Trigger bottomLimitSwitchTrigger = new Trigger(() -> bottomLimitSwitch.get());
 
-  private double targetPosition = ELEVATOR_BASE_HEIGHT.in(Meters);
+  private double targetPosition = Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters);
 
   public ElevatorControlSubsystem() {
     elevatorLeader = new TalonFX(ElevatorConstants.ELEVATOR_LEADER_ID, "rio");
@@ -164,6 +165,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     // } else if (isAtTopLimit()) {
     //   elevatorLeader.setControl(m_request.withPosition(MOTOR_TOP));
     // }
+    bottomLimitSwitchTrigger.onTrue(new InstantCommand(() -> {resetPosition();}));
   }
 
   /**
@@ -188,10 +190,10 @@ public class ElevatorControlSubsystem extends SubsystemBase {
    * @param meters position in meters
    */
   public void moveToPosition(double meters) {
-    if(meters < ELEVATOR_BASE_HEIGHT.in(Meters)){
-      meters = ELEVATOR_BASE_HEIGHT.in(Meters);
-    } else if (meters > ELEVATOR_HEIGHT.in(Meters)){
-      meters = ELEVATOR_HEIGHT.in(Meters);
+    if(meters < Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters)){
+      meters = Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters);
+    } else if (meters > Constants.ElevatorConstants.ELEVATOR_MAX_HEIGHT.in(Meters)){
+      meters = Constants.ElevatorConstants.ELEVATOR_MAX_HEIGHT.in(Meters);
     }
     targetPosition = meters;
     elevatorLeader.setControl(m_request.withPosition(metersToMotorPosition(meters)));
@@ -213,7 +215,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
    * Moves the elevator to the park/transit position.
    */
   public void parkElevator() {
-    moveToPosition(ELEVATOR_BASE_HEIGHT.in(Meters));
+    moveToPosition(Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters));
   }
 
   /**
@@ -221,7 +223,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
    * @return true if elevator is parked
    */
   public boolean isParked() {
-    return getElevatorPosition() < (ELEVATOR_BASE_HEIGHT.in(Meters) + 0.1);
+    return getElevatorPosition() < (Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters) + 0.1);
   }
 
   /**
@@ -238,28 +240,24 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     return !bottomLimitSwitch.get();
   }
 
-  public boolean isAtTopLimit() {
-    return !topLimitSwitch.get();
-  }
-
   public ElevatorMode getMode(){
     return elevatorMode;
   }
 
   public double motorPositionToMeters(double motorPosition) {
-    return (motorPosition * MOTOR_ENCODER_POSITION_COEFFICIENT + ELEVATOR_BASE_HEIGHT.in(Meters));
+    return (motorPosition * MOTOR_ENCODER_POSITION_COEFFICIENT + Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters));
   }
 
   public double metersToMotorPosition(double positionMeters) {
-    return ((positionMeters - ELEVATOR_BASE_HEIGHT.in(Meters)) / MOTOR_ENCODER_POSITION_COEFFICIENT);
+    return ((positionMeters - Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters)) / MOTOR_ENCODER_POSITION_COEFFICIENT);
   }
 
   public double limitPower(double power) {
     double slow = 0.3;
-    double min = ELEVATOR_BASE_HEIGHT.in(Meters);
-    double minSlow = ELEVATOR_BASE_HEIGHT.in(Meters) + 0.1;
-    double max = ELEVATOR_HEIGHT.in(Meters);
-    double maxSlow = ELEVATOR_HEIGHT.in(Meters) - 0.1;
+    double min = Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters);
+    double minSlow = Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters) + 0.1;
+    double max = Constants.ElevatorConstants.ELEVATOR_MAX_HEIGHT.in(Meters);
+    double maxSlow = Constants.ElevatorConstants.ELEVATOR_MAX_HEIGHT.in(Meters) - 0.1;
 
     double pos = getElevatorPosition();
 
@@ -291,6 +289,11 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
   public boolean isInRange(double val, double min, double max) {
     return (val >= min) && (val <= max);
+  }
+
+  public void resetPosition(){
+    elevatorLeader.setPosition(0);
+    elevatorFollower.setPosition(0);
   }
   
 }
