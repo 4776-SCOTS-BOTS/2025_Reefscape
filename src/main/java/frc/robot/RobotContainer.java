@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static frc.robot.customClass.SystemPositions.Positions;
+
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -34,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.DeliverCoral;
 import frc.robot.commands.IntakeCoral;
+import frc.robot.commands.MoveArmAndElevator;
 import frc.robot.commands.MoveRobot;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -91,6 +94,8 @@ public class RobotContainer {
     Trigger reallylowSpeedTrigger = driverCommandController.leftTrigger(0.5);
     JoystickButton sprintTrigger = new JoystickButton(m_driverController, XboxController.Button.kRightStick.value);
 
+    //Manipulator contorls
+    private Trigger placeCoral =  manipCommandController.axisGreaterThan(Constants.rightTrigger, 0.5);
 
 
     //Shuffleboard
@@ -157,9 +162,7 @@ public class RobotContainer {
                 new RunCommand(shoulderRunnable, shoulder));
 
             manipCommandController.button(Constants.rightMenuButton).onTrue(new InstantCommand(() -> {shoulder.setStraightBack();}));
-            manipCommandController.button(Constants.leftMenuButton).onTrue(new InstantCommand(() -> {shoulder.setStraightUp();}));
-
-            
+            manipCommandController.button(Constants.leftMenuButton).onTrue(new InstantCommand(() -> {shoulder.setStraightUp();}));            
         }
 
         if (hasIntake) {
@@ -183,7 +186,14 @@ public class RobotContainer {
         }
 
         if(hasIntake && hasShoulder){
-            manipCommandController.pov(270).onTrue(new DeliverCoral(intake, shoulder, false));
+            // manipCommandController.pov(270).onTrue(new DeliverCoral(intake, shoulder, false));
+            placeCoral.onTrue(new DeliverCoral(intake, shoulder, false));
+        }
+
+        if(hasElevator && hasShoulder){
+            manipCommandController.pov(270)
+                .onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION))
+                .onFalse(new MoveArmAndElevator(elevator, shoulder, Positions.INTAKE_STATION));
         }
 
        

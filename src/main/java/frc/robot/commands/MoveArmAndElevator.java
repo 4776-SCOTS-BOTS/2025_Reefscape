@@ -8,15 +8,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.customClass.SystemPositions;
 import frc.robot.subsystems.ElevatorControlSubsystem;
 import frc.robot.subsystems.Shoulder;
+import frc.robot.subsystems.ShoulderSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveArmAndElevator extends Command {
   /** Creates a new MoveArmAndElevator. */
   ElevatorControlSubsystem elevator;
-  Shoulder arm;
+  ShoulderSubsystem arm;
   SystemPositions.Positions position;
 
-  public MoveArmAndElevator(ElevatorControlSubsystem elevator, Shoulder arm, SystemPositions.Positions position) {
+  public MoveArmAndElevator(ElevatorControlSubsystem elevator, ShoulderSubsystem arm, SystemPositions.Positions position) {
     this.elevator = elevator;
     this.arm = arm;
     this.position = position;
@@ -30,7 +31,7 @@ public class MoveArmAndElevator extends Command {
   @Override
   public void execute() {
     elevator.moveToPosition(position.elevatorHeight);
-    arm.moveSholderTo(position.armPosition);
+    arm.setArmGoal(position.armPosition);
   }
 
   // Called once the command ends or is interrupted.
@@ -40,6 +41,6 @@ public class MoveArmAndElevator extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }
