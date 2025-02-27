@@ -17,6 +17,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.pathplanner.lib.auto.AutoBuilder.TriFunction;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Distance;
@@ -25,7 +26,9 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 
@@ -69,6 +72,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
   // Limit switches - FALSE means at limit
   private final DigitalInput bottomLimitSwitch = new DigitalInput(9); //TODO: Need to update.  Do we use?
+  private final Trigger bottomLimitSwitchTrigger = new Trigger(() -> bottomLimitSwitch.get());
 
   private double targetPosition = Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters);
 
@@ -161,6 +165,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     // } else if (isAtTopLimit()) {
     //   elevatorLeader.setControl(m_request.withPosition(MOTOR_TOP));
     // }
+    bottomLimitSwitchTrigger.onTrue(new InstantCommand(() -> {resetPosition();}));
   }
 
   /**
