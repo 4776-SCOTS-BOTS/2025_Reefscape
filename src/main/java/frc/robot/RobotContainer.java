@@ -97,10 +97,17 @@ public class RobotContainer {
 
     //Driver Controls
     JoystickButton brakeButton = new JoystickButton(m_driverController, XboxController.Button.kX.value);
-    POVButton resetGyro = new POVButton(m_driverController, 0); // Up on the D-Pad
+    // POVButton resetGyro = new POVButton(m_driverController, 0); // Up on the D-Pad
+    Trigger resetGyro = new Trigger(() -> m_driverController.getStartButton());
     Trigger lowSpeedTrigger = driverCommandController.rightTrigger(0.5);
     Trigger reallylowSpeedTrigger = driverCommandController.leftTrigger(0.5);
     JoystickButton sprintTrigger = new JoystickButton(m_driverController, XboxController.Button.kRightStick.value);
+
+    // d-pad field-rel Movement
+    POVButton dpadUp = new POVButton(m_driverController, 0);
+    POVButton dpadRight = new POVButton(m_driverController, 90);
+    POVButton dpadDown = new POVButton(m_driverController, 180);
+    POVButton dpadLeft = new POVButton(m_driverController, 270);
 
     //Manipulator contorls
     private Trigger placeCoral =  manipCommandController.axisGreaterThan(Constants.rightTrigger, 0.5);
@@ -204,7 +211,6 @@ public class RobotContainer {
                 .onFalse(new MoveArmAndElevator(elevator, shoulder, Positions.INTAKE_STATION));
         }
 
-       
         driverCommandController.leftBumper().onTrue(setFieldCent());
         driverCommandController.rightBumper().onTrue(setRobotCent());
         
@@ -249,7 +255,11 @@ public class RobotContainer {
         // Module pointing controller ... not useful for actual driving?
         // driverCommandController.y().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(
         //     new Rotation2d(-driverCommandController.getLeftY(), -driverCommandController.getLeftX()))));
-
+    
+        dpadUp.whileTrue(drivetrain.applyRequest(() -> driveFieldRel.withVelocityX(MaxSpeed).withVelocityY(0).withRotationalRate(0)));
+        dpadRight.whileTrue(drivetrain.applyRequest(() -> driveFieldRel.withVelocityX(0).withVelocityY(-0.5).withRotationalRate(0)));
+        dpadDown.whileTrue(drivetrain.applyRequest(() -> driveFieldRel.withVelocityX(-MaxSpeed).withVelocityY(0).withRotationalRate(0)));
+        dpadLeft.whileTrue(drivetrain.applyRequest(() -> driveFieldRel.withVelocityX(0).withVelocityY(0.5).withRotationalRate(0)));
         
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
 
@@ -258,7 +268,7 @@ public class RobotContainer {
         // reset the field-centric heading on left bumper press
         resetGyro.onTrue(drivetrain.runOnce(drivetrain::zeroFieldCentric));
 
-        drivetrain.registerTelemetry(logger::telemeterize);
+        drivetrain.registerTelemetry(logger::telemeterize);    
 
         // Development Commands
         // driverCommandController.a().onTrue(new MoveRobot(drivetrain, 1, 0, 0))
