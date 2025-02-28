@@ -68,10 +68,10 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     //Stick scaling factors
-    private double deadband = 0.05;
+    private double deadband = 0.03;
     private double scaleFactor = 1/(1 - deadband);
     private double offset = 1 - scaleFactor;
-    private double cubicWeight = 0.3;  
+    private double cubicWeight = 0.5;  
 
 
     //subsytems
@@ -162,8 +162,7 @@ public class RobotContainer {
 
             manipCommandController.pov(90).onTrue(new InstantCommand(() -> elevator.moveToPosition(1), elevator));
             manipCommandController.pov(180).onTrue(new InstantCommand(() -> elevator.parkElevator(), elevator));
-            manipCommandController.pov(0).onTrue(new InstantCommand(() -> elevator.moveToPosition(1.5), elevator));
-        }
+            
 
         if (hasShoulder){
             shoulder.setDefaultCommand(
@@ -202,6 +201,13 @@ public class RobotContainer {
             manipCommandController.pov(270)
                 .onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION))
                 .onFalse(new MoveArmAndElevator(elevator, shoulder, Positions.INTAKE_STATION));
+
+            manipCommandController.pov(0).onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY));
+            manipCommandController.pov(90).onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L3_READY));
+            manipCommandController.pov(180).onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L2_READY));
+                
+        
+        }
         }
 
        
