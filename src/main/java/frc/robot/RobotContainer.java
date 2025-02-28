@@ -256,10 +256,10 @@ public class RobotContainer {
         // driverCommandController.y().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(
         //     new Rotation2d(-driverCommandController.getLeftY(), -driverCommandController.getLeftX()))));
     
-        dpadUp.whileTrue(drivetrain.applyRequest(() -> driveFieldRel.withVelocityX(MaxSpeed).withVelocityY(0).withRotationalRate(0)));
-        dpadRight.whileTrue(drivetrain.applyRequest(() -> driveFieldRel.withVelocityX(0).withVelocityY(-0.5).withRotationalRate(0)));
-        dpadDown.whileTrue(drivetrain.applyRequest(() -> driveFieldRel.withVelocityX(-MaxSpeed).withVelocityY(0).withRotationalRate(0)));
-        dpadLeft.whileTrue(drivetrain.applyRequest(() -> driveFieldRel.withVelocityX(0).withVelocityY(0.5).withRotationalRate(0)));
+        dpadUp.whileTrue(drivetrain.applyRequest(   () -> driveRoboRel.withVelocityX(MaxSpeed).withVelocityY(0).withRotationalRate(0)));
+        dpadRight.whileTrue(drivetrain.applyRequest(() -> driveRoboRel.withVelocityX(0).withVelocityY(-0.5).withRotationalRate(0)));
+        dpadDown.whileTrue(drivetrain.applyRequest( () -> driveRoboRel.withVelocityX(-MaxSpeed).withVelocityY(0).withRotationalRate(0)));
+        dpadLeft.whileTrue(drivetrain.applyRequest( () -> driveRoboRel.withVelocityX(0).withVelocityY(0.5).withRotationalRate(0)));
         
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
 
