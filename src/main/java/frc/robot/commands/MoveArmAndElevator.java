@@ -7,7 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.customClass.SystemPositions;
 import frc.robot.subsystems.ElevatorControlSubsystem;
-import frc.robot.subsystems.Shoulder;
+import frc.robot.subsystems.NOTShoulder;
 import frc.robot.subsystems.ShoulderSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -25,14 +25,14 @@ public class MoveArmAndElevator extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
+  public void initialize() {
     elevator.moveToPosition(position.elevatorHeight);
     arm.setArmGoal(position.armPosition);
   }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override

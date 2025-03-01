@@ -41,7 +41,6 @@ import frc.robot.commands.MoveRobot;
 import frc.robot.customClass.SystemPositions.Positions;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.ElevatorAssembly;
 import frc.robot.subsystems.ElevatorControlSubsystem;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.ShoulderSubsystem;
@@ -113,6 +112,7 @@ public class RobotContainer {
 
     //Manipulator contorls
     private Trigger placeCoral =  manipCommandController.axisGreaterThan(Constants.rightTrigger, 0.5);
+    private Trigger holdAlgae =  manipCommandController.axisGreaterThan(Constants.leftTrigger, 0.5);
 
 
     //Shuffleboard
@@ -183,11 +183,13 @@ public class RobotContainer {
 
         if (hasIntake) {
             manipCommandController.button(Constants.leftButton).onTrue(new IntakeCoral(intake));
-            manipCommandController.button(Constants.rightButton).onTrue(new InstantCommand(intake::intakeOut, intake));
+            manipCommandController.button(Constants.rightButton).onTrue(new InstantCommand(intake::intakeOutFast, intake));
             manipCommandController.button(Constants.bottomButton).onTrue(new InstantCommand(intake::intakeOff, intake));
             manipCommandController.button(Constants.topButton).onTrue(new InstantCommand(intake::wristPickup, intake));
             manipCommandController.button(Constants.leftBumper).onTrue(new InstantCommand(intake::wristDeliver1, intake));
             manipCommandController.button(Constants.rightBumper).onTrue(new InstantCommand(intake::wristDeliver2, intake));
+            holdAlgae.onTrue(new InstantCommand(intake::intakeAlgae))
+            .onFalse(new InstantCommand(intake::intakeOut));
 
 
             // Manual Controls
@@ -202,7 +204,6 @@ public class RobotContainer {
         }
 
         if(hasIntake && hasShoulder){
-            // manipCommandController.pov(270).onTrue(new DeliverCoral(intake, shoulder, false));
             placeCoral.onTrue(new DeliverCoral(intake, shoulder, false));
         }
 
@@ -274,7 +275,7 @@ public class RobotContainer {
 
 
 
-        // reset the field-centric heading on left bumper press
+        // reset the field-centric heading
         resetGyro.onTrue(drivetrain.runOnce(drivetrain::zeroFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);    

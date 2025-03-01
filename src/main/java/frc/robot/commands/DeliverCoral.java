@@ -14,7 +14,6 @@ public class DeliverCoral extends Command {
   private ShoulderSubsystem shoulder;
 
   private Timer timer = new Timer();
-  private Timer timeoutTimer = new Timer();
   private boolean isCompleted = false;
   private boolean timerStarted = false;
   public boolean hasCoral = false;
@@ -23,26 +22,26 @@ public class DeliverCoral extends Command {
 
   private double ARM_OFFSET = 0.15;
 
-  /** Creates a new IntakeNote. 
+  /** Creates a new Deliver Coral. 
    * @param clockwiseArm Shoulde be false for front delivery, true for back delivery
   */
   public DeliverCoral(Intake intake, ShoulderSubsystem shoulder, boolean clockwiseArm) {
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(intake, shoulder);
     this.intake = intake;
     this.shoulder = shoulder;
 
     if (!clockwiseArm) {
-      ARM_OFFSET = -0.1;
+      ARM_OFFSET = -ARM_OFFSET;
     }
 
-    addRequirements(intake, shoulder);
+    
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     timer.reset();
-    timeoutTimer.restart();
     armStart = shoulder.getCurrentPosition();
     shoulder.setArmGoal(armStart + ARM_OFFSET);
     isCompleted = false;
@@ -57,7 +56,7 @@ public class DeliverCoral extends Command {
     )) {
       intake.intakeOut();
     }
-    if (timer.hasElapsed(1.5)) {
+    if (timer.hasElapsed(2.0)) {
       isCompleted = true;
     }
 
@@ -72,14 +71,9 @@ public class DeliverCoral extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    if (isCompleted == true) {
       intake.intakeOff();
       isCompleted = false;
       timerStarted = false;
-    }
   }
 
-  public static void setTimeout(double newTimeout){
-    timeout = newTimeout;
-  }
 }

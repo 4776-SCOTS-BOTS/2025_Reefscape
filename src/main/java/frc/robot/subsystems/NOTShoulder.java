@@ -23,7 +23,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class Shoulder extends SubsystemBase {
+public class NOTShoulder extends SubsystemBase {
   double manualSpeedLimit = 0.5;
 
   boolean useMotionMagic = false;
@@ -32,7 +32,7 @@ public class Shoulder extends SubsystemBase {
   final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
   /** Creates a new Sholder. */
-  public Shoulder() {
+  public NOTShoulder() {
 
     TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
     if (useMotionMagic) {

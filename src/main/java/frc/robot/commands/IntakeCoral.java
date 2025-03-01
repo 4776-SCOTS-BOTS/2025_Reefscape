@@ -20,9 +20,10 @@ public class IntakeCoral extends Command {
   /** Creates a new IntakeNote. */
   public IntakeCoral(Intake intake) {
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(intake);
     this.intake = intake;
 
-    addRequirements(intake);
+
   }
 
   // Called when the command is initially scheduled.
@@ -59,14 +60,9 @@ public class IntakeCoral extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    if (isCompleted == true) {
       intake.intakeOff();
       isCompleted = false;
       timerStarted = false;
-    }
   }
 
-  public static void setTimeout(double newTimeout){
-    timeout = newTimeout;
-  }
 }

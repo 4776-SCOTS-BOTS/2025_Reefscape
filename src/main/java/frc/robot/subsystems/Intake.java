@@ -117,7 +117,8 @@ public class Intake extends SubsystemBase {
 
     SparkMaxConfig intakeConfig = new SparkMaxConfig();
     intakeConfig.idleMode(IdleMode.kBrake);
-    intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    intakeConfig.smartCurrentLimit(20, 20);
+    intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     
   }
 
@@ -138,6 +139,10 @@ public class Intake extends SubsystemBase {
 
   public void intakeIn(){
     intakeMotor.set(.4);
+  }
+
+  public void intakeAlgae(){
+    intakeMotor.set(.8);
   }
 
   public void intakeOut(){

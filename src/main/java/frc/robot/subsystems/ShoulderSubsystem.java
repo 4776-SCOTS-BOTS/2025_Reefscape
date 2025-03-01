@@ -41,7 +41,7 @@ public class ShoulderSubsystem extends SubsystemBase {
   SparkClosedLoopController controller = shoulderMotor.getClosedLoopController();
   private SparkAbsoluteEncoder shoulderEncoder = shoulderMotor.getAbsoluteEncoder();
 
-  private double minRot = 0.077;
+  private double minRot = 0.076;
   private double maxRot = 0.91;
 
   private static double kDt = 0.02;
@@ -50,7 +50,7 @@ public class ShoulderSubsystem extends SubsystemBase {
   private double kG = 0.3; // was 0.17 from test arm
   private double kV = 2.0;//1.5 - 4.77
 
-  private final ArmFeedforward m_feedforward = new ArmFeedforward(kS, kG, kV, kDt);
+  private final ArmFeedforward m_feedforward = new ArmFeedforward(kS, kG, kV);
 
     // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint. Values are rotations / s
@@ -74,16 +74,6 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   public ShoulderMode shoulderMode = ShoulderMode.MANUAL;
 
-  double intakeAngle = 0.68; //@Base elevator position
-  double intakeSafe = 0.64; //@Base elevator position
-  double test = SystemPositions.Positions.INTAKE_STATION.armPosition;
-
-  double deliverReadyL4 = 0.36; //@elvator = 1.768
-  double deliverFinalL4 = 0.30; //@elvator = 1.768
-
-  double deliverReadyL3 = 0.337; //@elvator = 1.149
-  double deliverFinalL3 = 0.28; //@elvator = 1.149
-
 
   /** Create a new ArmSubsystem. */
   public ShoulderSubsystem() {
@@ -93,7 +83,7 @@ public class ShoulderSubsystem extends SubsystemBase {
     motorConfig.signals.absoluteEncoderPositionPeriodMs((int)(kDt*1000));
 
     motorConfig
-      .smartCurrentLimit(80, 60)
+      .smartCurrentLimit(80, 80)
       .inverted(true)
       .idleMode(IdleMode.kBrake); // Coast will be safer for tuning.  Eventually use brake
 
@@ -132,12 +122,10 @@ public class ShoulderSubsystem extends SubsystemBase {
   public void periodic() {
     // // This method will be called once per scheduler run
     if(shoulderMode == ShoulderMode.MANUAL){
-      m_setpoint = new TrapezoidProfile.State(getCurrentPosition(), getCurrentVelocity());
+      m_setpoint = new TrapezoidProfile.State(getCurrentPosition(), 0);
     }
 
     // System.out.println("Arm Position" + getCurrentPosition());
-
-
 
     if ((shoulderMode == ShoulderMode.RUN_TO_POSITION) && isValidGoal(m_goal)) {
       // Retrieve the profiled setpoint for the next timestep. This setpoint moves
@@ -152,8 +140,7 @@ public class ShoulderSubsystem extends SubsystemBase {
       //     m_setpoint.velocity);
 
       // Send setpoint to offboard controller PID
-      controller.setReference(m_setpoint.position, ControlType.kPosition, ClosedLoopSlot.kSlot0,
-      arbFF);
+      controller.setReference(m_setpoint.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, arbFF);
 
       // output arbFF, m_goal.position, m_setpoint.position
       // SmartDashboard.putNumber("arbFF", arbFF);
@@ -166,36 +153,10 @@ public class ShoulderSubsystem extends SubsystemBase {
     }
   }
 
-
-  public Command setArmGoalCommand(double goal) {
-    // System.out.println("goal: " + goal);
-    // if ((shoulderMode == ShoulderMode.RUN_TO_POSITION) && isValidGoal(m_goal)) {
-    //   System.out.println("True");
-      return Commands.runOnce(() -> {
-        m_goal = new TrapezoidProfile.State(goal, 0);
-        shoulderMode = ShoulderMode.RUN_TO_POSITION;
-      }, this);
-  //   } else {
-  //     return Commands.none();
-  //   }
-   }
-
    public void setArmGoal(double goal) {
      m_goal = new TrapezoidProfile.State(goal, 0);
      shoulderMode = ShoulderMode.RUN_TO_POSITION;
    }
-
-  public Command holdArmPositionCommand() {
-    return Commands.runOnce(() -> {
-      holdArmPosition();
-    }, this);
-  }
-
-  public void holdArmPosition() {
-    double goal = shoulderEncoder.getPosition();
-    shoulderMode = ShoulderMode.RUN_TO_POSITION;
-    m_goal = new TrapezoidProfile.State(goal, 0);
-  }
 
   public double getOffset() {
       return offsetAngleRads;
@@ -232,9 +193,9 @@ public class ShoulderSubsystem extends SubsystemBase {
   public double limitPower(double power) {
     double slow = 0.3;
     double min = minRot;
-    double minSlow = minRot + 0.1;
+    double minSlow = minRot + 0.05;
     double max = maxRot;
-    double maxSlow = maxRot - 0.1;
+    double maxSlow = maxRot - 0.05;
 
     double pos = getCurrentPosition();
 
