@@ -41,8 +41,8 @@ public class ShoulderSubsystem extends SubsystemBase {
   SparkClosedLoopController controller = shoulderMotor.getClosedLoopController();
   private SparkAbsoluteEncoder shoulderEncoder = shoulderMotor.getAbsoluteEncoder();
 
-  private double minRot = 0.125;
-  private double maxRot = 0.875;
+  private double minRot = 0.077;
+  private double maxRot = 0.91;
 
   private static double kDt = 0.02;
 
@@ -55,7 +55,7 @@ public class ShoulderSubsystem extends SubsystemBase {
     // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint. Values are rotations / s
   // Max speed is about 0.4 rev/s at 225:1
-  private final TrapezoidProfile m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(0.4, 1));
+  private final TrapezoidProfile m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(0.6, 2));
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   private double arbFF;
@@ -93,7 +93,7 @@ public class ShoulderSubsystem extends SubsystemBase {
     motorConfig.signals.absoluteEncoderPositionPeriodMs((int)(kDt*1000));
 
     motorConfig
-      .smartCurrentLimit(50, 30)
+      .smartCurrentLimit(80, 60)
       .inverted(true)
       .idleMode(IdleMode.kBrake); // Coast will be safer for tuning.  Eventually use brake
 
@@ -111,6 +111,9 @@ public class ShoulderSubsystem extends SubsystemBase {
     .i(0)
     .d(0)
     .outputRange(-1, 1);
+
+    motorConfig
+      .voltageCompensation(11);
 
     // motorConfig.closedLoop.maxMotion
     // // Set MAXMotion parameters for position control. We don't need to pass
