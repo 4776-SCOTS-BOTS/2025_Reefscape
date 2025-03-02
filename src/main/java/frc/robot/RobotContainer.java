@@ -96,6 +96,9 @@ public class RobotContainer {
     //private final CommandXboxController manipCommandController = new CommandXboxController(Constants.Controllers.kManipulatorControllerPort);
     private final CommandGenericHID manipCommandController = new CommandGenericHID(Constants.Controllers.kManipulatorControllerPort);
 
+    // Testing Controller -- Comment out for comps
+    private CommandXboxController testCommandXboxController = new CommandXboxController(4);
+
     //Driver Controls
     JoystickButton brakeButton = new JoystickButton(m_driverController, XboxController.Button.kX.value);
     // POVButton resetGyro = new POVButton(m_driverController, 0); // Up on the D-Pad
@@ -252,13 +255,13 @@ public class RobotContainer {
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
-        // driverCommandController.povRight().onTrue(new InstantCommand(() -> SignalLogger.start()));
-        // driverCommandController.povLeft().onTrue(new InstantCommand(() -> SignalLogger.stop()));
+        testCommandXboxController.povRight().onTrue(new InstantCommand(() -> SignalLogger.start()));
+        testCommandXboxController.povLeft().onTrue(new InstantCommand(() -> SignalLogger.stop()));
 
-        // driverCommandController.back().and(driverCommandController.b()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        // driverCommandController.back().and(driverCommandController.a()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        // driverCommandController.start().and(driverCommandController.b()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        // driverCommandController.start().and(driverCommandController.a()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        testCommandXboxController.back().and(testCommandXboxController.b()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        testCommandXboxController.back().and(testCommandXboxController.a()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        testCommandXboxController.start().and(testCommandXboxController.b()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        testCommandXboxController.start().and(testCommandXboxController.a()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
 
         // Module pointing controller ... not useful for actual driving?
