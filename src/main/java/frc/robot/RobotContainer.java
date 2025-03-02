@@ -255,13 +255,13 @@ public class RobotContainer {
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
-        testCommandXboxController.povRight().onTrue(new InstantCommand(() -> SignalLogger.start()));
-        testCommandXboxController.povLeft().onTrue(new InstantCommand(() -> SignalLogger.stop()));
+        // testCommandXboxController.povRight().onTrue(new InstantCommand(() -> SignalLogger.start()));
+        // testCommandXboxController.povLeft().onTrue(new InstantCommand(() -> SignalLogger.stop()));
 
-        testCommandXboxController.back().and(testCommandXboxController.b()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        testCommandXboxController.back().and(testCommandXboxController.a()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        testCommandXboxController.start().and(testCommandXboxController.b()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        testCommandXboxController.start().and(testCommandXboxController.a()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        // testCommandXboxController.back().and(testCommandXboxController.b()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        // testCommandXboxController.back().and(testCommandXboxController.a()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        // testCommandXboxController.start().and(testCommandXboxController.b()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        // testCommandXboxController.start().and(testCommandXboxController.a()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
 
         // Module pointing controller ... not useful for actual driving?

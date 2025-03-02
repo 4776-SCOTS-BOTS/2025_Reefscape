@@ -41,7 +41,7 @@ public class ShoulderSubsystem extends SubsystemBase {
   SparkClosedLoopController controller = shoulderMotor.getClosedLoopController();
   private SparkAbsoluteEncoder shoulderEncoder = shoulderMotor.getAbsoluteEncoder();
 
-  private double minRot = 0.076;
+  private double minRot = 0.083;
   private double maxRot = 0.91;
 
   private static double kDt = 0.02;
