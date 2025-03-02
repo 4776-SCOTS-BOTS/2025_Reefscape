@@ -22,6 +22,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -301,6 +302,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
 
+        updateOdometryFromLL_CTRE("limelight-front");
+        updateOdometryFromLL_CTRE("limelight-rear");
+
         field2d.setRobotPose(getState().Pose);
     }
 
@@ -358,9 +362,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return Math.toDegrees(getPigeon2().getAngularVelocityZWorld().getValueAsDouble());
     }
 
-    /** Updates the field relative position of the robot. */
+    /* 
+     * Sampe code from Limelight
+     * Updates the field relative position of the robot. 
+    */
     public void updateOdometryFromLL(String limelightName) {
         boolean useMegaTag2 = true; // set to false to use MegaTag1
+
         boolean doRejectUpdate = false;
         // String limelightName = "limelight-front";
         if (useMegaTag2 == false) {
@@ -389,7 +397,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             LimelightHelpers.SetRobotOrientation(limelightName,
                     getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
             LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
-            if (Math.abs(getTurnRate()) > 720) // if our angular velocity is greater than 720 degrees per second,
+            if (Math.abs(getTurnRate()) > 360) // if our angular velocity is greater than 360 degrees per second,
                                                // ignore vision updates
             {
                 doRejectUpdate = true;
@@ -397,7 +405,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             if (mt2.tagCount == 0) {
                 doRejectUpdate = true;
             }
-            if (!doRejectUpdate) {
+            if (!doRejectUpdate && mt2.avgTagDist < 2) {
                 super.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
                 addVisionMeasurement(
                         mt2.pose,
@@ -405,6 +413,29 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             }
         }
     }
+
+     /*
+     * Sample code from CTRE
+     * This example of adding Limelight is very simple and may not be sufficient for on-field use.
+     * Users typically need to provide a standard deviation that scales with the distance to target
+     * and changes with number of tags available.
+     *
+     * This example is sufficient to show that vision integration is possible, though exact implementation
+     * of how to use vision should be tuned per-robot and to the team's specification.
+     */
+     public void updateOdometryFromLL_CTRE(String limelightName) {
+
+         var driveState = getState();
+         double headingDeg = driveState.Pose.getRotation().getDegrees();
+         double omegaRps = Units.radiansToRotations(driveState.Speeds.omegaRadiansPerSecond);
+
+         LimelightHelpers.SetRobotOrientation(limelightName, headingDeg, 0, 0, 0, 0, 0);
+         var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+         if (llMeasurement != null && llMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0 && llMeasurement.avgTagDist < 2) {
+            // super.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+             addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds, VecBuilder.fill(.7, .7, 9999999));
+         }
+     }
 
     /** Force Pose Update from Limelight */
     public void forcePoseUpdate(String limelightName){

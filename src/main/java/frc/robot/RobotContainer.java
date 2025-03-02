@@ -303,6 +303,7 @@ public class RobotContainer {
     // Default Runnables
     Runnable driveRunnable = () -> {
         // System.out.println(fieldCentric);
+        // Can we use deferredCommand here?  Or maybe SelectCommand (probably ConditionalCommand)
         
         Command driveCom =
             drivetrain.applyRequest(fieldCentric ? 
