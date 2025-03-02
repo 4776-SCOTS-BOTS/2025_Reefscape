@@ -67,7 +67,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     //Stick scaling factors
-    private double deadband = 0.03;
+    private double deadband = 0.05;
     private double scaleFactor = 1/(1 - deadband);
     private double offset = 1 - scaleFactor;
     private double cubicWeight = 0.5;  
