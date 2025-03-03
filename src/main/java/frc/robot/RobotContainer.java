@@ -48,6 +48,14 @@ import frc.robot.subsystems.ElevatorControlSubsystem.ElevatorMode;
 import frc.robot.subsystems.ShoulderSubsystem.ShoulderMode;
 
 public class RobotContainer {
+    //Stick scaling factors
+    private double deadband = 0.05;
+    private double scaleFactor = 1/(1 - deadband);
+    private double offset = 1 - scaleFactor;
+    private double cubicWeight = 0.5;  
+
+    private double dpadSpeed = 0.3;
+
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(1.0).in(RadiansPerSecond); // Chaged from 3/4  to 1 of a rotation per second max angular velocity
     public boolean fieldCentric = true;
@@ -56,7 +64,7 @@ public class RobotContainer {
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric driveFieldRel = new SwerveRequest.FieldCentric()
-            // .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            .withDeadband(MaxSpeed * 0.03).withRotationalDeadband(MaxAngularRate * 0.03) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.RobotCentric driveRoboRel = new SwerveRequest.RobotCentric()
             // .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -66,13 +74,6 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    //Stick scaling factors
-    private double deadband = 0.05;
-    private double scaleFactor = 1/(1 - deadband);
-    private double offset = 1 - scaleFactor;
-    private double cubicWeight = 0.5;  
-
-    private double dpadSpeed = 0.3;
 
 
     //subsytems
@@ -255,13 +256,13 @@ public class RobotContainer {
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
-        // testCommandXboxController.povRight().onTrue(new InstantCommand(() -> SignalLogger.start()));
-        // testCommandXboxController.povLeft().onTrue(new InstantCommand(() -> SignalLogger.stop()));
+        testCommandXboxController.povRight().onTrue(new InstantCommand(() -> SignalLogger.start()));
+        testCommandXboxController.povLeft().onTrue(new InstantCommand(() -> SignalLogger.stop()));
 
-        // testCommandXboxController.back().and(testCommandXboxController.b()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        // testCommandXboxController.back().and(testCommandXboxController.a()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        // testCommandXboxController.start().and(testCommandXboxController.b()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        // testCommandXboxController.start().and(testCommandXboxController.a()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        testCommandXboxController.x().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        testCommandXboxController.y().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        testCommandXboxController.a().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        testCommandXboxController.b().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
 
         // Module pointing controller ... not useful for actual driving?
@@ -286,7 +287,7 @@ public class RobotContainer {
         // Development Commands
         // driverCommandController.a().onTrue(new MoveRobot(drivetrain, 1, 0, 0))
         // .onFalse(new InstantCommand(driveRunnable, drivetrain));
-        // driverCommandController.b().onTrue(new InstantCommand(() -> drivetrain.forcePoseUpdate("limelight-front")));
+        driverCommandController.b().onTrue(new InstantCommand(() -> drivetrain.forcePoseUpdate("limelight-front")));
 
 
 

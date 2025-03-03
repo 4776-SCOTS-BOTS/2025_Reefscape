@@ -445,9 +445,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     /** Standby Limelight IMU Updates */
     public void standyLimelightUpdate(String limelightName) {
+        LimelightHelpers.SetIMUMode(limelightName, 1);
         LimelightHelpers.SetRobotOrientation(limelightName,
                 getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        
+    }
+
+    public void standbyLimelightZero(String limelightName){
         LimelightHelpers.SetIMUMode(limelightName, 1);
+        LimelightHelpers.SetRobotOrientation(limelightName,
+                0, 0, 0, 0, 0, 0);
+        
     }
 
     /** Active Limelight IMU nUpdates */
@@ -457,8 +465,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public void zeroFieldCentric(){
         seedFieldCentric();
-        standyLimelightUpdate("limelight-front");
+        standbyLimelightZero("limelight-front");
+        standbyLimelightZero("limelight-rear");
         activeLimelightUpdate("limelight-front");
+        activeLimelightUpdate("limelight-rear");
     }
 
 }
