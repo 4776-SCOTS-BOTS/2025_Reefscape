@@ -72,7 +72,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
   // Limit switches - FALSE means at limit
   private final DigitalInput bottomLimitSwitch = new DigitalInput(9); //TODO: Need to update.  Do we use?
-  private final Trigger bottomLimitSwitchTrigger = new Trigger(() -> bottomLimitSwitch.get());
+  // private final Trigger bottomLimitSwitchTrigger = new Trigger(() -> bottomLimitSwitch.get());
 
   private double targetPosition = Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters);
 
@@ -165,7 +165,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     // } else if (isAtTopLimit()) {
     //   elevatorLeader.setControl(m_request.withPosition(MOTOR_TOP));
     // }
-    bottomLimitSwitchTrigger.onTrue(new InstantCommand(() -> {resetPosition();}));
+    // bottomLimitSwitchTrigger.onTrue(new InstantCommand(() -> {resetPosition();}));
   }
 
   /**

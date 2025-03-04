@@ -302,8 +302,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
 
-        updateOdometryFromLL_CTRE("limelight-front");
-        updateOdometryFromLL_CTRE("limelight-rear");
+        // updateOdometryFromLL_CTRE("limelight-front");
+        // updateOdometryFromLL_CTRE("limelight-rear");
 
         field2d.setRobotPose(getState().Pose);
     }
