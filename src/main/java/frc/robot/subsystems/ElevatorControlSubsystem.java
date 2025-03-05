@@ -50,8 +50,8 @@ public class ElevatorControlSubsystem extends SubsystemBase {
                                                                     / (MOTOR_TOP - MOTOR_BOTTOM); // m/rot
 
   // Convert Elevator Speed and Acceleration to rotations
-  private final double MAX_LINEAR_SPEED = 0.5; // m/s
-  private final double MAX_LINEAR_ACCEL = 1; // m / s^2
+  private final double MAX_LINEAR_SPEED = 0.75; // m/s
+  private final double MAX_LINEAR_ACCEL = 1.15; // m / s^2
   private final double MAX_ROT_SPEED = MAX_LINEAR_SPEED/ MOTOR_ENCODER_POSITION_COEFFICIENT; // rot / s
   private final double MAX_ROT_ACCEL = MAX_LINEAR_ACCEL / MOTOR_ENCODER_POSITION_COEFFICIENT;// rot /s^2
 

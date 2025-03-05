@@ -124,7 +124,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     );
 
     /* The SysId routine to test */
-    private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
+    private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineRotation;
     // private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation; //Default setting
 
     /**
@@ -302,8 +302,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
 
-        // updateOdometryFromLL_CTRE("limelight-front");
-        // updateOdometryFromLL_CTRE("limelight-rear");
+        updateOdometryFromLL_CTRE("limelight-front");
+        updateOdometryFromLL_CTRE("limelight-rear");
 
         field2d.setRobotPose(getState().Pose);
     }
