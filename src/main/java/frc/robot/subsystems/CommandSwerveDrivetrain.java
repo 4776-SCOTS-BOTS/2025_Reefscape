@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -124,7 +125,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     );
 
     /* The SysId routine to test */
-    private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
+    private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineRotation;
     // private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation; //Default setting
 
     /**
@@ -445,9 +446,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     /** Standby Limelight IMU Updates */
     public void standyLimelightUpdate(String limelightName) {
+        LimelightHelpers.SetIMUMode(limelightName, 1);
         LimelightHelpers.SetRobotOrientation(limelightName,
                 getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        
+    }
+
+    public void standbyLimelightZero(String limelightName){
         LimelightHelpers.SetIMUMode(limelightName, 1);
+        LimelightHelpers.SetRobotOrientation(limelightName,
+                0, 0, 0, 0, 0, 0);
+        
     }
 
     /** Active Limelight IMU nUpdates */
@@ -457,8 +466,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public void zeroFieldCentric(){
         seedFieldCentric();
-        standyLimelightUpdate("limelight-front");
+        standbyLimelightZero("limelight-front");
+        standbyLimelightZero("limelight-rear");
         activeLimelightUpdate("limelight-front");
+        activeLimelightUpdate("limelight-rear");
     }
 
 }

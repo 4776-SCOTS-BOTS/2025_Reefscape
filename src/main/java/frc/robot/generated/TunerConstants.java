@@ -24,9 +24,17 @@ public class TunerConstants {
     // The steer motor uses any SwerveModule.SteerRequestType control request with the
     // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
     private static final Slot0Configs steerGains = new Slot0Configs()
-        .withKP(100).withKI(0).withKD(0.5)
-        .withKS(0.1).withKV(1.22).withKA(0)
+        .withKP(115).withKI(0).withKD(0.15) //Tuner kD = 1.7
+        .withKS(0.1).withKV(0.1).withKA(0)
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
+    
+    
+    //Original values
+    // private static final Slot0Configs steerGains = new Slot0Configs()
+    //         .withKP(100).withKI(0).withKD(0.5)
+    //         .withKS(0.1).withKV(1.22).withKA(0)
+    //         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
+    
     // When using closed-loop control, the drive motor uses the control
     // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
     private static final Slot0Configs driveGains = new Slot0Configs()
@@ -51,7 +59,7 @@ public class TunerConstants {
 
     // The stator current at which the wheels start to slip;
     // This needs to be tuned to your individual robot
-    private static final Current kSlipCurrent = Amps.of(120.0);
+    private static final Current kSlipCurrent = Amps.of(100.0);
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
     // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
@@ -151,7 +159,7 @@ public class TunerConstants {
     private static final int kBackLeftDriveMotorId = 1;
     private static final int kBackLeftSteerMotorId = 2;
     private static final int kBackLeftEncoderId = 3;
-    private static final Angle kBackLeftEncoderOffset = Rotations.of(0.468994140625);
+    private static final Angle kBackLeftEncoderOffset = Rotations.of(-0.4738);
     private static final boolean kBackLeftSteerMotorInverted = false;
     private static final boolean kBackLeftEncoderInverted = false;
 
