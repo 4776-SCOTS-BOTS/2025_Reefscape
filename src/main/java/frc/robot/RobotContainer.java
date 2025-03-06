@@ -11,6 +11,8 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -23,6 +25,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -30,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -50,11 +55,11 @@ import frc.robot.subsystems.ElevatorControlSubsystem.ElevatorMode;
 import frc.robot.subsystems.ShoulderSubsystem.ShoulderMode;
 
 public class RobotContainer {
-    //Stick scaling factors
+    // Stick scaling factors
     private double deadband = 0.05;
-    private double scaleFactor = 1/(1 - deadband);
+    private double scaleFactor = 1 / (1 - deadband);
     private double offset = 1 - scaleFactor;
-    private double cubicWeight = 0.5;  
+    private double cubicWeight = 0.5;
 
     double rateLimit = 3;
     SlewRateLimiter xfilter = new SlewRateLimiter(rateLimit);
@@ -74,7 +79,7 @@ public class RobotContainer {
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric driveFieldRel = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 10% deadband
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+            // .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
             .withDriveRequestType(DriveRequestType.Velocity); // Use open-loop control for drive motors
     private final SwerveRequest.RobotCentric driveRoboRel = new SwerveRequest.RobotCentric()
             // .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05)
@@ -84,9 +89,7 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-
-
-    //subsytems
+    // subsytems
     private boolean hasElevator = true;
     private ElevatorControlSubsystem elevator;
 
@@ -100,21 +103,26 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    //Controls
-    private final CommandXboxController driverCommandController = new CommandXboxController(Constants.Controllers.kDriverControllerPort);
+    // Controls
+    private final CommandXboxController driverCommandController = new CommandXboxController(
+            Constants.Controllers.kDriverControllerPort);
     XboxController m_driverController = new XboxController(Constants.Controllers.kDriverControllerPort);
 
-    //private final CommandXboxController manipCommandController = new CommandXboxController(Constants.Controllers.kManipulatorControllerPort);
-    private final CommandGenericHID manipCommandController = new CommandGenericHID(Constants.Controllers.kManipulatorControllerPort);
+    // private final CommandXboxController manipCommandController = new
+    // CommandXboxController(Constants.Controllers.kManipulatorControllerPort);
+    private final CommandGenericHID manipCommandController = new CommandGenericHID(
+            Constants.Controllers.kManipulatorControllerPort);
 
     // Testing Controller -- Comment out for comps
-    // private CommandXboxController testCommandXboxController = new CommandXboxController(4);
+    // private CommandXboxController testCommandXboxController = new
+    // CommandXboxController(4);
     // private Trigger testControl_dPadRight = testCommandXboxController.pov(90);
     // private Trigger testControl_dPadLeft = testCommandXboxController.pov(270);
 
-    //Driver Controls
+    // Driver Controls
     JoystickButton brakeButton = new JoystickButton(m_driverController, XboxController.Button.kX.value);
-    // POVButton resetGyro = new POVButton(m_driverController, 0); // Up on the D-Pad
+    // POVButton resetGyro = new POVButton(m_driverController, 0); // Up on the
+    // D-Pad
     Trigger resetGyro = new Trigger(() -> m_driverController.getStartButton());
     Trigger lowSpeedTrigger = driverCommandController.rightTrigger(0.5);
     Trigger reallylowSpeedTrigger = driverCommandController.leftTrigger(0.5);
@@ -129,9 +137,9 @@ public class RobotContainer {
     POVButton dpadDown = new POVButton(m_driverController, 180);
     POVButton dpadLeft = new POVButton(m_driverController, 270);
 
-    //Manipulator contorls
-    private Trigger placeCoral =  manipCommandController.axisGreaterThan(Constants.rightTrigger, 0.5);
-    private Trigger holdAlgae =  manipCommandController.axisGreaterThan(Constants.leftTrigger, 0.5);
+    // Manipulator contorls
+    private Trigger placeCoral = manipCommandController.axisGreaterThan(Constants.rightTrigger, 0.5);
+    private Trigger holdAlgae = manipCommandController.axisGreaterThan(Constants.leftTrigger, 0.5);
     private Trigger intakeButton = manipCommandController.button(Constants.leftButton);
     private Trigger outFastButton = manipCommandController.button(Constants.rightButton);
     private Trigger intakeOffButton = manipCommandController.button(Constants.bottomButton);
@@ -143,46 +151,80 @@ public class RobotContainer {
     private Trigger L4Button = manipCommandController.pov(0);
     private Trigger L3Button = manipCommandController.pov(90);
     private Trigger L2Button = manipCommandController.pov(180);
-    
 
-    //Shuffleboard
+    // Shuffleboard
     ShuffleboardLayout elevatorLayout;
     ShuffleboardLayout intakeLayout;
     ShuffleboardLayout shoulderLayout;
 
+    private SendableChooser<Command> m_chooser = new SendableChooser<>();
+    private Command m_selectCommand = null;
+
     public RobotContainer() {
-        //Setup Elevator if present
-        if(hasElevator){
+        // Setup Elevator if present
+        if (hasElevator) {
             elevator = new ElevatorControlSubsystem();
-            // elevatorLayout = Shuffleboard.getTab("Subsystems").getLayout("ElevatorControl", BuiltInLayouts.kList);
+            // elevatorLayout =
+            // Shuffleboard.getTab("Subsystems").getLayout("ElevatorControl",
+            // BuiltInLayouts.kList);
             // elevator.addDashboardWidgets(elevatorLayout);
         } else {
             elevator = null;
         }
 
-        if(hasShoulder){
+        if (hasShoulder) {
             shoulder = new ShoulderSubsystem();
-            // shoulderLayout = Shuffleboard.getTab("Subsystems").getLayout("Shoulder", BuiltInLayouts.kList);
+            // shoulderLayout = Shuffleboard.getTab("Subsystems").getLayout("Shoulder",
+            // BuiltInLayouts.kList);
             // shoulder.addDashboardWidgets(shoulderLayout);
         } else {
             shoulder = null;
         }
 
-        if(hasIntake){
+        if (hasIntake) {
             intake = new Intake();
-            // intakeLayout = Shuffleboard.getTab("Subsystems").getLayout("Intake", BuiltInLayouts.kList);
+            // intakeLayout = Shuffleboard.getTab("Subsystems").getLayout("Intake",
+            // BuiltInLayouts.kList);
             // intake.addDashboardWidgets(intakeLayout);
         } else {
             intake = null;
         }
 
-        //Setup Climber if present
+        // Setup Climber if present
         // if(hasClimber){
-        //     climber = new Clkimber();
-        //     } else {
-        //         elevator = null;
-        //     }
-        
+        // climber = new Clkimber();
+        // } else {
+        // elevator = null;
+        // }
+
+        // Register Named Commands
+        NamedCommands.registerCommand("ReadyHigh", new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.75));
+        NamedCommands.registerCommand("DeliverCoral", new DeliverCoral(intake, shoulder, false));
+        NamedCommands.registerCommand("IntakeDeliverPos", new InstantCommand(intake::wristDeliver1, intake));
+
+        /* EXAMPLES FROM LAST YEAR */
+        // NamedCommands.registerCommand("StopIntake", new
+        // InstantCommand(m_Intake::intakeOff));
+        // NamedCommands.registerCommand("FirstShot", new SequentialCommandGroup(
+        // new InstantCommand(m_Shooter::setAngleSpeakerShot),
+        // new WaitCommand(0.5),
+        // new ShootCommand(m_Shooter)));
+
+        // Build an auto chooser. This will use Commands.none() as the default option.
+        m_chooser = AutoBuilder.buildAutoChooser();
+
+        // Another option that allows you to specify the default auto by its name
+        // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
+
+        // Setup auto command chooser
+        m_selectCommand = null;
+
+        // Shuffleboard.getTab("SmartDashboard").add(m_chooser)
+        // .withPosition(0, 2)
+        // .withSize(7, 2);
+
+        SmartDashboard.putData("Auto Chooser", m_chooser);
+
         configureBindings();
     }
 
@@ -194,13 +236,24 @@ public class RobotContainer {
                 // driveCommand()
                 new ConditionalCommand(
                         drivetrain.applyRequest(() -> driveFieldRel
-                                .withVelocityX(xfilter.calculate(-driverCommandController.getLeftY()) * MaxSpeed
+                                .withVelocityX(scaleStick(-driverCommandController.getLeftY(), cubicWeight) * MaxSpeed
                                         * speedMultiplier) // Drive forward with negative Y (forward)
-                                .withVelocityY(yfilter.calculate(-driverCommandController.getLeftX()) * MaxSpeed
+                                .withVelocityY(scaleStick(-driverCommandController.getLeftX(), cubicWeight) * MaxSpeed
                                         * speedMultiplier) // Drive left with negative X (left)
-                                .withRotationalRate(rotfilter.calculate(-driverCommandController.getRightX())
+                                .withRotationalRate(scaleStick(-driverCommandController.getRightX(), cubicWeight)
                                         * MaxAngularRate * rotMultiplier)), // Drive counterclockwise with negative X
                                                                             // (left)
+
+                        // drivetrain.applyRequest(() -> driveFieldRel
+                        // .withVelocityX(xfilter.calculate(-driverCommandController.getLeftY()) *
+                        // MaxSpeed
+                        // * speedMultiplier) // Drive forward with negative Y (forward)
+                        // .withVelocityY(yfilter.calculate(-driverCommandController.getLeftX()) *
+                        // MaxSpeed
+                        // * speedMultiplier) // Drive left with negative X (left)
+                        // .withRotationalRate(rotfilter.calculate(-driverCommandController.getRightX())
+                        // * MaxAngularRate * rotMultiplier)), // Drive counterclockwise with negative X
+                        // // (left)
 
                         drivetrain.applyRequest(() -> driveRoboRel
                                 .withVelocityX(scaleStick(-driverCommandController.getLeftY(), cubicWeight) * MaxSpeed
@@ -222,9 +275,9 @@ public class RobotContainer {
                     new RunCommand(elevatorRunnable, elevator));
         }
 
-        if (hasShoulder){
+        if (hasShoulder) {
             shoulder.setDefaultCommand(
-                new RunCommand(shoulderRunnable, shoulder));          
+                    new RunCommand(shoulderRunnable, shoulder));
         }
 
         if (hasIntake) {
@@ -235,39 +288,37 @@ public class RobotContainer {
             wristPos1Button.onTrue(new InstantCommand(intake::wristDeliver1, intake));
             wristPos2Button.onTrue(new InstantCommand(intake::wristDeliver2, intake));
             holdAlgae.onTrue(new InstantCommand(intake::intakeAlgae))
-            .onFalse(new InstantCommand(intake::intakeOut));
-
+                    .onFalse(new InstantCommand(intake::intakeOut));
 
             // Manual Controls
             // manipCommandController.button(Constants.rightBumper)
-            //         .onTrue(new InstantCommand(() -> intake.runWrist(0.35)))
-            //         .onFalse(new InstantCommand(() -> intake.runWrist(0)));
+            // .onTrue(new InstantCommand(() -> intake.runWrist(0.35)))
+            // .onFalse(new InstantCommand(() -> intake.runWrist(0)));
 
             // manipCommandController.button(Constants.leftBumper)
-            //         .onTrue(new InstantCommand(() -> intake.runWrist(-0.35)))
-            //         .onFalse(new InstantCommand(() -> intake.runWrist(0)));
+            // .onTrue(new InstantCommand(() -> intake.runWrist(-0.35)))
+            // .onFalse(new InstantCommand(() -> intake.runWrist(0)));
 
         }
 
-        if(hasIntake && hasShoulder){
+        if (hasIntake && hasShoulder) {
             placeCoral.onTrue(new DeliverCoral(intake, shoulder, false));
         }
 
-        if(hasElevator && hasShoulder){
+        if (hasElevator && hasShoulder) {
             intakeAutoPos
-                .onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION))
-                .onFalse(new MoveArmAndElevator(elevator, shoulder, Positions.INTAKE_STATION));
+                    .onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION))
+                    .onFalse(new MoveArmAndElevator(elevator, shoulder, Positions.INTAKE_STATION));
 
-            L4Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY));
+            L4Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.5));
             L3Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L3_READY));
             L2Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L2_READY));
-        
+
         }
-        
 
         setFieldCentButton.onTrue(setFieldCent());
         setRobotCentButton.onTrue(setRobotCent());
-        
+
         lowSpeedTrigger.onTrue(new InstantCommand(() -> {
             speedMultiplier = Constants.DriveConstants.driveLowPercentScale;
             rotMultiplier = Constants.DriveConstants.rotLowRateModifier;
@@ -279,7 +330,7 @@ public class RobotContainer {
 
         reallylowSpeedTrigger.onTrue(new InstantCommand(() -> {
             speedMultiplier = Constants.DriveConstants.driveLowPercentScale * 0.5;
-            rotMultiplier = Constants.DriveConstants.rotLowRateModifier*0.6;
+            rotMultiplier = Constants.DriveConstants.rotLowRateModifier * 0.6;
         }))
                 .onFalse(new InstantCommand(() -> {
                     speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
@@ -305,105 +356,122 @@ public class RobotContainer {
         // testCommandXboxController.a().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         // testCommandXboxController.b().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-
         // Module pointing controller ... not useful for actual driving?
-        // driverCommandController.y().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(
-        //     new Rotation2d(-driverCommandController.getLeftY(), -driverCommandController.getLeftX()))));
-    
+        // driverCommandController.y().whileTrue(drivetrain.applyRequest(() ->
+        // point.withModuleDirection(
+        // new Rotation2d(-driverCommandController.getLeftY(),
+        // -driverCommandController.getLeftX()))));
 
-        dpadUp.whileTrue(drivetrain.applyRequest(() -> driveRoboRel.withVelocityX(dpadSpeed).withVelocityY(0).withRotationalRate(0)));
-        dpadRight.whileTrue(drivetrain.applyRequest(() -> driveRoboRel.withVelocityX(0).withVelocityY(-dpadSpeed).withRotationalRate(0)));
-        dpadDown.whileTrue(drivetrain.applyRequest(() -> driveRoboRel.withVelocityX(-dpadSpeed).withVelocityY(0).withRotationalRate(0)));
-        dpadLeft.whileTrue(drivetrain.applyRequest(() -> driveRoboRel.withVelocityX(0).withVelocityY(dpadSpeed).withRotationalRate(0)));
-        
+        dpadUp.whileTrue(drivetrain
+                .applyRequest(() -> driveRoboRel.withVelocityX(dpadSpeed).withVelocityY(0).withRotationalRate(0)));
+        dpadRight.whileTrue(drivetrain
+                .applyRequest(() -> driveRoboRel.withVelocityX(0).withVelocityY(-dpadSpeed).withRotationalRate(0)));
+        dpadDown.whileTrue(drivetrain
+                .applyRequest(() -> driveRoboRel.withVelocityX(-dpadSpeed).withVelocityY(0).withRotationalRate(0)));
+        dpadLeft.whileTrue(drivetrain
+                .applyRequest(() -> driveRoboRel.withVelocityX(0).withVelocityY(dpadSpeed).withRotationalRate(0)));
+
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
-
-
 
         // reset the field-centric heading
         resetGyro.onTrue(drivetrain.runOnce(drivetrain::zeroFieldCentric));
 
-        drivetrain.registerTelemetry(logger::telemeterize);    
+        drivetrain.registerTelemetry(logger::telemeterize);
 
         // Development Commands
         // driverCommandController.a().onTrue(new MoveRobot(drivetrain, 1, 0, 0))
         // .onFalse(new InstantCommand(driveRunnable, drivetrain));
         forcePoseButton.onTrue(new InstantCommand(() -> drivetrain.forcePoseUpdate("limelight-front")));
 
-
-
-
         // if (hasElevator) {
-        //     manipCommandController.button(Constants.rightButton).whileTrue(new InstantCommand(elevator.intake::intakeIn))
-        //             .onFalse(new InstantCommand(elevator.intake::intakeIn));
+        // manipCommandController.button(Constants.rightButton).whileTrue(new
+        // InstantCommand(elevator.intake::intakeIn))
+        // .onFalse(new InstantCommand(elevator.intake::intakeIn));
         // }
-
 
     }
 
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        return m_chooser.getSelected();
     }
 
     // // Default Runnables
     // Runnable driveRunnable = () -> {
-    //     // System.out.println(fieldCentric);
-    //     // Can we use deferredCommand here?  Or maybe SelectCommand (probably ConditionalCommand)
-        
-    //     Command driveCom =
-    //         drivetrain.applyRequest(() -> driveFieldRel.withVelocityX(-driverCommandController.getLeftY() * MaxSpeed * speedMultiplier) // Drive forward with negative Y (forward)
-    //             .withVelocityY(-driverCommandController.getLeftX() * MaxSpeed * speedMultiplier) // Drive left with negative X (left)
-    //             .withRotationalRate(-driverCommandController.getRightX()* MaxAngularRate * rotMultiplier) // Drive counterclockwise with negative X (left)
-    //             );
+    // // System.out.println(fieldCentric);
+    // // Can we use deferredCommand here? Or maybe SelectCommand (probably
+    // ConditionalCommand)
 
-    //     CommandScheduler.getInstance().schedule(driveCom);
+    // Command driveCom =
+    // drivetrain.applyRequest(() ->
+    // driveFieldRel.withVelocityX(-driverCommandController.getLeftY() * MaxSpeed *
+    // speedMultiplier) // Drive forward with negative Y (forward)
+    // .withVelocityY(-driverCommandController.getLeftX() * MaxSpeed *
+    // speedMultiplier) // Drive left with negative X (left)
+    // .withRotationalRate(-driverCommandController.getRightX()* MaxAngularRate *
+    // rotMultiplier) // Drive counterclockwise with negative X (left)
+    // );
+
+    // CommandScheduler.getInstance().schedule(driveCom);
 
     // };
 
     // Runnable driveRunnable = () -> {
-    //     // System.out.println(fieldCentric);
-    //     // Can we use deferredCommand here?  Or maybe SelectCommand (probably ConditionalCommand)
-        
-    //     Command driveCom =
-    //         drivetrain.applyRequest(fieldCentric ? 
-    //             () -> driveFieldRel.withVelocityX(scaleStick(-driverCommandController.getLeftY(), cubicWeight) * MaxSpeed * speedMultiplier) // Drive forward with negative Y (forward)
-    //             .withVelocityY(scaleStick(-driverCommandController.getLeftX(), cubicWeight) * MaxSpeed * speedMultiplier) // Drive left with negative X (left)
-    //             .withRotationalRate(scaleStick(-driverCommandController.getRightX(), cubicWeight) * MaxAngularRate * rotMultiplier) : // Drive counterclockwise with negative X (left)
-    //             () -> driveRoboRel.withVelocityX(scaleStick(-driverCommandController.getLeftY(), cubicWeight) * MaxSpeed * speedMultiplier) // Drive forward with negative Y (forward)
-    //             .withVelocityY(scaleStick(-driverCommandController.getLeftX(), cubicWeight) * MaxSpeed * speedMultiplier) // Drive left with negative X (left)
-    //             .withRotationalRate(scaleStick(-driverCommandController.getRightX(), cubicWeight) * MaxAngularRate * rotMultiplier) // Drive counterclockwise with negative X (left)
-    //         );
+    // // System.out.println(fieldCentric);
+    // // Can we use deferredCommand here? Or maybe SelectCommand (probably
+    // ConditionalCommand)
 
-    //     CommandScheduler.getInstance().schedule(driveCom);
+    // Command driveCom =
+    // drivetrain.applyRequest(fieldCentric ?
+    // () ->
+    // driveFieldRel.withVelocityX(scaleStick(-driverCommandController.getLeftY(),
+    // cubicWeight) * MaxSpeed * speedMultiplier) // Drive forward with negative Y
+    // (forward)
+    // .withVelocityY(scaleStick(-driverCommandController.getLeftX(), cubicWeight) *
+    // MaxSpeed * speedMultiplier) // Drive left with negative X (left)
+    // .withRotationalRate(scaleStick(-driverCommandController.getRightX(),
+    // cubicWeight) * MaxAngularRate * rotMultiplier) : // Drive counterclockwise
+    // with negative X (left)
+    // () ->
+    // driveRoboRel.withVelocityX(scaleStick(-driverCommandController.getLeftY(),
+    // cubicWeight) * MaxSpeed * speedMultiplier) // Drive forward with negative Y
+    // (forward)
+    // .withVelocityY(scaleStick(-driverCommandController.getLeftX(), cubicWeight) *
+    // MaxSpeed * speedMultiplier) // Drive left with negative X (left)
+    // .withRotationalRate(scaleStick(-driverCommandController.getRightX(),
+    // cubicWeight) * MaxAngularRate * rotMultiplier) // Drive counterclockwise with
+    // negative X (left)
+    // );
+
+    // CommandScheduler.getInstance().schedule(driveCom);
 
     // };
 
-    Runnable elevatorRunnable = () ->{
+    Runnable elevatorRunnable = () -> {
         double elevatorStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.leftStickY), 0.03);
 
-        if(elevatorStick == 0 && elevator.getMode() != ElevatorMode.RUN_TO_POSITION){
+        if (elevatorStick == 0 && elevator.getMode() != ElevatorMode.RUN_TO_POSITION) {
             elevator.moveElevator(0);
-        } else if (elevatorStick !=0) {
+        } else if (elevatorStick != 0) {
             elevator.moveElevator(elevatorStick);
         }
 
     };
 
     Runnable shoulderRunnable = () -> {
-    double shoulderStick = MathUtil.applyDeadband(manipCommandController.getRawAxis(Constants.rightStickX), 0.03);
+        double shoulderStick = MathUtil.applyDeadband(manipCommandController.getRawAxis(Constants.rightStickX), 0.03);
 
-    if ((Math.abs(shoulderStick) < 0.03) && shoulder.shoulderMode == ShoulderMode.MANUAL){
-      shoulder.runMotor(0);
-    } else if (Math.abs(shoulderStick) >= 0.03) {
-      shoulder.runMotor(shoulderStick * 0.5);
-    }
-  };
+        if ((Math.abs(shoulderStick) < 0.03) && shoulder.shoulderMode == ShoulderMode.MANUAL) {
+            shoulder.runMotor(0);
+        } else if (Math.abs(shoulderStick) >= 0.03) {
+            shoulder.runMotor(shoulderStick * 0.5);
+        }
+    };
 
-    private Command setFieldCent(){
+    private Command setFieldCent() {
         return drivetrain.runOnce(() -> fieldCentric = true);
     }
 
-    private Command setRobotCent(){
+    private Command setRobotCent() {
         return drivetrain.runOnce(() -> fieldCentric = false);
     }
 
@@ -419,6 +487,5 @@ public class RobotContainer {
         return (weight * cubedInput) + (remainingWeight * input);
 
     }
-
 
 }

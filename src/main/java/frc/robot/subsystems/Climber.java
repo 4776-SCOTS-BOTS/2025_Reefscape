@@ -22,42 +22,19 @@ import frc.robot.Constants.ElevatorConstants;
 
 public class Climber extends SubsystemBase {
   /** Creates a new Climber. */
-  public Climber() {
-
   private final TalonFX climbMotor;
   private final TalonFX tiltMotor;
 
+  private double tiltRange = 5;
 
-  private double targetPosition = Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters);
+  public Climber() {
+    climbMotor = new TalonFX(ElevatorConstants.ELEVATOR_LEADER_ID, "rio");
+    tiltMotor = new TalonFX(ElevatorConstants.ELEVATOR_FOLLOWER_ID, "rio");
 
-  public ElevatorControlSubsystem() {
-    elevatorLeader = new TalonFX(ElevatorConstants.ELEVATOR_LEADER_ID, "rio");
-    elevatorFollower = new TalonFX(ElevatorConstants.ELEVATOR_FOLLOWER_ID, "rio");
+    TalonFXConfiguration climb_cfg = new TalonFXConfiguration();
+    TalonFXConfiguration tilt_cfg = new TalonFXConfiguration();
 
-    // // Configure closed-loop control
-    // double kP = 0.13;
-    // double kI = 0;
-    // double kD = 0; 
-    // double kIz = 0;
-    // double kF = 0.00;
-    // double kMaxOutput = 0.7;
-    // double kMinOutput = -.4;
-    // double allowedErr = 1;
-
-    // // Magic Motion Coefficients
-    // double maxVel = 10000;
-    // double maxAcc = 30000;
-
-    TalonFXConfiguration leader_cfg = new TalonFXConfiguration();
-    TalonFXConfiguration follower_cfg = new TalonFXConfiguration();
-
-    /* Configure Motion Magic */
-    MotionMagicConfigs mm = leader_cfg.MotionMagic;
-    mm.withMotionMagicCruiseVelocity(RotationsPerSecond.of(MAX_ROT_SPEED)) // (motor) rotations per second cruise
-      .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(MAX_ROT_ACCEL)) // Take approximately 0.5 seconds to reach max vel
-      .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(MAX_ROT_SPEED * 10)); // Take approximately 0.1 seconds to reach max accel 
-
-    Slot0Configs slot0 = leader_cfg.Slot0;
+    Slot0Configs slot0 = climb_cfg.Slot0;
     slot0.kS = 0.05; // Add 0.25 V output to overcome static friction
     slot0.kV = 0.05; // A velocity target of 1 rps results in 0.12 V output
     slot0.kA = 0.1; // An acceleration of 1 rps/s requires 0.01 V output
@@ -67,14 +44,14 @@ public class Climber extends SubsystemBase {
     slot0.GravityType = GravityTypeValue.Elevator_Static;
     slot0.kG = 0.2;
 
-    MotorOutputConfigs leader_mo = leader_cfg.MotorOutput;
+    MotorOutputConfigs leader_mo = climb_cfg.MotorOutput;
     leader_mo.Inverted = InvertedValue.Clockwise_Positive;
     leader_mo.NeutralMode = NeutralModeValue.Brake;
 
-    leader_cfg.CurrentLimits.StatorCurrentLimit = 60; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
-    leader_cfg.CurrentLimits.StatorCurrentLimitEnable = true;
+    climb_cfg.CurrentLimits.StatorCurrentLimit = 60; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
+    climb_cfg.CurrentLimits.StatorCurrentLimitEnable = true;
 
-    elevatorLeader.getConfigurator().apply(leader_cfg);
+    climbMotor.getConfigurator().apply(climb_cfg);
   }
 
   @Override

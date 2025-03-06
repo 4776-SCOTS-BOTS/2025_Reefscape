@@ -33,6 +33,7 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {
     m_robotContainer.drivetrain.standyLimelightUpdate("limelight-front");
     m_robotContainer.drivetrain.standyLimelightUpdate("limelight-rear");
+
   }
 
   @Override
@@ -40,9 +41,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_robotContainer.drivetrain.activeLimelightUpdate("limelight-front");
-    m_robotContainer.drivetrain.activeLimelightUpdate("limelight-rear");
-
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
