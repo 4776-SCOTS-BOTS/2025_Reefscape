@@ -123,6 +123,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     null,
                     this));
 
+    public enum LimelightUpdateMode {
+        front,
+        back,
+        both
+    };
+
+    private LimelightUpdateMode currentLimelightUpdateMode = LimelightUpdateMode.both;
+
     /* The SysId routine to test */
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineRotation;
     // private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
@@ -319,8 +327,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
 
         if (DriverStation.isEnabled()) {
-            updateOdometryFromLL_CTRE("limelight-front");
-            updateOdometryFromLL_CTRE("limelight-rear");
+            if (currentLimelightUpdateMode == LimelightUpdateMode.both){
+                updateOdometryFromLL_CTRE("limelight-front");
+                updateOdometryFromLL_CTRE("limelight-rear");
+            } else if (currentLimelightUpdateMode == LimelightUpdateMode.front) {
+                updateOdometryFromLL_CTRE("limelight-front");
+            } else {
+                updateOdometryFromLL_CTRE("limelight-rear");
+            }
         }
 
         field2d.setRobotPose(getState().Pose);
@@ -339,6 +353,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             updateSimState(deltaTime, RobotController.getBatteryVoltage());
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
+    }
+
+    public LimelightUpdateMode getCurrentLimelightUpdateMode() {
+        return currentLimelightUpdateMode;
+    }
+
+    public void setLimelightUpdateMode(LimelightUpdateMode mode) {
+        currentLimelightUpdateMode = mode;
     }
 
     /**
