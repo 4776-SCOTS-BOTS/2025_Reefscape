@@ -7,7 +7,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 10.0
+            "waitTime": 5.0
           }
         },
         {
@@ -50,6 +50,25 @@
                       }
                     }
                   ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "DeliverCoral"
                 }
               }
             ]

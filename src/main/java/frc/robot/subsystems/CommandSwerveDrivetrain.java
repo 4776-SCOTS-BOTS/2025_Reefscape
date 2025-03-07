@@ -126,7 +126,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public enum LimelightUpdateMode {
         front,
         back,
-        both
+        both,
+        none
     };
 
     private LimelightUpdateMode currentLimelightUpdateMode = LimelightUpdateMode.both;
@@ -245,7 +246,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                             // PID constants for translation
                             new PIDConstants(10, 0, 0),
                             // PID constants for rotation
-                            new PIDConstants(7, 0, 0)),
+                            new PIDConstants(9, 0, 0)),
                     config,
                     // Assume the path needs to be flipped for Red vs Blue, this is normally the
                     // case
@@ -326,16 +327,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
 
-        if (DriverStation.isEnabled()) {
+        // if (DriverStation.isEnabled()) {
             if (currentLimelightUpdateMode == LimelightUpdateMode.both){
                 updateOdometryFromLL_CTRE("limelight-front");
                 updateOdometryFromLL_CTRE("limelight-rear");
             } else if (currentLimelightUpdateMode == LimelightUpdateMode.front) {
                 updateOdometryFromLL_CTRE("limelight-front");
-            } else {
+            } else if (currentLimelightUpdateMode == LimelightUpdateMode.back) {
                 updateOdometryFromLL_CTRE("limelight-rear");
             }
-        }
+        // }
 
         field2d.setRobotPose(getState().Pose);
     }
@@ -476,15 +477,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * specification.
      */
     public void updateOdometryFromLL_CTRE(String limelightName) {
-
+        double distance;
         var driveState = getState();
         double headingDeg = driveState.Pose.getRotation().getDegrees();
         double omegaRps = Units.radiansToRotations(driveState.Speeds.omegaRadiansPerSecond);
 
-        // LimelightHelpers.SetRobotOrientation(limelightName, headingDeg, 0, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation(limelightName, headingDeg, 0, 0, 0, 0, 0);
         var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+        if(llMeasurement != null){
+            distance = getState().Pose.getTranslation().getDistance(llMeasurement.pose.getTranslation());
+        } else {
+            distance = 1000;
+        }
         if (llMeasurement != null && llMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0
-                && llMeasurement.avgTagDist < 2) {
+                && llMeasurement.avgTagDist < 2 && distance < 2) {
             // super.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
             addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds, VecBuilder.fill(.7, .7, 9999999));
         }
@@ -533,17 +539,24 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public void resetPosewithLimelight(Pose2d pose){
+        // Not really sure if this matters? Can the periodic method run while this is running?
+        LimelightUpdateMode lastUpdateMode = currentLimelightUpdateMode;
+        currentLimelightUpdateMode = LimelightUpdateMode.none;
+
+        resetPose(pose);
+
         LimelightHelpers.SetIMUMode("limelight-front", 1);
         LimelightHelpers.SetRobotOrientation("limelight-front",
                 pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
-        LimelightHelpers.SetIMUMode("limelight-front", 2);
+        // LimelightHelpers.SetIMUMode("limelight-front", 2);
 
         LimelightHelpers.SetIMUMode("limelight-rear", 1);
         LimelightHelpers.SetRobotOrientation("limelight-rear",
                 pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
-        LimelightHelpers.SetIMUMode("limelight-rear", 2);
+        // LimelightHelpers.SetIMUMode("limelight-rear", 2);
 
-        resetPose(pose);
+        currentLimelightUpdateMode = lastUpdateMode;
+
     }
 
 }
