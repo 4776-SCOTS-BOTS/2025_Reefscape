@@ -114,8 +114,8 @@ public final class Constants {
       leftButton = 1;
       leftBumper = 5;
       rightBumper = 6;
-      leftTrigger = 7;
-      rightTrigger = 8;
+      leftTrigger = 3; //Axis, called X Rotate in DriverStation
+      rightTrigger = 4; //Axis, called Y Rotate in DriverStation
       leftStickButton = 11;
       rightStickButton = 12;
       dpadUp = 0;
@@ -128,10 +128,10 @@ public final class Constants {
       rightMenuButton = 10;
       PS5TouchpadButton = 14;
 
-      leftStickX = 0; //Axis
-      leftStickY = 1; //Axis
-      rightStickX = 2; //Axis
-      rightStickY = 5; //Axis
+      leftStickX = 0; //Axis, called X Axis in DriverStation
+      leftStickY = 1; //Axis, called Y Axis in DriverStation
+      rightStickX = 2; //Axis, called Z Axis in DriverStation
+      rightStickY = 5; //Axis, called Z Rotate in DriverStation
     } else {
       //Controllers.kManipulatorControllerPort = Controllers.kLogitechControllerPort;
       //Xbox Controller
