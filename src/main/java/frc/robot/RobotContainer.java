@@ -56,10 +56,10 @@ import frc.robot.subsystems.ShoulderSubsystem.ShoulderMode;
 
 public class RobotContainer {
     // Stick scaling factors
-    private double deadband = 0.05;
+    private double deadband = 0.03;
     private double scaleFactor = 1 / (1 - deadband);
     private double offset = 1 - scaleFactor;
-    private double cubicWeight = 0.5;
+    private double cubicWeight = 0.3;
 
     double rateLimit = 3;
     SlewRateLimiter xfilter = new SlewRateLimiter(rateLimit);
@@ -310,7 +310,7 @@ public class RobotContainer {
                     .onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION))
                     .onFalse(new MoveArmAndElevator(elevator, shoulder, Positions.INTAKE_STATION));
 
-            L4Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.5));
+            L4Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.75));
             L3Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L3_READY));
             L2Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L2_READY));
 
@@ -329,8 +329,8 @@ public class RobotContainer {
                 }));
 
         reallylowSpeedTrigger.onTrue(new InstantCommand(() -> {
-            speedMultiplier = Constants.DriveConstants.driveLowPercentScale * 0.5;
-            rotMultiplier = Constants.DriveConstants.rotLowRateModifier * 0.6;
+            speedMultiplier = Constants.DriveConstants.driveLowPercentScale * 0.4;
+            rotMultiplier = Constants.DriveConstants.rotLowRateModifier * 0.4;
         }))
                 .onFalse(new InstantCommand(() -> {
                     speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
@@ -447,7 +447,7 @@ public class RobotContainer {
     // };
 
     Runnable elevatorRunnable = () -> {
-        double elevatorStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.leftStickY), 0.03);
+        double elevatorStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.leftStickY), 0.05);
 
         if (elevatorStick == 0 && elevator.getMode() != ElevatorMode.RUN_TO_POSITION) {
             elevator.moveElevator(0);
