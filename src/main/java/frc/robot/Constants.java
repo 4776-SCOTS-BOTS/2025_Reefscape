@@ -127,7 +127,6 @@ public final class Constants {
       leftMenuButton = 9;
       rightMenuButton = 10;
       PS5TouchpadButton = 14;
-
       leftStickX = 0; //Axis, called X Axis in DriverStation
       leftStickY = 1; //Axis, called Y Axis in DriverStation
       rightStickX = 2; //Axis, called Z Axis in DriverStation
