@@ -7,7 +7,13 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 10.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LimelightFront"
           }
         },
         {
@@ -61,10 +67,16 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 0.25
+                  "waitTime": 0.0
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LimelightBack"
           }
         },
         {
@@ -84,13 +96,25 @@
                     {
                       "type": "wait",
                       "data": {
+                        "waitTime": 0.2
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "StationIntakeDelay"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
                         "waitTime": 0.25
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "StationSafeTest"
+                        "name": "IntakePickupPos"
                       }
                     },
                     {
@@ -103,6 +127,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LimelightFront"
           }
         },
         {
@@ -119,6 +149,37 @@
                 "type": "named",
                 "data": {
                   "name": "ReadyHigh"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "IntakeDeliverPos"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "DeliverCoral"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "RemoveAlgae"
                 }
               }
             ]

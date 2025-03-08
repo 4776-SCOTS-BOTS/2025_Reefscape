@@ -580,4 +580,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return tag;
     }
 
+    public void setFrontLimelight(){
+        currentLimelightUpdateMode = LimelightUpdateMode.front;
+    }
+
+    public void setBackLimelight(){
+        currentLimelightUpdateMode = LimelightUpdateMode.back;
+    }
+
+    public void setBothLimelight(){
+        currentLimelightUpdateMode = LimelightUpdateMode.both;
+    }
+
+    public void setNoLimelight(){
+        currentLimelightUpdateMode = LimelightUpdateMode.none;
+    }
+
 }

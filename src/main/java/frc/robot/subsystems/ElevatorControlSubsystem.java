@@ -190,14 +190,12 @@ public class ElevatorControlSubsystem extends SubsystemBase {
    * @param meters position in meters
    */
   public void moveToPosition(double meters) {
-    System.out.println("Meters Incoming: " + meters);
     if(meters < Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters)){
       meters = Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters);
     } else if (meters > Constants.ElevatorConstants.ELEVATOR_MAX_HEIGHT.in(Meters)){
       meters = Constants.ElevatorConstants.ELEVATOR_MAX_HEIGHT.in(Meters);
     }
     targetPosition = meters;
-    System.out.println("Meters Corrected: " + targetPosition);
     elevatorLeader.setControl(m_request.withPosition(metersToMotorPosition(meters)));
     if(!useLeader){
       elevatorFollower.setControl(m_request.withPosition(metersToMotorPosition(meters)));

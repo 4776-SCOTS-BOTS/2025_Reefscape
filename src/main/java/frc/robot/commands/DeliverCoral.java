@@ -56,7 +56,7 @@ public class DeliverCoral extends Command {
     )) {
       intake.intakeOut();
     }
-    if (timer.hasElapsed(2.0)) {
+    if (timer.hasElapsed(1.25)) {
       isCompleted = true;
     }
 

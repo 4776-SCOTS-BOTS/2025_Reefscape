@@ -46,6 +46,7 @@ import frc.robot.commands.DriveToReefTag;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.MoveArmAndElevator;
 import frc.robot.commands.MoveRobot;
+import frc.robot.commands.RemoveAlgae;
 import frc.robot.customClass.FieldPositions.Side;
 import frc.robot.customClass.SystemPositions.Positions;
 import frc.robot.generated.TunerConstants;
@@ -151,6 +152,8 @@ public class RobotContainer {
     private Trigger wristPos1Button = manipCommandController.button(Constants.leftBumper);
     private Trigger wristPos2Button = manipCommandController.button(Constants.rightBumper);
 
+    private Trigger testButton = manipCommandController.button(Constants.rightMenuButton);
+
     private Trigger intakeAutoPos = manipCommandController.pov(270);
     private Trigger L4Button = manipCommandController.pov(0);
     private Trigger L3Button = manipCommandController.pov(90);
@@ -205,11 +208,15 @@ public class RobotContainer {
         NamedCommands.registerCommand("ReadyHigh", new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.75));
         NamedCommands.registerCommand("DeliverCoral", new DeliverCoral(intake, shoulder, false));
         NamedCommands.registerCommand("IntakeDeliverPos", new InstantCommand(intake::wristDeliver1, intake));
+        NamedCommands.registerCommand("IntakePickupPos", new InstantCommand(intake::wristPickup, intake));
         NamedCommands.registerCommand("StationSafeTest", new MoveArmAndElevator(elevator, shoulder, Positions.ARM_SAFE_HIGH, 0.5));
         NamedCommands.registerCommand("StationSafe", new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION, 0.5));
-        NamedCommands.registerCommand("StationIntakeDelay", new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION, 0.5));
-        NamedCommands.registerCommand("StationIntakeImmediate", new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION, 0));
+        NamedCommands.registerCommand("StationIntakeDelay", new MoveArmAndElevator(elevator, shoulder, Positions.INTAKE_STATION, 0.25));
+        NamedCommands.registerCommand("StationIntakeImmediate", new MoveArmAndElevator(elevator, shoulder, Positions.INTAKE_STATION, 0));
         NamedCommands.registerCommand("IntakeCoral", new IntakeCoral(intake));
+        NamedCommands.registerCommand("RemoveAlgae", new RemoveAlgae(elevator, intake));
+        NamedCommands.registerCommand("LimelightFront", new InstantCommand(drivetrain::setFrontLimelight));
+        NamedCommands.registerCommand("LimelightBack", new InstantCommand(drivetrain::setBackLimelight));
 
         // Build an auto chooser. This will use Commands.none() as the default option.
         m_chooser = AutoBuilder.buildAutoChooser();
@@ -315,6 +322,8 @@ public class RobotContainer {
             L3Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L3_READY));
             L2Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L2_READY));
 
+        } if (hasElevator && hasIntake){
+            testButton.onTrue(new RemoveAlgae(elevator, intake));
         }
 
         // setFieldCentButton.onTrue(setFieldCent());
