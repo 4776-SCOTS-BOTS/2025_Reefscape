@@ -71,7 +71,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   final MotionMagicVoltage m_request = new MotionMagicVoltage(0); 
 
   // Limit switches - FALSE means at limit
-  private final DigitalInput bottomLimitSwitch = new DigitalInput(9); //TODO: Need to update.  Do we use?
+  // private final DigitalInput bottomLimitSwitch = new DigitalInput(9); //TODO: Need to update.  Do we use?
   // private final Trigger bottomLimitSwitchTrigger = new Trigger(() -> bottomLimitSwitch.get());
 
   private double targetPosition = Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters);
@@ -190,12 +190,14 @@ public class ElevatorControlSubsystem extends SubsystemBase {
    * @param meters position in meters
    */
   public void moveToPosition(double meters) {
+    System.out.println("Meters Incoming: " + meters);
     if(meters < Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters)){
       meters = Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters);
     } else if (meters > Constants.ElevatorConstants.ELEVATOR_MAX_HEIGHT.in(Meters)){
       meters = Constants.ElevatorConstants.ELEVATOR_MAX_HEIGHT.in(Meters);
     }
     targetPosition = meters;
+    System.out.println("Meters Corrected: " + targetPosition);
     elevatorLeader.setControl(m_request.withPosition(metersToMotorPosition(meters)));
     if(!useLeader){
       elevatorFollower.setControl(m_request.withPosition(metersToMotorPosition(meters)));
@@ -236,9 +238,9 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     }
   }
 
-  public boolean isAtBottomLimit() {
-    return !bottomLimitSwitch.get();
-  }
+  // public boolean isAtBottomLimit() {
+  //   return !bottomLimitSwitch.get();
+  // }
 
   public ElevatorMode getMode(){
     return elevatorMode;

@@ -7,7 +7,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 20.0
+            "waitTime": 5.0
           }
         },
         {
@@ -15,38 +15,49 @@
           "data": {
             "commands": [
               {
-                "type": "parallel",
+                "type": "path",
+                "data": {
+                  "pathName": "Left Start to 5"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ReadyHigh"
+                }
+              },
+              {
+                "type": "sequential",
                 "data": {
                   "commands": [
                     {
-                      "type": "sequential",
+                      "type": "wait",
                       "data": {
-                        "commands": [
-                          {
-                            "type": "wait",
-                            "data": {
-                              "waitTime": 0.5
-                            }
-                          },
-                          {
-                            "type": "named",
-                            "data": {
-                              "name": "IntakeDeliverPos"
-                            }
-                          }
-                        ]
+                        "waitTime": 1.0
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "ReadyHigh"
+                        "name": "IntakeDeliverPos"
                       }
                     }
                   ]
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 to Left Station"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left Station to 5"
           }
         }
       ]

@@ -42,9 +42,11 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.DeliverCoral;
+import frc.robot.commands.DriveToReefTag;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.MoveArmAndElevator;
 import frc.robot.commands.MoveRobot;
+import frc.robot.customClass.FieldPositions.Side;
 import frc.robot.customClass.SystemPositions.Positions;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -127,8 +129,10 @@ public class RobotContainer {
     Trigger lowSpeedTrigger = driverCommandController.rightTrigger(0.5);
     Trigger reallylowSpeedTrigger = driverCommandController.leftTrigger(0.5);
     JoystickButton sprintTrigger = new JoystickButton(m_driverController, XboxController.Button.kRightStick.value);
-    private Trigger setFieldCentButton = driverCommandController.leftBumper();
-    private Trigger setRobotCentButton = driverCommandController.rightBumper();
+    // private Trigger setFieldCentButton = driverCommandController.leftBumper();
+    // private Trigger setRobotCentButton = driverCommandController.rightBumper();
+    private Trigger driveLeftReef = driverCommandController.leftBumper();
+    private Trigger driveRightReef = driverCommandController.rightBumper();
     private Trigger forcePoseButton = driverCommandController.a();
 
     // d-pad field-rel Movement
@@ -201,6 +205,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("ReadyHigh", new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.75));
         NamedCommands.registerCommand("DeliverCoral", new DeliverCoral(intake, shoulder, false));
         NamedCommands.registerCommand("IntakeDeliverPos", new InstantCommand(intake::wristDeliver1, intake));
+        NamedCommands.registerCommand("StationSafeTest", new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION, 0.75));
 
         /* EXAMPLES FROM LAST YEAR */
         // NamedCommands.registerCommand("StopIntake", new
@@ -316,8 +321,8 @@ public class RobotContainer {
 
         }
 
-        setFieldCentButton.onTrue(setFieldCent());
-        setRobotCentButton.onTrue(setRobotCent());
+        // setFieldCentButton.onTrue(setFieldCent());
+        // setRobotCentButton.onTrue(setRobotCent());
 
         lowSpeedTrigger.onTrue(new InstantCommand(() -> {
             speedMultiplier = Constants.DriveConstants.driveLowPercentScale;
@@ -373,6 +378,11 @@ public class RobotContainer {
 
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
 
+        driveLeftReef.onTrue(new DriveToReefTag(drivetrain, Side.LEFT, "limelight-front"))
+                .onFalse(new InstantCommand(() -> {
+                    double a = 1;
+                }, drivetrain));
+
         // reset the field-centric heading
         resetGyro.onTrue(drivetrain.runOnce(drivetrain::zeroFieldCentric));
 
@@ -382,6 +392,7 @@ public class RobotContainer {
         // driverCommandController.a().onTrue(new MoveRobot(drivetrain, 1, 0, 0))
         // .onFalse(new InstantCommand(driveRunnable, drivetrain));
         forcePoseButton.onTrue(new InstantCommand(() -> drivetrain.forcePoseUpdate("limelight-front")));
+
 
         // if (hasElevator) {
         // manipCommandController.button(Constants.rightButton).whileTrue(new

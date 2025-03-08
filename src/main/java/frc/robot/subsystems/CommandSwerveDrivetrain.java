@@ -132,7 +132,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         none
     };
 
-    private LimelightUpdateMode currentLimelightUpdateMode = LimelightUpdateMode.both;
+    private LimelightUpdateMode currentLimelightUpdateMode = LimelightUpdateMode.front;
 
     /* The SysId routine to test */
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineRotation;
