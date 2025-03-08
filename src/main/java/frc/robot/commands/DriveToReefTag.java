@@ -31,21 +31,30 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DriveToReefTag extends Command {
-  private static final double KpX = 1.0;
+  private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+  private double MaxAngularRate = RotationsPerSecond.of(2*Math.PI).in(RadiansPerSecond); // Chaged from 3/4  to 1 of a rotation per second max angular velocity
+
+
+  private static final double KpX = 6;//5
     private static final double KiX = 0;
     private static final double KdX = 0;
 
-    private static final double KpY = 0.5;
+    private static final double KpY = 6;//5
     private static final double KiY = 0;
     private static final double KdY = 0;
 
-    private static final double KpRot = 0.2;
+    private static final double KpRot = 8;//6
     private static final double KiRot = 0;
     private static final double KdRot = 0;
 
-    private ProfiledPIDController pidControllerX = new ProfiledPIDController(KpX, KiX, KdX, new TrapezoidProfile.Constraints(0.5, 0.5));
-    private ProfiledPIDController pidControllerY = new ProfiledPIDController(KpY, KiY, KdY, new TrapezoidProfile.Constraints(0.5, 0.5));
-    private ProfiledPIDController pidControllerRot = new ProfiledPIDController(KpRot, KiRot, KdRot, new TrapezoidProfile.Constraints(0.5, 0.5));
+    // private ProfiledPIDController pidControllerX = new ProfiledPIDController(KpX, KiX, KdX, new TrapezoidProfile.Constraints(MaxSpeed*0.5, MaxSpeed*3));
+    // private ProfiledPIDController pidControllerY = new ProfiledPIDController(KpY, KiY, KdY, new TrapezoidProfile.Constraints(MaxSpeed*0.5, MaxSpeed*3));
+    // private ProfiledPIDController pidControllerRot = new ProfiledPIDController(KpRot, KiRot, KdRot, new TrapezoidProfile.Constraints(MaxAngularRate * 0.5, 2*MaxAngularRate));
+
+    private PIDController pidControllerX = new PIDController(KpX, KiX, KdX);
+    private PIDController pidControllerY = new PIDController(KpY, KiY, KdY);
+    private PIDController pidControllerRot = new PIDController(KpRot, KiRot, KdRot);
+
 
     private double setpointX = 0.0;
     private double setpointY = 0.0;
@@ -61,16 +70,14 @@ public class DriveToReefTag extends Command {
     Pose2d targetPose;
     boolean validTarget = false;
 
-    static final double translationTol = 0.05;
-    static final double rotTol = 5;
+    static final double translationTol = 0.01;
+    static final double rotTol = 3;
 
-    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(1.0).in(RadiansPerSecond); // Chaged from 3/4  to 1 of a rotation per second max angular velocity
-
+    
     private CommandSwerveDrivetrain drivetrain;
 
     private final SwerveRequest.FieldCentric driveFieldRel = new SwerveRequest.FieldCentric()
-    .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 10% deadband
+    .withDeadband(MaxSpeed * 0.03).withRotationalDeadband(MaxAngularRate * 0.03) // Add a 10% deadband
     .withDriveRequestType(DriveRequestType.Velocity); // Use open-loop control for drive motors
 
   /** Creates a new MoveRobot. */
@@ -91,6 +98,8 @@ public class DriveToReefTag extends Command {
 
     targetPose = FieldPositions.getTagCoord(nearestTag, side);
 
+    // System.out.println("Tag: " + nearestTag + " Pose: " + targetPose);
+
     if (targetPose != null) {
 
       setpointX = targetPose.getX();
@@ -99,11 +108,21 @@ public class DriveToReefTag extends Command {
 
       pidControllerX.setTolerance(translationTol);
       pidControllerY.setTolerance(translationTol);
-      pidControllerX.setTolerance(Math.toRadians(rotTol));
+      pidControllerRot.setTolerance(Math.toRadians(rotTol));
 
-      pidControllerX.setGoal(setpointX);
-      pidControllerY.setGoal(setpointY);
-      pidControllerRot.setGoal(setpointRot);
+      // pidControllerX.setGoal(setpointX);
+      // pidControllerY.setGoal(setpointY);
+      // pidControllerRot.setGoal(setpointRot);
+
+      pidControllerX.setSetpoint(setpointX);
+      pidControllerY.setSetpoint(setpointY);
+      pidControllerRot.setSetpoint(setpointRot);
+
+
+      // pidControllerX.reset(drivetrain.getState().Pose.getX());
+      // pidControllerY.reset(drivetrain.getState().Pose.getY());
+      // pidControllerRot.reset(drivetrain.getState().Pose.getRotation().getRadians());
+
       validTarget = true;
     } else {
       validTarget = false;
@@ -113,37 +132,53 @@ public class DriveToReefTag extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double currentPositionX = drivetrain.getState().Pose.getX();
-    double currentPositionY = drivetrain.getState().Pose.getY();
-    double currentRotation  = drivetrain.getState().Pose.getRotation().getRadians();
+    if (validTarget) {
+      double currentPositionX = drivetrain.getState().Pose.getX();
+      double currentPositionY = drivetrain.getState().Pose.getY();
+      double currentRotation = drivetrain.getState().Pose.getRotation().getRadians();
 
-    pidControllerX.setTolerance(translationTol);
-    pidControllerY.setTolerance(translationTol);
-    pidControllerRot.setTolerance(Math.toRadians(rotTol));
+      // System.out.println("Current Pose: " + drivetrain.getState().Pose);
 
-    // Calculate the PID outputs
-    double outputX = MathUtil.clamp(pidControllerX.calculate(currentPositionX), -0.25, +0.25);
-    double outputY = MathUtil.clamp(pidControllerY.calculate(currentPositionY), -0.25, +0.25);
-    double outputRot = MathUtil.clamp(pidControllerRot.calculate(currentRotation), -0.25, +0.25);
+      // Calculate the PID outputs
+      double outputX = pidControllerX.calculate(currentPositionX);
+      double outputY = pidControllerY.calculate(currentPositionY);
+      double outputRot = pidControllerRot.calculate(currentRotation);
 
-    SmartDashboard.putNumber("X Error", pidControllerX.getPositionError());
-    SmartDashboard.putNumber("X Error Tol", pidControllerX.getPositionTolerance());
-    SmartDashboard.putNumber("X Output", outputX);
-    SmartDashboard.putBoolean("X at Setpoint", pidControllerX.atSetpoint());
+      SmartDashboard.putNumber("X Error", pidControllerX.getPositionError());
+      SmartDashboard.putNumber("X Error Tol", pidControllerX.getPositionTolerance());
+      SmartDashboard.putNumber("X Output", outputX);
+      SmartDashboard.putBoolean("X at Setpoint", pidControllerX.atSetpoint());
+      SmartDashboard.putNumber("Y Error", pidControllerY.getPositionError());
+      SmartDashboard.putNumber("Y Error Tol", pidControllerY.getPositionTolerance());
+      SmartDashboard.putNumber("Y Output", outputY);
+      SmartDashboard.putBoolean("Y at Setpoint", pidControllerY.atSetpoint());      
+      SmartDashboard.putNumber("Rot Error", pidControllerRot.getPositionError());
+      SmartDashboard.putNumber("Rot Error Tol", pidControllerRot.getPositionTolerance());
+      SmartDashboard.putNumber("Rot Output", outputRot);
+      SmartDashboard.putBoolean("Rot at Setpoint", pidControllerRot.atSetpoint());
 
-    // System.out.println("Current X: " + currentPositionX + " Current Y: " + currentPositionY +  " pidx: " + outputX + " pidy: " + outputY);
-    // System.out.println("X Error: " + pidControllerX.getError() + " Xpos" + currentPositionX);
 
-    drivetrain.applyRequestMethod(
-                () -> driveFieldRel.withVelocityX(outputX * MaxSpeed) // Drive forward with negative Y (forward)
-                .withVelocityY(outputY * MaxSpeed) // Drive left with negative X (left)
-                .withRotationalRate(outputRot * MaxAngularRate));// Drive counterclockwise with negative X (left)
+
+
+
+
+      // System.out.println("Current X: " + currentPositionX + " Current Y: " +
+      // currentPositionY + " pidx: " + outputX + " pidy: " + outputY);
+      // System.out.println("X Error: " + pidControllerX.getError() + " Xpos" +
+      // currentPositionX);
+
+      drivetrain.applyRequestMethod(
+          () -> driveFieldRel.withVelocityX(outputX) // Drive forward with negative Y (forward)
+              .withVelocityY(outputY) // Drive left with negative X (left)
+              .withRotationalRate(outputRot));// Drive counterclockwise with negative X (left)
+
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    System.out.println("DONE!");
+    System.out.println("DONE!" + interrupted);
     drivetrain.applyRequestMethod(
                 () -> driveFieldRel.withVelocityX(0) // Drive forward with negative Y (forward)
                 .withVelocityY(0) // Drive left with negative X (left)
@@ -153,6 +188,6 @@ public class DriveToReefTag extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return pidControllerX.atSetpoint();// && pidControllerY.atSetpoint() && pidControllerRot.atSetpoint();
+    return (pidControllerX.atSetpoint() && pidControllerY.atSetpoint() && pidControllerRot.atSetpoint()) || !validTarget;
   }
 }
