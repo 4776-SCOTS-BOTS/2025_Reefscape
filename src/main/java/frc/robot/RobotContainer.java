@@ -205,15 +205,11 @@ public class RobotContainer {
         NamedCommands.registerCommand("ReadyHigh", new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.75));
         NamedCommands.registerCommand("DeliverCoral", new DeliverCoral(intake, shoulder, false));
         NamedCommands.registerCommand("IntakeDeliverPos", new InstantCommand(intake::wristDeliver1, intake));
-        NamedCommands.registerCommand("StationSafeTest", new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION, 0.75));
-
-        /* EXAMPLES FROM LAST YEAR */
-        // NamedCommands.registerCommand("StopIntake", new
-        // InstantCommand(m_Intake::intakeOff));
-        // NamedCommands.registerCommand("FirstShot", new SequentialCommandGroup(
-        // new InstantCommand(m_Shooter::setAngleSpeakerShot),
-        // new WaitCommand(0.5),
-        // new ShootCommand(m_Shooter)));
+        NamedCommands.registerCommand("StationSafeTest", new MoveArmAndElevator(elevator, shoulder, Positions.ARM_SAFE_HIGH, 0.5));
+        NamedCommands.registerCommand("StationSafe", new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION, 0.5));
+        NamedCommands.registerCommand("StationIntakeDelay", new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION, 0.5));
+        NamedCommands.registerCommand("StationIntakeImmediate", new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION, 0));
+        NamedCommands.registerCommand("IntakeCoral", new IntakeCoral(intake));
 
         // Build an auto chooser. This will use Commands.none() as the default option.
         m_chooser = AutoBuilder.buildAutoChooser();
