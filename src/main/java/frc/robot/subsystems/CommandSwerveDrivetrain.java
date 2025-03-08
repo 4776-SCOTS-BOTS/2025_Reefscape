@@ -36,6 +36,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.LimelightHelpers;
+import frc.robot.LimelightHelpers.PoseEstimate;
+import frc.robot.LimelightHelpers.RawFiducial;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -476,7 +478,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * of how to use vision should be tuned per-robot and to the team's
      * specification.
      */
-    public void updateOdometryFromLL_CTRE(String limelightName) {
+    public PoseEstimate updateOdometryFromLL_CTRE(String limelightName) {
         double distance;
         var driveState = getState();
         double headingDeg = driveState.Pose.getRotation().getDegrees();
@@ -494,6 +496,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             // super.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
             addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds, VecBuilder.fill(.7, .7, 9999999));
         }
+
+        return llMeasurement;
     }
 
     /** Force Pose Update from Limelight */
@@ -557,6 +561,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         currentLimelightUpdateMode = lastUpdateMode;
 
+    }
+
+    public int getNearestTag(PoseEstimate poseEstimate) {
+        RawFiducial[] fiducials = poseEstimate.rawFiducials;
+        int tag = 0;
+        double tagDistance = 1000;
+
+        for (RawFiducial fiducial : fiducials) {
+            if (fiducial != null) {
+                if (fiducial.distToRobot < tagDistance) {
+                    tagDistance = fiducial.distToRobot;
+                    tag = fiducial.id;
+                }
+            }
+        }
+
+        return tag;
     }
 
 }

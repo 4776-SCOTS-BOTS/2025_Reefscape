@@ -9,28 +9,56 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Distance.*;
 
 public class FieldPositions {
-    public static enum Side {
+    public static enum Loc {
         //Red side coordinants are still referenced to BLUE coordinates and rotations
-        BLUE_12(new Pose2d(0, 0, new Rotation2d(Math.toRadians(180))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(180)))),
-        BLUE_2(new Pose2d(0, 0, new Rotation2d(Math.toRadians(120))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(120)))),
-        BLUE_4(new Pose2d(0, 0, new Rotation2d(Math.toRadians(60))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(60)))),
-        BLUE_6(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)))),
-        BLUE_8(new Pose2d(0, 0, new Rotation2d(Math.toRadians(-60))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(-60)))),
-        BLUE_10(new Pose2d(0, 0, new Rotation2d(Math.toRadians(-120))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(-120)))),
-        RED_12(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(0)))),
-        RED_2(new Pose2d(0, 0, new Rotation2d(Math.toRadians(60))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(60)))),
-        RED_4(new Pose2d(0, 0, new Rotation2d(Math.toRadians(120))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(120)))),
-        RED_6(new Pose2d(0, 0, new Rotation2d(Math.toRadians(180))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(180)))),
-        RED_8(new Pose2d(0, 0, new Rotation2d(Math.toRadians(-120))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(-120)))),
-        RED_10(new Pose2d(0, 0, new Rotation2d(Math.toRadians(-60))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(-60))));
+        BLUE_1(new Pose2d(0, 0, new Rotation2d(Math.toRadians(180))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(180))),1),
+        BLUE_2(new Pose2d(0, 0, new Rotation2d(Math.toRadians(120))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(120))),1),
+        BLUE_3(new Pose2d(0, 0, new Rotation2d(Math.toRadians(60))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(60))),1),
+        BLUE_4(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))),1),
+        BLUE_5(new Pose2d(0, 0, new Rotation2d(Math.toRadians(-60))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(-60))),1),
+        BLUE_6(new Pose2d(0, 0, new Rotation2d(Math.toRadians(-120))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(-120))),1),
+        RED_1(new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(0))),1),
+        RED_2(new Pose2d(0, 0, new Rotation2d(Math.toRadians(60))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(60))),1),
+        RED_3(new Pose2d(0, 0, new Rotation2d(Math.toRadians(120))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(120))),1),
+        RED_4(new Pose2d(0, 0, new Rotation2d(Math.toRadians(180))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(180))),1),
+        RED_5(new Pose2d(0, 0, new Rotation2d(Math.toRadians(-120))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(-120))),1),
+        RED_6(new Pose2d(0, 0, new Rotation2d(Math.toRadians(-60))), new Pose2d(0, 0, new Rotation2d(Math.toRadians(-60))),1);
 
 
         public final Pose2d left;
         public final Pose2d right;
+        public final int tag;
 
-        private Side(Pose2d left, Pose2d right) {
+        private Loc(Pose2d left, Pose2d right, int tag) {
             this.left = left;
             this.right = right;
+            this.tag = tag;
+        }
+
+        public static Loc findByTag(int tag) {
+            for (Loc loc : values()) {
+                if (loc.tag == tag) {
+                    return loc;
+                }
+            }
+            return null;
+        }
+    }
+
+    public static enum Side {
+        LEFT,
+        RIGHT;
+    }
+
+    public static Pose2d getTagCoord(int tag, Side side) {
+        Loc loc = Loc.findByTag(tag);
+
+        if (loc != null && side == Side.LEFT) {
+            return loc.left;
+        } else if (loc != null && side == Side.RIGHT) {
+            return loc.right;
+        } else {
+            return null;
         }
     }
 
