@@ -6,6 +6,8 @@ package frc.robot;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.Orchestra;
+import com.pathplanner.lib.pathfinding.LocalADStar;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,6 +40,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledExit() {}
+
+  public void robotInit() {
+    Pathfinding.setPathfinder(new LocalADStar());
+  }
 
   @Override
   public void autonomousInit() {
