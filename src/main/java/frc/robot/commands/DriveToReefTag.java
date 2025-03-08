@@ -35,11 +35,11 @@ public class DriveToReefTag extends Command {
     private static final double KiX = 0;
     private static final double KdX = 0;
 
-    private static final double KpY = 0.5;
+    private static final double KpY = 1.0;
     private static final double KiY = 0;
     private static final double KdY = 0;
 
-    private static final double KpRot = 0.2;
+    private static final double KpRot = 1;
     private static final double KiRot = 0;
     private static final double KdRot = 0;
 
@@ -91,6 +91,8 @@ public class DriveToReefTag extends Command {
 
     targetPose = FieldPositions.getTagCoord(nearestTag, side);
 
+    System.out.println("Tag: " + nearestTag);
+
     if (targetPose != null) {
 
       setpointX = targetPose.getX();
@@ -113,31 +115,36 @@ public class DriveToReefTag extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double currentPositionX = drivetrain.getState().Pose.getX();
-    double currentPositionY = drivetrain.getState().Pose.getY();
-    double currentRotation  = drivetrain.getState().Pose.getRotation().getRadians();
+    if (validTarget) {
+      double currentPositionX = drivetrain.getState().Pose.getX();
+      double currentPositionY = drivetrain.getState().Pose.getY();
+      double currentRotation = drivetrain.getState().Pose.getRotation().getRadians();
 
-    pidControllerX.setTolerance(translationTol);
-    pidControllerY.setTolerance(translationTol);
-    pidControllerRot.setTolerance(Math.toRadians(rotTol));
+      pidControllerX.setTolerance(translationTol);
+      pidControllerY.setTolerance(translationTol);
+      pidControllerRot.setTolerance(Math.toRadians(rotTol));
 
-    // Calculate the PID outputs
-    double outputX = MathUtil.clamp(pidControllerX.calculate(currentPositionX), -0.25, +0.25);
-    double outputY = MathUtil.clamp(pidControllerY.calculate(currentPositionY), -0.25, +0.25);
-    double outputRot = MathUtil.clamp(pidControllerRot.calculate(currentRotation), -0.25, +0.25);
+      // Calculate the PID outputs
+      double outputX = MathUtil.clamp(pidControllerX.calculate(currentPositionX), -0.25, +0.25);
+      double outputY = MathUtil.clamp(pidControllerY.calculate(currentPositionY), -0.25, +0.25);
+      double outputRot = MathUtil.clamp(pidControllerRot.calculate(currentRotation), -0.25, +0.25);
 
-    SmartDashboard.putNumber("X Error", pidControllerX.getPositionError());
-    SmartDashboard.putNumber("X Error Tol", pidControllerX.getPositionTolerance());
-    SmartDashboard.putNumber("X Output", outputX);
-    SmartDashboard.putBoolean("X at Setpoint", pidControllerX.atSetpoint());
+      SmartDashboard.putNumber("X Error", pidControllerX.getPositionError());
+      SmartDashboard.putNumber("X Error Tol", pidControllerX.getPositionTolerance());
+      SmartDashboard.putNumber("X Output", outputX);
+      SmartDashboard.putBoolean("X at Setpoint", pidControllerX.atSetpoint());
 
-    // System.out.println("Current X: " + currentPositionX + " Current Y: " + currentPositionY +  " pidx: " + outputX + " pidy: " + outputY);
-    // System.out.println("X Error: " + pidControllerX.getError() + " Xpos" + currentPositionX);
+      // System.out.println("Current X: " + currentPositionX + " Current Y: " +
+      // currentPositionY + " pidx: " + outputX + " pidy: " + outputY);
+      // System.out.println("X Error: " + pidControllerX.getError() + " Xpos" +
+      // currentPositionX);
 
-    drivetrain.applyRequestMethod(
-                () -> driveFieldRel.withVelocityX(outputX * MaxSpeed) // Drive forward with negative Y (forward)
-                .withVelocityY(outputY * MaxSpeed) // Drive left with negative X (left)
-                .withRotationalRate(outputRot * MaxAngularRate));// Drive counterclockwise with negative X (left)
+      drivetrain.applyRequestMethod(
+          () -> driveFieldRel.withVelocityX(outputX * MaxSpeed) // Drive forward with negative Y (forward)
+              .withVelocityY(outputY * MaxSpeed) // Drive left with negative X (left)
+              .withRotationalRate(outputRot * MaxAngularRate));// Drive counterclockwise with negative X (left)
+
+    }
   }
 
   // Called once the command ends or is interrupted.
@@ -153,6 +160,6 @@ public class DriveToReefTag extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return pidControllerX.atSetpoint();// && pidControllerY.atSetpoint() && pidControllerRot.atSetpoint();
+    return (pidControllerX.atGoal() && pidControllerY.atGoal() && pidControllerRot.atGoal()) || !validTarget;
   }
 }
