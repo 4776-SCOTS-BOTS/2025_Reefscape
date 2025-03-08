@@ -462,8 +462,10 @@ public class RobotContainer {
 
         if ((Math.abs(shoulderStick) < 0.03) && shoulder.shoulderMode == ShoulderMode.MANUAL) {
             shoulder.runMotor(0);
+            //System.out.println("Shoulder Stopped");
         } else if (Math.abs(shoulderStick) >= 0.03) {
             shoulder.runMotor(shoulderStick * 0.5);
+            //System.out.println("Shoulder Running");
         }
     };
 
