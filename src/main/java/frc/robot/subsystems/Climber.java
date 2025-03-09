@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -22,10 +23,20 @@ import frc.robot.Constants.ElevatorConstants;
 
 public class Climber extends SubsystemBase {
   /** Creates a new Climber. */
-  private final TalonFX climbMotor;
-  private final TalonFX tiltMotor;
+  public final TalonFX climbMotor;
+  public final TalonFX tiltMotor;
 
-  private double tiltRange = 5;
+  public double climbPosition = 42;
+  public double tiltRange = 5;
+
+  public enum ClimberMode {
+    RUN_TO_POSITION,
+    MANUAL
+  }
+
+  public ClimberMode climberMode = ClimberMode.MANUAL;
+
+  
 
   public Climber() {
     climbMotor = new TalonFX(ElevatorConstants.ELEVATOR_LEADER_ID, "rio");
@@ -34,28 +45,62 @@ public class Climber extends SubsystemBase {
     TalonFXConfiguration climb_cfg = new TalonFXConfiguration();
     TalonFXConfiguration tilt_cfg = new TalonFXConfiguration();
 
-    Slot0Configs slot0 = climb_cfg.Slot0;
-    slot0.kS = 0.05; // Add 0.25 V output to overcome static friction
-    slot0.kV = 0.05; // A velocity target of 1 rps results in 0.12 V output
-    slot0.kA = 0.1; // An acceleration of 1 rps/s requires 0.01 V output
-    slot0.kP = 10; // A position error of 0.2 rotations results in 12 V output
-    slot0.kI = 0; // No output for integrated error
-    slot0.kD = 0; // A velocity error of 1 rps results in 0.5 V output
-    slot0.GravityType = GravityTypeValue.Elevator_Static;
-    slot0.kG = 0.2;
+    MotorOutputConfigs climb_mo = climb_cfg.MotorOutput;
+    climb_mo.Inverted = InvertedValue.Clockwise_Positive;
+    climb_mo.NeutralMode = NeutralModeValue.Brake;
 
-    MotorOutputConfigs leader_mo = climb_cfg.MotorOutput;
-    leader_mo.Inverted = InvertedValue.Clockwise_Positive;
-    leader_mo.NeutralMode = NeutralModeValue.Brake;
-
-    climb_cfg.CurrentLimits.StatorCurrentLimit = 60; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
+    climb_cfg.CurrentLimits.StatorCurrentLimit = 90; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
     climb_cfg.CurrentLimits.StatorCurrentLimitEnable = true;
 
     climbMotor.getConfigurator().apply(climb_cfg);
+
+    tilt_cfg = climb_cfg;
+    tiltMotor.getConfigurator().apply(climb_cfg);
+
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
   }
+
+  public void runClimber(double speed){
+    if(speed > 0 && climbMotor.getPosition().getValueAsDouble() >= climbPosition){
+      speed = 0;
+    } else if(speed < 0 && climbMotor.getPosition().getValueAsDouble() <= 0){
+      speed = 0;
+    }
+    climbMotor.set(speed);
+  }
+
+  public void manualClimb(double speed){
+    runClimber(speed);
+    climberMode = ClimberMode.MANUAL;
+  }
+
+  public void autoClimb(double speed){
+    runClimber(speed);
+    climberMode = ClimberMode.RUN_TO_POSITION;
+  }
+
+  public void runTilt(double speed){
+    if(speed > 0 && tiltMotor.getPosition().getValueAsDouble() >= tiltRange){
+      speed = 0;
+    } else if(speed < 0 && tiltMotor.getPosition().getValueAsDouble() <= 0){
+      speed = 0;
+    }   
+    tiltMotor.set(speed);
+  }
+
+  public void manualTilt(double speed){
+    runTilt(speed);
+    climberMode = ClimberMode.MANUAL;
+  }
+  public void autoTilt(double speed){
+    runTilt(speed);
+    climberMode = ClimberMode.RUN_TO_POSITION;
+  }
+
+
+
 }
