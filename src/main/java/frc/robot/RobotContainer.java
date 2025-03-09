@@ -46,14 +46,19 @@ import frc.robot.commands.DriveToReefTag;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.MoveArmAndElevator;
 import frc.robot.commands.MoveRobot;
+import frc.robot.commands.PathfindToReefTag;
+import frc.robot.commands.ReadyClimb;
 import frc.robot.commands.RemoveAlgae;
+import frc.robot.commands.UnReadyClimb;
 import frc.robot.customClass.FieldPositions.Side;
 import frc.robot.customClass.SystemPositions.Positions;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorControlSubsystem;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.ShoulderSubsystem;
+import frc.robot.subsystems.Climber.ClimberMode;
 import frc.robot.subsystems.ElevatorControlSubsystem.ElevatorMode;
 import frc.robot.subsystems.ShoulderSubsystem.ShoulderMode;
 
@@ -103,6 +108,8 @@ public class RobotContainer {
     private Intake intake;
 
     private boolean hasClimber = false;
+    private boolean climberMode = false;
+    private Climber climber;
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -152,7 +159,9 @@ public class RobotContainer {
     private Trigger wristPos1Button = manipCommandController.button(Constants.leftBumper);
     private Trigger wristPos2Button = manipCommandController.button(Constants.rightBumper);
 
-    private Trigger testButton = manipCommandController.button(Constants.rightMenuButton);
+    private Trigger climberModeButton = manipCommandController.button(Constants.rightMenuButton);
+
+    // private Trigger testButton = manipCommandController.button(Constants.rightMenuButton);
 
     private Trigger intakeAutoPos = manipCommandController.pov(270);
     private Trigger L4Button = manipCommandController.pov(0);
@@ -198,11 +207,11 @@ public class RobotContainer {
         }
 
         // Setup Climber if present
-        // if(hasClimber){
-        // climber = new Clkimber();
-        // } else {
-        // elevator = null;
-        // }
+        if (hasClimber) {
+            climber = new Climber();
+        } else {
+            climber = null;
+        }
 
         // Register Named Commands
         NamedCommands.registerCommand("ReadyHigh", new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.75));
@@ -232,6 +241,7 @@ public class RobotContainer {
         // .withSize(7, 2);
 
         SmartDashboard.putData("Auto Chooser", m_chooser);
+        SmartDashboard.putBoolean("Climber Moder", climberMode);
 
         configureBindings();
     }
@@ -322,8 +332,19 @@ public class RobotContainer {
             L3Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L3_READY));
             L2Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L2_READY));
 
-        } if (hasElevator && hasIntake){
-            testButton.onTrue(new RemoveAlgae(elevator, intake));
+        } 
+        
+        if (hasElevator && hasIntake){
+            
+        }
+
+        if (hasClimber){
+            climberModeButton.onTrue(new InstantCommand(() -> climberMode = !climberMode)
+                .andThen(new ConditionalCommand(new ReadyClimb(climber), new UnReadyClimb(climber), () -> {return climberMode;})));
+
+            climber.setDefaultCommand(
+                new RunCommand(climberRunnable, climber));
+
         }
 
         // setFieldCentButton.onTrue(setFieldCent());
@@ -383,10 +404,8 @@ public class RobotContainer {
 
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
 
-        driveLeftReef.onTrue(new DriveToReefTag(drivetrain, Side.LEFT, "limelight-front"))
-                .onFalse(new InstantCommand(() -> {
-                    double a = 1;
-                }, drivetrain));
+        driveLeftReef.onTrue(new PathfindToReefTag(drivetrain, Side.LEFT, "limelight-front"))
+                .onFalse(new InstantCommand(() -> {}, drivetrain));
 
         // reset the field-centric heading
         resetGyro.onTrue(drivetrain.runOnce(drivetrain::zeroFieldCentric));
@@ -463,12 +482,17 @@ public class RobotContainer {
     // };
 
     Runnable elevatorRunnable = () -> {
-        double elevatorStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.leftStickY), 0.05);
+        if (!climberMode) {
+            double elevatorStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.leftStickY),
+                    0.05);
 
-        if (elevatorStick == 0 && elevator.getMode() != ElevatorMode.RUN_TO_POSITION) {
+            if (elevatorStick == 0 && elevator.getMode() != ElevatorMode.RUN_TO_POSITION) {
+                elevator.moveElevator(0);
+            } else if (elevatorStick != 0) {
+                elevator.moveElevator(elevatorStick);
+            }
+        } else {
             elevator.moveElevator(0);
-        } else if (elevatorStick != 0) {
-            elevator.moveElevator(elevatorStick);
         }
 
     };
@@ -483,6 +507,29 @@ public class RobotContainer {
             shoulder.runMotor(shoulderStick * 0.5);
             //System.out.println("Shoulder Running");
         }
+    };
+
+    Runnable climberRunnable = () -> {
+        if (climberMode) {
+            double climberStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.leftStickY),
+                    0.03);
+
+            if ((Math.abs(climberStick) < 0.03) && climber.climberMode == ClimberMode.MANUAL) {
+                climber.manualClimb(0);
+            } else if (Math.abs(climberStick) >= 0.03) {
+                climber.manualClimb(climberStick * 0.5);
+            }
+
+            double tiltStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.leftStickX),
+                    0.1);
+
+            if ((Math.abs(tiltStick) < 0.1) && climber.climberMode == ClimberMode.MANUAL) {
+                climber.manualClimb(0);
+            } else if (Math.abs(tiltStick) >= 0.1) {
+                climber.manualClimb(tiltStick * 0.5);
+            }
+        }
+
     };
 
     private Command setFieldCent() {

@@ -39,20 +39,19 @@ public class PathfindToReefTag extends Command {
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
   private double MaxAngularRate = RotationsPerSecond.of(2*Math.PI).in(RadiansPerSecond); // Chaged from 3/4  to 1 of a rotation per second max angular velocity
 
-    String limelight = null;
-    Side side = null;
+  String limelight = null;
+  Side side = null;
 
-    Pose2d targetPose;
-    boolean validTarget = false;
+  Pose2d targetPose;
+  boolean validTarget = false;
 
-    PathConstraints constraints = new PathConstraints(
+  PathConstraints constraints = new PathConstraints(
       3.0, 4.0,
       9.424778, 12.56637);
-      Command pathfindingCommand;
+  Command pathfindingCommand;
 
-
-    static final double translationTol = 0.01;
-    static final double rotTol = 3;
+  static final double translationTol = 0.01;
+  static final double rotTol = 3;
 
     
     private CommandSwerveDrivetrain drivetrain;
@@ -74,8 +73,8 @@ public class PathfindToReefTag extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    PoseEstimate currentLoc = drivetrain.updateOdometryFromLL_CTRE(limelight);
-    int nearestTag = drivetrain.getNearestTag(currentLoc);
+    PoseEstimate currentPoseEst = drivetrain.updateOdometryFromLL_CTRE(limelight);
+    int nearestTag = drivetrain.getNearestTag(currentPoseEst);
 
     targetPose = FieldPositions.getTagCoord(nearestTag, side);
 
@@ -104,7 +103,7 @@ public class PathfindToReefTag extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    System.out.println("DONE!" + interrupted);
+    // System.out.println("DONE!" + interrupted);
     drivetrain.applyRequestMethod(
                 () -> driveFieldRel.withVelocityX(0) // Drive forward with negative Y (forward)
                 .withVelocityY(0) // Drive left with negative X (left)
