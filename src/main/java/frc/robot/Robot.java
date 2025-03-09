@@ -9,9 +9,13 @@ import com.ctre.phoenix6.Orchestra;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -42,6 +46,12 @@ public class Robot extends TimedRobot {
   public void disabledExit() {}
 
   public void robotInit() {
+    CameraServer.startAutomaticCapture();
+    // NetworkTableInstance.getDefault()
+    //   .getTable("SmartDashboard")
+    //   .getEntry("CameraStreamURL")
+    //   .setString("http://10.47.76.2:1181/stream.mjpg");
+
     Pathfinding.setPathfinder(new LocalADStar());
   }
 
