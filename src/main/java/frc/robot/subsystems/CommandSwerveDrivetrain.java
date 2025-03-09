@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -51,6 +52,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private final Field2d field2d = new Field2d();
     ShuffleboardTab tab = Shuffleboard.getTab("Field Map");
+
+    private CANrange frontCANrange = new CANrange(50, "TestBed");
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -341,6 +344,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // }
 
         field2d.setRobotPose(getState().Pose);
+        SmartDashboard.putNumber("Front Distance", frontCANrange.getDistance().getValueAsDouble());
     }
 
     private void startSimThread() {

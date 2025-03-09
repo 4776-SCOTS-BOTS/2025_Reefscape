@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -41,6 +42,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.Climb;
 import frc.robot.commands.DeliverCoral;
 import frc.robot.commands.DriveToReefTag;
 import frc.robot.commands.IntakeCoral;
@@ -107,7 +109,7 @@ public class RobotContainer {
     private boolean hasIntake = true;
     private Intake intake;
 
-    private boolean hasClimber = false;
+    private boolean hasClimber = true;
     private boolean climberMode = false;
     private Climber climber;
 
@@ -160,6 +162,7 @@ public class RobotContainer {
     private Trigger wristPos2Button = manipCommandController.button(Constants.rightBumper);
 
     private Trigger climberModeButton = manipCommandController.button(Constants.rightMenuButton);
+    private Trigger autoClimbButton = manipCommandController.button(Constants.leftMenuButton);
 
     // private Trigger testButton = manipCommandController.button(Constants.rightMenuButton);
 
@@ -342,6 +345,8 @@ public class RobotContainer {
             climberModeButton.onTrue(new InstantCommand(() -> climberMode = !climberMode)
                 .andThen(new ConditionalCommand(new ReadyClimb(climber), new UnReadyClimb(climber), () -> {return climberMode;})));
 
+            autoClimbButton.onTrue(new ConditionalCommand(new Climb(climber), new InstantCommand(() -> {}), () -> {return climberMode;}));
+
             climber.setDefaultCommand(
                 new RunCommand(climberRunnable, climber));
 
@@ -405,7 +410,11 @@ public class RobotContainer {
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
 
         driveLeftReef.onTrue(new PathfindToReefTag(drivetrain, Side.LEFT, "limelight-front"))
-                .onFalse(new InstantCommand(() -> {}, drivetrain));
+                .onFalse(new InstantCommand(() -> {
+                }, drivetrain));
+        driveLeftReef.onTrue(new PathfindToReefTag(drivetrain, Side.RIGHT, "limelight-front"))
+                .onFalse(new InstantCommand(() -> {
+                }, drivetrain));
 
         // reset the field-centric heading
         resetGyro.onTrue(drivetrain.runOnce(drivetrain::zeroFieldCentric));
@@ -491,8 +500,6 @@ public class RobotContainer {
             } else if (elevatorStick != 0) {
                 elevator.moveElevator(elevatorStick);
             }
-        } else {
-            elevator.moveElevator(0);
         }
 
     };
@@ -520,13 +527,13 @@ public class RobotContainer {
                 climber.manualClimb(climberStick * 0.5);
             }
 
-            double tiltStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.leftStickX),
+            double tiltStick = MathUtil.applyDeadband(manipCommandController.getRawAxis(Constants.leftStickX),
                     0.1);
 
             if ((Math.abs(tiltStick) < 0.1) && climber.climberMode == ClimberMode.MANUAL) {
-                climber.manualClimb(0);
+                climber.manualTilt(0);
             } else if (Math.abs(tiltStick) >= 0.1) {
-                climber.manualClimb(tiltStick * 0.5);
+                climber.manualTilt(tiltStick * 0.5);
             }
         }
 

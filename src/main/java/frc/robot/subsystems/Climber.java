@@ -26,8 +26,8 @@ public class Climber extends SubsystemBase {
   public final TalonFX climbMotor;
   public final TalonFX tiltMotor;
 
-  public double climbPosition = 42;
-  public double tiltRange = 5;
+  public double climbPosition = 23;
+  public double tiltRange = 15;
 
   public enum ClimberMode {
     RUN_TO_POSITION,
@@ -39,14 +39,14 @@ public class Climber extends SubsystemBase {
   
 
   public Climber() {
-    climbMotor = new TalonFX(ElevatorConstants.ELEVATOR_LEADER_ID, "rio");
-    tiltMotor = new TalonFX(ElevatorConstants.ELEVATOR_FOLLOWER_ID, "rio");
+    climbMotor = new TalonFX(Constants.ClimberConstants.climberMotorCANID, "rio");
+    tiltMotor = new TalonFX(Constants.ClimberConstants.tiltMotorCANID, "rio");
 
     TalonFXConfiguration climb_cfg = new TalonFXConfiguration();
     TalonFXConfiguration tilt_cfg = new TalonFXConfiguration();
 
     MotorOutputConfigs climb_mo = climb_cfg.MotorOutput;
-    climb_mo.Inverted = InvertedValue.Clockwise_Positive;
+    climb_mo.Inverted = InvertedValue.CounterClockwise_Positive;
     climb_mo.NeutralMode = NeutralModeValue.Brake;
 
     climb_cfg.CurrentLimits.StatorCurrentLimit = 90; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
@@ -55,6 +55,7 @@ public class Climber extends SubsystemBase {
     climbMotor.getConfigurator().apply(climb_cfg);
 
     tilt_cfg = climb_cfg;
+    tilt_cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     tiltMotor.getConfigurator().apply(climb_cfg);
 
   }
@@ -86,7 +87,8 @@ public class Climber extends SubsystemBase {
   public void runTilt(double speed){
     if(speed > 0 && tiltMotor.getPosition().getValueAsDouble() >= tiltRange){
       speed = 0;
-    } else if(speed < 0 && tiltMotor.getPosition().getValueAsDouble() <= 0){
+    } else if(speed < 0 && tiltMotor.getPosition().getValueAsDouble() <= -15){
+      //Ignoring negative limits for now
       speed = 0;
     }   
     tiltMotor.set(speed);

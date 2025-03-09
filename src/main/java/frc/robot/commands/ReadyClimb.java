@@ -24,6 +24,7 @@ public class ReadyClimb extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    System.out.println("Ready Climber");
     climber.autoTilt(0.25);
     startTilt = false;
     isComplete = false;
@@ -34,8 +35,7 @@ public class ReadyClimb extends Command {
   public void execute() {
     if (climber.tiltMotor.getPosition().getValueAsDouble() < climber.tiltRange) {
       climber.autoTilt(0.25);
-    }
-    {
+    } else {
       climber.autoTilt(0);
       isComplete = true;
     }

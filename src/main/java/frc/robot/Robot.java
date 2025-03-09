@@ -79,8 +79,8 @@ public class Robot extends TimedRobot {
     }
 
     // Switch Limelight Megatag2 mode to internal IMU
-    m_robotContainer.drivetrain.activeLimelightUpdate("limelight-front");
-    m_robotContainer.drivetrain.activeLimelightUpdate("limelight-rear");
+    // m_robotContainer.drivetrain.activeLimelightUpdate("limelight-front");
+    // m_robotContainer.drivetrain.activeLimelightUpdate("limelight-rear");
   }
 
   @Override
