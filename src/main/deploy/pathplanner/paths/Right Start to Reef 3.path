@@ -8,28 +8,42 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.677553278688523,
-        "y": 1.3697233606557373
+        "x": 5.91329690311697,
+        "y": 0.8095112864436975
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.917282776574835,
-        "y": 2.6893400617868326
+        "x": 3.9873988959714963,
+        "y": 2.8186326737183482
       },
       "prevControl": {
-        "x": 3.2842930129555468,
-        "y": 1.760741115945493
+        "x": 3.08375047875836,
+        "y": 1.1239905986356133
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Reef 3 Right Pole"
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.6158594491927845,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.5,
+        "maxAcceleration": 1.5,
+        "maxAngularVelocity": 150.0,
+        "maxAngularAcceleration": 150.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {

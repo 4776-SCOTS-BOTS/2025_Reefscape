@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.403,
-        "y": 1.334
+        "x": 0.9770280427254996,
+        "y": 1.1781900332085695
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.8516079759658481,
-        "y": 1.6357262347397967
+        "x": 1.4256360186913477,
+        "y": 1.4799162679483662
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Station Right"
     },
     {
       "anchor": {
-        "x": 3.65625,
-        "y": 2.898155737704918
+        "x": 3.6887498960026135,
+        "y": 2.9699917716362965
       },
       "prevControl": {
-        "x": 2.8530737704918034,
-        "y": 1.7053790983606552
+        "x": 2.885573666494417,
+        "y": 1.7772151322920335
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,7 @@
   "folder": "Blue",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 50.0
+    "rotation": 55.0
   },
   "useDefaultConstraints": true
 }

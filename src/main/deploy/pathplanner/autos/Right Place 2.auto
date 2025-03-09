@@ -7,7 +7,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 10.0
+            "waitTime": 5.0
           }
         },
         {
@@ -102,7 +102,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "StationSafe"
+                        "name": "StationIntakeDelay"
                       }
                     },
                     {
@@ -165,15 +165,15 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "wait",
                 "data": {
-                  "name": "DeliverCoral"
+                  "waitTime": 5.0
                 }
               },
               {
-                "type": "wait",
+                "type": "named",
                 "data": {
-                  "waitTime": 0.0
+                  "name": "DeliverCoral"
                 }
               },
               {

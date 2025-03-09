@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.927020124124582,
-        "y": 2.6899927824046754
+        "x": 3.9873988959714963,
+        "y": 2.8186326737183482
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.978946353632779,
-        "y": 0.9211095856833627
+        "x": 3.0393251254796936,
+        "y": 1.0497494769970355
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Reef 3 Right Pole"
     },
     {
       "anchor": {
-        "x": 1.403,
-        "y": 1.334
+        "x": 0.9770280427254996,
+        "y": 1.1781900332085695
       },
       "prevControl": {
-        "x": 2.0252126594841027,
-        "y": 2.306287179755649
+        "x": 1.5992407022096025,
+        "y": 2.150477212964218
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Station Right"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 50.0
+    "rotation": 55.0
   },
   "reversed": false,
   "folder": "Blue",
