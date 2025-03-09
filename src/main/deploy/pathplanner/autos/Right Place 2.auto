@@ -86,7 +86,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Reef 3 to Right Station"
+                  "pathName": "RIGHT Reef 3 to Right Station"
                 }
               },
               {
@@ -142,7 +142,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Station to Reef 3"
+                  "pathName": "Right Station to LEFT Reef 3"
                 }
               },
               {
