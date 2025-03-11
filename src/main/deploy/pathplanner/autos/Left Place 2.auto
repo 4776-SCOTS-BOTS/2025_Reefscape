@@ -7,7 +7,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 10.0
+            "waitTime": 0.0
           }
         },
         {
@@ -23,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Left Start to Reef 5"
+                  "pathName": "Left Start to LEFT Reef 5"
                 }
               },
               {
@@ -39,7 +39,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.0
+                        "waitTime": 0.5
                       }
                     },
                     {
@@ -59,15 +59,15 @@
           "data": {
             "commands": [
               {
-                "type": "named",
-                "data": {
-                  "name": "DeliverCoral"
-                }
-              },
-              {
                 "type": "wait",
                 "data": {
                   "waitTime": 0.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "DeliverCoral"
                 }
               }
             ]
@@ -86,7 +86,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Reef 5 to Left Station"
+                  "pathName": "LEFT Reef 5 to Left Station"
                 }
               },
               {
@@ -122,6 +122,12 @@
                       "data": {
                         "name": "IntakeCoral"
                       }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.0
+                      }
                     }
                   ]
                 }
@@ -142,7 +148,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Left Station to Reef 5"
+                  "pathName": "Left Station to RIGHT Reef 5"
                 }
               },
               {
@@ -165,15 +171,15 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "wait",
                 "data": {
-                  "name": "DeliverCoral"
+                  "waitTime": 0.5
                 }
               },
               {
-                "type": "wait",
+                "type": "named",
                 "data": {
-                  "waitTime": 0.0
+                  "name": "DeliverCoral"
                 }
               },
               {
