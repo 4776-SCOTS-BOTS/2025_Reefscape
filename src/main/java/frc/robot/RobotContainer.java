@@ -345,7 +345,8 @@ public class RobotContainer {
 
         if (hasClimber){
             climberModeButton.onTrue(new InstantCommand(() -> climberMode = !climberMode)
-                .andThen(new ConditionalCommand(new ReadyClimb(climber), new UnReadyClimb(climber), () -> {return climberMode;})));
+                .andThen(new ConditionalCommand(new ReadyClimb(climber), new UnReadyClimb(climber), () -> {return climberMode;}))
+                .andThen(new InstantCommand(() -> {SmartDashboard.putBoolean("Climber Moder", climberMode);})));
 
             autoClimbButton.onTrue(new ConditionalCommand(new Climb(climber), new InstantCommand(() -> {}), () -> {return climberMode;}));
 
