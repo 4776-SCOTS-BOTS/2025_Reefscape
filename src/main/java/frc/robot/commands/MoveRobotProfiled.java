@@ -111,10 +111,10 @@ public class MoveRobotProfiled extends Command {
     double outputY = MathUtil.clamp(pidControllerY.calculate(currentPositionY), -0.25, +0.25);
     double outputRot = MathUtil.clamp(pidControllerRot.calculate(currentRotation), -0.25, +0.25);
 
-    SmartDashboard.putNumber("X Error", pidControllerX.getPositionError());
-    SmartDashboard.putNumber("X Error Tol", pidControllerX.getPositionTolerance());
-    SmartDashboard.putNumber("X Output", outputX);
-    SmartDashboard.putBoolean("X at Setpoint", pidControllerX.atSetpoint());
+    // SmartDashboard.putNumber("X Error", pidControllerX.getPositionError());
+    // SmartDashboard.putNumber("X Error Tol", pidControllerX.getPositionTolerance());
+    // SmartDashboard.putNumber("X Output", outputX);
+    // SmartDashboard.putBoolean("X at Setpoint", pidControllerX.atSetpoint());
 
     // System.out.println("Current X: " + currentPositionX + " Current Y: " + currentPositionY +  " pidx: " + outputX + " pidy: " + outputY);
     // System.out.println("X Error: " + pidControllerX.getError() + " Xpos" + currentPositionX);

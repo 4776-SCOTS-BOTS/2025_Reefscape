@@ -51,6 +51,7 @@ import frc.robot.commands.MoveRobot;
 import frc.robot.commands.PathfindToReefTag;
 import frc.robot.commands.ReadyClimb;
 import frc.robot.commands.RemoveAlgae;
+import frc.robot.commands.RemoveAlgaeHigh;
 import frc.robot.commands.UnReadyClimb;
 import frc.robot.customClass.FieldPositions.Side;
 import frc.robot.customClass.SystemPositions.Positions;
@@ -141,8 +142,8 @@ public class RobotContainer {
     JoystickButton sprintTrigger = new JoystickButton(m_driverController, XboxController.Button.kRightStick.value);
     // private Trigger setFieldCentButton = driverCommandController.leftBumper();
     // private Trigger setRobotCentButton = driverCommandController.rightBumper();
-    private Trigger driveLeftReef = driverCommandController.leftBumper();
-    private Trigger driveRightReef = driverCommandController.rightBumper();
+    // private Trigger driveLeftReef = driverCommandController.leftBumper();
+    // private Trigger driveRightReef = driverCommandController.rightBumper();
     private Trigger forcePoseButton = driverCommandController.a();
 
     // d-pad field-rel Movement
@@ -227,6 +228,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("StationIntakeImmediate", new MoveArmAndElevator(elevator, shoulder, Positions.INTAKE_STATION, 0));
         NamedCommands.registerCommand("IntakeCoral", new IntakeCoral(intake));
         NamedCommands.registerCommand("RemoveAlgae", new RemoveAlgae(elevator, intake));
+        NamedCommands.registerCommand("RemoveAlgaeHigh", new RemoveAlgaeHigh(elevator, intake));
         NamedCommands.registerCommand("LimelightFront", new InstantCommand(drivetrain::setFrontLimelight));
         NamedCommands.registerCommand("LimelightBack", new InstantCommand(drivetrain::setBackLimelight));
 
@@ -409,12 +411,12 @@ public class RobotContainer {
 
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
 
-        driveLeftReef.onTrue(new PathfindToReefTag(drivetrain, Side.LEFT, "limelight-front"))
-                .onFalse(new InstantCommand(() -> {
-                }, drivetrain));
-        driveLeftReef.onTrue(new PathfindToReefTag(drivetrain, Side.RIGHT, "limelight-front"))
-                .onFalse(new InstantCommand(() -> {
-                }, drivetrain));
+        // driveLeftReef.onTrue(new PathfindToReefTag(drivetrain, Side.LEFT, "limelight-front"))
+        //         .onFalse(new InstantCommand(() -> {
+        //         }, drivetrain));
+        // driveLeftReef.onTrue(new PathfindToReefTag(drivetrain, Side.RIGHT, "limelight-front"))
+        //         .onFalse(new InstantCommand(() -> {
+        //         }, drivetrain));
 
         // reset the field-centric heading
         resetGyro.onTrue(drivetrain.runOnce(drivetrain::zeroFieldCentric));

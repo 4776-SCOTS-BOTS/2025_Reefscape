@@ -144,18 +144,18 @@ public class DriveToReefTag extends Command {
       double outputY = pidControllerY.calculate(currentPositionY);
       double outputRot = pidControllerRot.calculate(currentRotation);
 
-      SmartDashboard.putNumber("X Error", pidControllerX.getPositionError());
-      SmartDashboard.putNumber("X Error Tol", pidControllerX.getPositionTolerance());
-      SmartDashboard.putNumber("X Output", outputX);
-      SmartDashboard.putBoolean("X at Setpoint", pidControllerX.atSetpoint());
-      SmartDashboard.putNumber("Y Error", pidControllerY.getPositionError());
-      SmartDashboard.putNumber("Y Error Tol", pidControllerY.getPositionTolerance());
-      SmartDashboard.putNumber("Y Output", outputY);
-      SmartDashboard.putBoolean("Y at Setpoint", pidControllerY.atSetpoint());      
-      SmartDashboard.putNumber("Rot Error", pidControllerRot.getPositionError());
-      SmartDashboard.putNumber("Rot Error Tol", pidControllerRot.getPositionTolerance());
-      SmartDashboard.putNumber("Rot Output", outputRot);
-      SmartDashboard.putBoolean("Rot at Setpoint", pidControllerRot.atSetpoint());
+      // SmartDashboard.putNumber("X Error", pidControllerX.getPositionError());
+      // SmartDashboard.putNumber("X Error Tol", pidControllerX.getPositionTolerance());
+      // SmartDashboard.putNumber("X Output", outputX);
+      // SmartDashboard.putBoolean("X at Setpoint", pidControllerX.atSetpoint());
+      // SmartDashboard.putNumber("Y Error", pidControllerY.getPositionError());
+      // SmartDashboard.putNumber("Y Error Tol", pidControllerY.getPositionTolerance());
+      // SmartDashboard.putNumber("Y Output", outputY);
+      // SmartDashboard.putBoolean("Y at Setpoint", pidControllerY.atSetpoint());      
+      // SmartDashboard.putNumber("Rot Error", pidControllerRot.getPositionError());
+      // SmartDashboard.putNumber("Rot Error Tol", pidControllerRot.getPositionTolerance());
+      // SmartDashboard.putNumber("Rot Output", outputRot);
+      // SmartDashboard.putBoolean("Rot at Setpoint", pidControllerRot.atSetpoint());
 
 
 
@@ -178,7 +178,7 @@ public class DriveToReefTag extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    System.out.println("DONE!" + interrupted);
+    // System.out.println("DONE!" + interrupted);
     drivetrain.applyRequestMethod(
                 () -> driveFieldRel.withVelocityX(0) // Drive forward with negative Y (forward)
                 .withVelocityY(0) // Drive left with negative X (left)

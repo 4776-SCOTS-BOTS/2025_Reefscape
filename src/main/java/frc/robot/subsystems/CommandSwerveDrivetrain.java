@@ -50,8 +50,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
-    private final Field2d field2d = new Field2d();
-    ShuffleboardTab tab = Shuffleboard.getTab("Field Map");
+    // private final Field2d field2d = new Field2d();
+    // ShuffleboardTab tab = Shuffleboard.getTab("Field Map");
 
     private CANrange frontCANrange = new CANrange(50, "TestBed");
 
@@ -164,8 +164,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         configureAutoBuilder();
 
-        SmartDashboard.putData(field2d);
-        tab.add("Field", field2d).withPosition(0, 0).withSize(10, 5);
+        // SmartDashboard.putData(field2d);
+        // tab.add("Field", field2d).withPosition(0, 0).withSize(10, 5);
     }
 
     /**
@@ -343,8 +343,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             }
         // }
 
-        field2d.setRobotPose(getState().Pose);
-        SmartDashboard.putNumber("Front Distance", frontCANrange.getDistance().getValueAsDouble());
+        // field2d.setRobotPose(getState().Pose);
+        // SmartDashboard.putNumber("Front Distance", frontCANrange.getDistance().getValueAsDouble());
     }
 
     private void startSimThread() {

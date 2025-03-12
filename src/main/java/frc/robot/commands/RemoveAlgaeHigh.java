@@ -4,55 +4,48 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.ElevatorControlSubsystem;
+import frc.robot.subsystems.Intake;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class ReadyClimb extends Command {
-  /** Creates a new Climb. */
-  private Climber climber;
-  private boolean startTilt = false;
-  private boolean isComplete = false;
-  
-  public ReadyClimb(Climber climber) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(climber);
+public class RemoveAlgaeHigh extends Command {
+  /** Creates a new RemoveAlgae. */
+  private ElevatorControlSubsystem elevator;
+  private Intake intake;
+  private Timer timer = new Timer();
+  double timeout = 2;
 
-    this.climber = climber;
+  public RemoveAlgaeHigh(ElevatorControlSubsystem elevator, Intake intake) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(elevator, intake);
+    this.elevator = elevator;
+    this.intake = intake;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // System.out.println("Ready Climber");
-    climber.autoTilt(0.25);
-    startTilt = false;
-    isComplete = false;
+    double newPostion = elevator.getElevatorPosition() - 0.10;
+    intake.intakeOutFast();
+    elevator.moveToPosition(newPostion);
+    timer.restart();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (climber.tiltMotor.getPosition().getValueAsDouble() < climber.tiltRange) {
-      climber.autoTilt(0.25);
-    } else {
-      climber.autoTilt(0);
-      isComplete = true;
-    }
-
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    climber.autoTilt(0);
-    climber.autoClimb(0);
-    climber.climberMode = Climber.ClimberMode.RUN_TO_POSITION;
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return isComplete;
+    return timer.hasElapsed(timeout);
   }
 }

@@ -78,7 +78,7 @@ public class PathfindToReefTag extends Command {
 
     targetPose = FieldPositions.getTagCoord(nearestTag, side);
 
-    System.out.println("Tag: " + nearestTag + " Pose: " + targetPose);
+    // System.out.println("Tag: " + nearestTag + " Pose: " + targetPose);
 
     if (targetPose != null) {
       pathfindingCommand = AutoBuilder.pathfindToPose(

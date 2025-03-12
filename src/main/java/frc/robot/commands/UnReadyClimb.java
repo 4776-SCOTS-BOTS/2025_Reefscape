@@ -24,7 +24,7 @@ public class UnReadyClimb extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.println("UNReady Climber");
+    // System.out.println("UNReady Climber");
     climber.autoTilt(-0.25);
     startTilt = false;
     isComplete = false;

@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.customClass.SystemPositions;
 import frc.robot.subsystems.ElevatorControlSubsystem;
-import frc.robot.subsystems.NOTShoulder;
 import frc.robot.subsystems.ShoulderSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */

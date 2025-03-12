@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 5.81,
-        "y": 4.231
+        "x": 5.7738188652632125,
+        "y": 4.1912981235138
       },
       "prevControl": {
-        "x": 6.890039380069079,
-        "y": 4.231
+        "x": 6.853858245332292,
+        "y": 4.1912981235138
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Real Reef1 Right"
     }
   ],
   "rotationTargets": [],
