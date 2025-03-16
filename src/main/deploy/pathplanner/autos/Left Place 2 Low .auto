@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.0
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "LimelightFront"
@@ -17,13 +23,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Start - Initial to Reef 3 Right"
+                  "pathName": "Left Start - Initial Reef 5 Left"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "ReadyHigh"
+                  "name": "ReefDeliverLow"
                 }
               },
               {
@@ -34,12 +40,6 @@
                       "type": "wait",
                       "data": {
                         "waitTime": 0.5
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "IntakeDeliverPos"
                       }
                     }
                   ]
@@ -52,6 +52,12 @@
           "type": "sequential",
           "data": {
             "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.0
+                }
+              },
               {
                 "type": "named",
                 "data": {
@@ -74,7 +80,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Start - Reef 3 Right to Station"
+                  "pathName": "Left Start - Reef 5 Left to Station"
                 }
               },
               {
@@ -110,6 +116,12 @@
                       "data": {
                         "name": "IntakeCoral"
                       }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.0
+                      }
                     }
                   ]
                 }
@@ -130,19 +142,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Start - Station to Reef 3 Left"
+                  "pathName": "Left Start - Station to Reef 5 Right"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "ReadyHigh"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "IntakeDeliverPos"
+                  "name": "ReefDeliverLow"
                 }
               }
             ]
@@ -162,63 +168,6 @@
                 "type": "named",
                 "data": {
                   "name": "DeliverCoral"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "RemoveAlgae"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.5
-                }
-              },
-              {
-                "type": "parallel",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "Right Start - Reef 3 Left to Station"
-                      }
-                    },
-                    {
-                      "type": "sequential",
-                      "data": {
-                        "commands": [
-                          {
-                            "type": "wait",
-                            "data": {
-                              "waitTime": 0.25
-                            }
-                          },
-                          {
-                            "type": "named",
-                            "data": {
-                              "name": "StationSafe"
-                            }
-                          },
-                          {
-                            "type": "named",
-                            "data": {
-                              "name": "IntakePickupPos"
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  ]
                 }
               }
             ]

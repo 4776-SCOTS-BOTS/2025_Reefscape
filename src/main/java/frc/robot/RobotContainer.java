@@ -231,6 +231,9 @@ public class RobotContainer {
         NamedCommands.registerCommand("RemoveAlgaeHigh", new RemoveAlgaeHigh(elevator, intake));
         NamedCommands.registerCommand("LimelightFront", new InstantCommand(drivetrain::setFrontLimelight));
         NamedCommands.registerCommand("LimelightBack", new InstantCommand(drivetrain::setBackLimelight));
+        NamedCommands.registerCommand("ReefDeliverLow", new MoveArmAndElevator(elevator, shoulder, Positions.L1_READY, 0));
+        NamedCommands.registerCommand("OuttakeSlow", new InstantCommand(intake::intakeOut));
+
 
         // Build an auto chooser. This will use Commands.none() as the default option.
         m_chooser = AutoBuilder.buildAutoChooser();
@@ -305,7 +308,7 @@ public class RobotContainer {
 
         if (hasIntake) {
             intakeButton.onTrue(new IntakeCoral(intake));
-            outFastButton.onTrue(new InstantCommand(intake::intakeOutFast, intake));
+            outFastButton.onTrue(new InstantCommand(intake::intakeOut, intake));
             intakeOffButton.onTrue(new InstantCommand(intake::intakeOff, intake));
             wristPickupButton.onTrue(new InstantCommand(intake::wristPickup, intake));
             wristPos1Button.onTrue(new InstantCommand(intake::wristDeliver1, intake));

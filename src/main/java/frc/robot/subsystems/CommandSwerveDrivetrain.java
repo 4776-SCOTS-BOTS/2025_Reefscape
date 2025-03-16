@@ -496,7 +496,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             distance = 1000;
         }
         if (llMeasurement != null && llMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0
-                && llMeasurement.avgTagDist < 2 && distance < 2) {
+                && llMeasurement.avgTagDist < 3 && distance < 2) {
             // super.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
             addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds, VecBuilder.fill(.7, .7, 9999999));
         }

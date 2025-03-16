@@ -23,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Left Start to LEFT Reef 5"
+                  "pathName": "Left Start - Initial Reef 5 Left"
                 }
               },
               {
@@ -86,7 +86,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LEFT Reef 5 to Left Station"
+                  "pathName": "Left Start - Reef 5 Left to Station"
                 }
               },
               {
@@ -148,7 +148,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Left Station to RIGHT Reef 5"
+                  "pathName": "Left Start - Station to Reef 5 Right"
                 }
               },
               {

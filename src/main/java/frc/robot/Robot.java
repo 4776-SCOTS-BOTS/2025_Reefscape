@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
   public void disabledExit() {}
 
   public void robotInit() {
-    CameraServer.startAutomaticCapture();
+    // CameraServer.startAutomaticCapture();
     // NetworkTableInstance.getDefault()
     //   .getTable("SmartDashboard")
     //   .getEntry("CameraStreamURL")

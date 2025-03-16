@@ -23,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Mid Start to Reef 1"
+                  "pathName": "Mid Start - Initial to Reef 1 Left"
                 }
               },
               {
@@ -99,7 +99,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Reef1 Backup"
+                  "pathName": "Mid Start - Reef 1 Backup"
                 }
               }
             ]

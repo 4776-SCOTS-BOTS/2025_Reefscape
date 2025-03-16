@@ -805,6 +805,45 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "21,3": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/limelight-climb_PipelineName",
+              "_title": "limelight-climb_PipelineName",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "23,3": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/limelight-climb_Stream",
+              "_title": "limelight-climb_Stream",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "25,3": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/limelight-climb_Interface",
+              "_title": "limelight-climb_Interface",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
@@ -835,8 +874,8 @@
               "Crosshair/Crosshair color": "#FFFFFFFF",
               "Controls/Show controls": true,
               "Controls/Rotation": "NONE",
-              "compression": 35.0,
-              "fps": -1,
+              "compression": 37.0,
+              "fps": 10,
               "imageWidth": 320,
               "imageHeight": 180
             }
@@ -870,8 +909,8 @@
               "Crosshair/Crosshair color": "#FFFFFFFF",
               "Controls/Show controls": true,
               "Controls/Rotation": "NONE",
-              "compression": 35.0,
-              "fps": -1,
+              "compression": 37.0,
+              "fps": 10,
               "imageWidth": 320,
               "imageHeight": 180
             }
@@ -909,9 +948,9 @@
     }
   ],
   "windowGeometry": {
-    "x": -5.599999904632568,
-    "y": 0.0,
-    "width": 1551.199951171875,
-    "height": 713.5999755859375
+    "x": 0.800000011920929,
+    "y": 0.800000011920929,
+    "width": 1534.4000244140625,
+    "height": 814.4000244140625
   }
 }
