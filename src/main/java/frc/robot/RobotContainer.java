@@ -42,6 +42,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.AlignToRange;
 import frc.robot.commands.Climb;
 import frc.robot.commands.DeliverCoral;
 import frc.robot.commands.DriveToReefTag;
@@ -114,6 +115,8 @@ public class RobotContainer {
     private boolean climberMode = false;
     private Climber climber;
 
+    private boolean isL4 = false;
+
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     // Controls
@@ -144,7 +147,9 @@ public class RobotContainer {
     // private Trigger setRobotCentButton = driverCommandController.rightBumper();
     // private Trigger driveLeftReef = driverCommandController.leftBumper();
     // private Trigger driveRightReef = driverCommandController.rightBumper();
-    private Trigger forcePoseButton = driverCommandController.a();
+    // private Trigger forcePoseButton = driverCommandController.a();
+    private Trigger searchLeftButton = driverCommandController.leftBumper();
+    private Trigger searchRighttButton = driverCommandController.rightBumper();
 
     // d-pad field-rel Movement
     POVButton dpadUp = new POVButton(m_driverController, 0);
@@ -336,9 +341,12 @@ public class RobotContainer {
                     .onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION))
                     .onFalse(new MoveArmAndElevator(elevator, shoulder, Positions.INTAKE_STATION));
 
-            L4Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.75));
-            L3Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L3_READY));
-            L2Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L2_READY));
+            L4Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.75)
+                    .andThen(new InstantCommand(() -> isL4 = true)));
+            L3Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L3_READY)
+                    .andThen(new InstantCommand(() -> isL4 = false)));
+            L2Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L2_READY)
+                    .andThen(new InstantCommand(() -> isL4 = false)));
 
         } 
         
@@ -415,12 +423,8 @@ public class RobotContainer {
 
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
 
-        // driveLeftReef.onTrue(new PathfindToReefTag(drivetrain, Side.LEFT, "limelight-front"))
-        //         .onFalse(new InstantCommand(() -> {
-        //         }, drivetrain));
-        // driveLeftReef.onTrue(new PathfindToReefTag(drivetrain, Side.RIGHT, "limelight-front"))
-        //         .onFalse(new InstantCommand(() -> {
-        //         }, drivetrain));
+        searchLeftButton.onTrue(new AlignToRange(drivetrain, true, isL4));
+        searchRighttButton.onTrue(new AlignToRange(drivetrain, false, isL4));
 
         // reset the field-centric heading
         resetGyro.onTrue(drivetrain.runOnce(drivetrain::zeroFieldCentric));
@@ -430,7 +434,8 @@ public class RobotContainer {
         // Development Commands
         // driverCommandController.a().onTrue(new MoveRobot(drivetrain, 1, 0, 0))
         // .onFalse(new InstantCommand(driveRunnable, drivetrain));
-        forcePoseButton.onTrue(new InstantCommand(() -> drivetrain.forcePoseUpdate("limelight-front")));
+        // forcePoseButton.onTrue(new InstantCommand(() -> drivetrain.forcePoseUpdate("limelight-front")));
+    
 
 
         // if (hasElevator) {

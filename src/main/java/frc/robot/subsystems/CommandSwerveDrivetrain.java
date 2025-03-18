@@ -53,7 +53,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // private final Field2d field2d = new Field2d();
     // ShuffleboardTab tab = Shuffleboard.getTab("Field Map");
 
-    private CANrange frontCANrange = new CANrange(50, "TestBed");
+    private CANrange armCANrange = new CANrange(50, "rio");
+    private double ARM_RANGE_L4 = 0.5;
+    private double ARM_RANGE_LOWER = 0.5;
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -600,4 +602,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         currentLimelightUpdateMode = LimelightUpdateMode.none;
     }
 
+
+    public double getArmRange(){
+        return armCANrange.getDistance().getValueAsDouble();
+    }
+
+    public boolean isArmInRangeL4(){
+        return getArmRange() <= ARM_RANGE_L4;
+    }
+
+    public boolean isArmInRangeLower(){
+        return getArmRange() <= ARM_RANGE_LOWER;
+    }
 }
