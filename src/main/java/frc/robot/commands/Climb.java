@@ -39,7 +39,7 @@ public class Climb extends Command {
       startTilt = true;
     }
 
-    if(startTilt && climber.tiltMotor.getPosition().getValueAsDouble() >= -1) {
+    if(startTilt && climber.tiltMotor.getPosition().getValueAsDouble() >= -0.25) {
       climber.autoTilt(-0.4);
     } else if (startTilt){
       climber.autoTilt(0);

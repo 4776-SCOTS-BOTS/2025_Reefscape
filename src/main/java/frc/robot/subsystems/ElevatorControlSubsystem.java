@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StrictFollower;
@@ -54,6 +55,13 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   private final double MAX_LINEAR_ACCEL = 1.15; // m / s^2
   private final double MAX_ROT_SPEED = MAX_LINEAR_SPEED/ MOTOR_ENCODER_POSITION_COEFFICIENT; // rot / s
   private final double MAX_ROT_ACCEL = MAX_LINEAR_ACCEL / MOTOR_ENCODER_POSITION_COEFFICIENT;// rot /s^2
+  private final double MAX_ROT_JERK = MAX_ROT_ACCEL * 10;
+
+  private final double SLOW_LINEAR_SPEED = 0.75; // m/s
+  private final double SLOW_LINEAR_ACCEL = 1.15; // m / s^2
+  private final double SLOW_ROT_SPEED = SLOW_LINEAR_SPEED/ MOTOR_ENCODER_POSITION_COEFFICIENT; // rot / s
+  private final double SLOW_ROT_ACCEL = SLOW_LINEAR_ACCEL / MOTOR_ENCODER_POSITION_COEFFICIENT;// rot /s^2
+  private final double SLOW_ROT_JERK = SLOW_ROT_ACCEL * 10;
 
   public enum ElevatorMode {
     RUN_TO_POSITION,
@@ -63,13 +71,15 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   public ElevatorMode elevatorMode = ElevatorMode.MANUAL;
 
   public boolean useLeader = false;
+  public boolean useDynamic = false;
 
 
   private final TalonFX elevatorLeader;
   private final TalonFX elevatorFollower;
 
-  final MotionMagicVoltage m_request = new MotionMagicVoltage(0); 
-
+  final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
+  private DynamicMotionMagicVoltage m_dynamicRequest;
+  
   // Limit switches - FALSE means at limit
   // private final DigitalInput bottomLimitSwitch = new DigitalInput(9); //TODO: Need to update.  Do we use?
   // private final Trigger bottomLimitSwitchTrigger = new Trigger(() -> bottomLimitSwitch.get());
@@ -80,28 +90,21 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     elevatorLeader = new TalonFX(ElevatorConstants.ELEVATOR_LEADER_ID, "rio");
     elevatorFollower = new TalonFX(ElevatorConstants.ELEVATOR_FOLLOWER_ID, "rio");
 
-    // // Configure closed-loop control
-    // double kP = 0.13;
-    // double kI = 0;
-    // double kD = 0; 
-    // double kIz = 0;
-    // double kF = 0.00;
-    // double kMaxOutput = 0.7;
-    // double kMinOutput = -.4;
-    // double allowedErr = 1;
-
-    // // Magic Motion Coefficients
-    // double maxVel = 10000;
-    // double maxAcc = 30000;
-
     TalonFXConfiguration leader_cfg = new TalonFXConfiguration();
     TalonFXConfiguration follower_cfg = new TalonFXConfiguration();
 
     /* Configure Motion Magic */
-    MotionMagicConfigs mm = leader_cfg.MotionMagic;
-    mm.withMotionMagicCruiseVelocity(RotationsPerSecond.of(MAX_ROT_SPEED)) // (motor) rotations per second cruise
-      .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(MAX_ROT_ACCEL)) // Take approximately 0.5 seconds to reach max vel
-      .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(MAX_ROT_SPEED * 10)); // Take approximately 0.1 seconds to reach max accel 
+    if (!useDynamic) {
+      MotionMagicConfigs mm = leader_cfg.MotionMagic;
+      mm.withMotionMagicCruiseVelocity(RotationsPerSecond.of(MAX_ROT_SPEED)) // (motor) rotations per second cruise
+          .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(MAX_ROT_ACCEL)) // Take approximately 0.5 seconds
+                                                                                      // to reach max vel
+          .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(MAX_ROT_JERK)); // Take approximately
+                                                                                                // 0.1 seconds to reach
+                                                                                                // max accel
+    } else {
+      m_dynamicRequest = new DynamicMotionMagicVoltage(0, MAX_ROT_SPEED, MAX_ROT_ACCEL, MAX_ROT_JERK);
+    }
 
     Slot0Configs slot0 = leader_cfg.Slot0;
     slot0.kS = 0.05; // Add 0.25 V output to overcome static friction
@@ -187,20 +190,38 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
   /**
    * Moves the elevator to a position
+   * 
    * @param meters position in meters
    */
   public void moveToPosition(double meters) {
-    if(meters < Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters)){
+    if (meters < Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters)) {
       meters = Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters);
-    } else if (meters > Constants.ElevatorConstants.ELEVATOR_MAX_HEIGHT.in(Meters)){
+    } else if (meters > Constants.ElevatorConstants.ELEVATOR_MAX_HEIGHT.in(Meters)) {
       meters = Constants.ElevatorConstants.ELEVATOR_MAX_HEIGHT.in(Meters);
     }
+
     targetPosition = meters;
-    elevatorLeader.setControl(m_request.withPosition(metersToMotorPosition(meters)));
-    if(!useLeader){
-      elevatorFollower.setControl(m_request.withPosition(metersToMotorPosition(meters)));
+
+    if (useDynamic) {
+      if (targetPosition == Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters)) {
+        goSlow();
+      } else {
+        goFast();
+      }
+
+      elevatorLeader.setControl(m_dynamicRequest.withPosition(metersToMotorPosition(meters)));
+      if (!useLeader) {
+        elevatorFollower.setControl(m_dynamicRequest.withPosition(metersToMotorPosition(meters)));
+      }
+    } else {
+      elevatorLeader.setControl(m_request.withPosition(metersToMotorPosition(meters)));
+      if (!useLeader) {
+        elevatorFollower.setControl(m_request.withPosition(metersToMotorPosition(meters)));
+      }
     }
+
     elevatorMode = ElevatorMode.RUN_TO_POSITION;
+    
   }
   
   /**
@@ -294,6 +315,18 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   public void resetPosition(){
     elevatorLeader.setPosition(0);
     elevatorFollower.setPosition(0);
+  }
+
+  private void goFast(){
+    m_dynamicRequest.Velocity = MAX_ROT_SPEED;
+    m_dynamicRequest.Acceleration = MAX_ROT_ACCEL;
+    m_dynamicRequest.Jerk = MAX_ROT_JERK;
+  }
+
+  private void goSlow(){
+    m_dynamicRequest.Velocity = SLOW_ROT_SPEED;
+    m_dynamicRequest.Acceleration = SLOW_ROT_ACCEL;
+    m_dynamicRequest.Jerk = SLOW_ROT_JERK;
   }
   
 }
