@@ -27,7 +27,7 @@ public class Climber extends SubsystemBase {
   public final TalonFX tiltMotor;
 
   public double climbPosition = 23;
-  public double tiltRange = 6.5;//15
+  public double tiltRange = 11.0;//15
 
   public enum ClimberMode {
     RUN_TO_POSITION,
@@ -56,6 +56,7 @@ public class Climber extends SubsystemBase {
 
     tilt_cfg = climb_cfg;
     tilt_cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    tilt_cfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     tiltMotor.getConfigurator().apply(climb_cfg);
 
   }
@@ -87,7 +88,7 @@ public class Climber extends SubsystemBase {
   public void runTilt(double speed){
     if(speed > 0 && tiltMotor.getPosition().getValueAsDouble() >= tiltRange*1.5){
       speed = 0;
-    } else if(speed < 0 && tiltMotor.getPosition().getValueAsDouble() <= -0.25){
+    } else if(speed < 0 && tiltMotor.getPosition().getValueAsDouble() <= -0.5){
       speed = 0;
     }   
     tiltMotor.set(speed);

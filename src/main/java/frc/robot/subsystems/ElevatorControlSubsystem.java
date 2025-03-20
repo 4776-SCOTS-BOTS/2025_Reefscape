@@ -51,17 +51,17 @@ public class ElevatorControlSubsystem extends SubsystemBase {
                                                                     / (MOTOR_TOP - MOTOR_BOTTOM); // m/rot
 
   // Convert Elevator Speed and Acceleration to rotations
-  private final double MAX_LINEAR_SPEED = 0.75; // m/s
-  private final double MAX_LINEAR_ACCEL = 1.15; // m / s^2
+  private final double MAX_LINEAR_SPEED = 1.0; // m/s
+  private final double MAX_LINEAR_ACCEL = 1.25; // m / s^2
   private final double MAX_ROT_SPEED = MAX_LINEAR_SPEED/ MOTOR_ENCODER_POSITION_COEFFICIENT; // rot / s
   private final double MAX_ROT_ACCEL = MAX_LINEAR_ACCEL / MOTOR_ENCODER_POSITION_COEFFICIENT;// rot /s^2
   private final double MAX_ROT_JERK = MAX_ROT_ACCEL * 10;
 
-  private final double SLOW_LINEAR_SPEED = 0.75; // m/s
-  private final double SLOW_LINEAR_ACCEL = 1.15; // m / s^2
+  private final double SLOW_LINEAR_SPEED = 0.6; // m/s
+  private final double SLOW_LINEAR_ACCEL = 1.0; // m / s^2
   private final double SLOW_ROT_SPEED = SLOW_LINEAR_SPEED/ MOTOR_ENCODER_POSITION_COEFFICIENT; // rot / s
   private final double SLOW_ROT_ACCEL = SLOW_LINEAR_ACCEL / MOTOR_ENCODER_POSITION_COEFFICIENT;// rot /s^2
-  private final double SLOW_ROT_JERK = SLOW_ROT_ACCEL * 10;
+  private final double SLOW_ROT_JERK = SLOW_ROT_ACCEL * 5;
 
   public enum ElevatorMode {
     RUN_TO_POSITION,

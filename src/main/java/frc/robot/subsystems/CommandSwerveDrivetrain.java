@@ -19,6 +19,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -53,9 +54,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // private final Field2d field2d = new Field2d();
     // ShuffleboardTab tab = Shuffleboard.getTab("Field Map");
 
-    private CANrange armCANrange = new CANrange(50, "rio");
-    private double ARM_RANGE_L4 = 0.5;
-    private double ARM_RANGE_LOWER = 0.5;
+    private CANrange armCANrange = new CANrange(51, "rio");
+    private double ARM_RANGE_L4 = 0.35;
+    private double ARM_RANGE_LOWER = 0.6;
+    private LinearFilter m_filter = LinearFilter.movingAverage(5);
+    public double armRangeFiltered = 0;
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -347,6 +350,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         // field2d.setRobotPose(getState().Pose);
         // SmartDashboard.putNumber("Front Distance", frontCANrange.getDistance().getValueAsDouble());
+        armRangeFiltered = m_filter.calculate(armCANrange.getDistance().getValueAsDouble()); 
+        // SmartDashboard.putNumber("Arm Range", armRangeFiltered);   
     }
 
     private void startSimThread() {
@@ -602,16 +607,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         currentLimelightUpdateMode = LimelightUpdateMode.none;
     }
 
-
     public double getArmRange(){
         return armCANrange.getDistance().getValueAsDouble();
     }
 
     public boolean isArmInRangeL4(){
-        return getArmRange() <= ARM_RANGE_L4;
+        return armRangeFiltered <= ARM_RANGE_L4;
     }
 
     public boolean isArmInRangeLower(){
-        return getArmRange() <= ARM_RANGE_LOWER;
+        return armRangeFiltered <= ARM_RANGE_LOWER;
+    }
+
+    public double getArmRangeFiltered(){
+        return armRangeFiltered;
     }
 }

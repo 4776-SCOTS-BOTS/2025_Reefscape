@@ -142,15 +142,9 @@ public class ShoulderSubsystem extends SubsystemBase {
       // Send setpoint to offboard controller PID
       controller.setReference(m_setpoint.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, arbFF);
 
-      // output arbFF, m_goal.position, m_setpoint.position
-      // SmartDashboard.putNumber("arbFF", arbFF);
-      // SmartDashboard.putNumber("m_goal.position", m_goal.position);
-      // SmartDashboard.putNumber("m_setpoint.position", m_setpoint.position);
-      // SmartDashboard.putNumber("Current Pos", getCurrentPosition());
-      // SmartDashboard.putNumber("m_setpoint.velocity", m_setpoint.velocity);
-
 
     }
+    SmartDashboard.putNumber("Shoulder Cur", shoulderMotor.getAppliedOutput());
   }
 
    public void setArmGoal(double goal) {

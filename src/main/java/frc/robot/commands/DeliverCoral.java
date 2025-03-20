@@ -20,7 +20,7 @@ public class DeliverCoral extends Command {
   private static double timeout = 4.0;
   private double armStart;
 
-  private double ARM_OFFSET = 0.15;
+  private double ARM_OFFSET = 0.15; //Was 0.15
 
   /** Creates a new Deliver Coral. 
    * @param clockwiseArm Shoulde be false for front delivery, true for back delivery

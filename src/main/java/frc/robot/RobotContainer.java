@@ -423,8 +423,10 @@ public class RobotContainer {
 
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
 
-        searchLeftButton.onTrue(new AlignToRange(drivetrain, true, isL4));
-        searchRighttButton.onTrue(new AlignToRange(drivetrain, false, isL4));
+        searchLeftButton.onTrue(new AlignToRange(drivetrain, true, isL4))
+                .onFalse(new InstantCommand(() -> {}, drivetrain));
+        searchRighttButton.onTrue(new AlignToRange(drivetrain, false, isL4))
+                .onFalse(new InstantCommand(() -> {}, drivetrain));
 
         // reset the field-centric heading
         resetGyro.onTrue(drivetrain.runOnce(drivetrain::zeroFieldCentric));
