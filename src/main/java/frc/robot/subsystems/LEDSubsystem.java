@@ -70,7 +70,7 @@ LEDPattern breathe = steps.breathe(Seconds.of(10));
     // Not certain if this works one time for animated patterns or needs update every cycle
     // If every cycle, probably need a generic LEDPattern that methods / commands assign based
     // on desired effect.
-    breathe.applyTo(m_buffer);
+    stepsDark.applyTo(m_buffer);
 
     // Write to the actual LEDs
     m_led.setData(m_buffer);
