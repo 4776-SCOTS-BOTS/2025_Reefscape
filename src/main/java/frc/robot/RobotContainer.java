@@ -61,6 +61,7 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorControlSubsystem;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.ShoulderSubsystem;
 import frc.robot.subsystems.Climber.ClimberMode;
 import frc.robot.subsystems.ElevatorControlSubsystem.ElevatorMode;
@@ -102,6 +103,8 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     // subsytems
+    LEDSubsystem m_led = new LEDSubsystem();
+
     private boolean hasElevator = true;
     private ElevatorControlSubsystem elevator;
 
