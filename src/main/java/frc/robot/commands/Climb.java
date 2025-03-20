@@ -33,14 +33,14 @@ public class Climb extends Command {
   @Override
   public void execute() {
     if(climber.climbMotor.getPosition().getValueAsDouble() <= climber.climbPosition && !startTilt) {
-      climber.autoClimb(0.25);
+      climber.autoClimb(0.3);
     } else {
       climber.autoClimb(0);
       startTilt = true;
     }
 
     if(startTilt && climber.tiltMotor.getPosition().getValueAsDouble() >= -0.25) {
-      climber.autoTilt(-0.4);
+      climber.autoTilt(-0.5);
     } else if (startTilt){
       climber.autoTilt(0);
       isComplete = true;

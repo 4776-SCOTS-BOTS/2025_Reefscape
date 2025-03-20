@@ -844,6 +844,19 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "27,3": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Shoulder Cur",
+              "_title": "Shoulder Cur",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }

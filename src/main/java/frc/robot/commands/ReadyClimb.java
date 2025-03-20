@@ -34,7 +34,7 @@ public class ReadyClimb extends Command {
   @Override
   public void execute() {
     if (climber.tiltMotor.getPosition().getValueAsDouble() < climber.tiltRange) {
-      climber.autoTilt(0.25);
+      climber.autoTilt(0.5);
     } else {
       climber.autoTilt(0);
       isComplete = true;
