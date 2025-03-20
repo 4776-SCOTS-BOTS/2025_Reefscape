@@ -58,6 +58,18 @@ LEDPattern breathe = steps.breathe(Seconds.of(10));
     // setDefaultCommand(runPattern(LEDPattern.solid(Color.kGreen)));
   }
 
+  public void setLEDs(int r, int g, int b) {
+    for (int i = 0; i < m_buffer.getLength(); i++) {
+        m_buffer.setRGB(i, r, g, b);
+    }
+    m_led.setData(m_buffer);
+  }
+
+  public void turnOffLeds()
+  {
+    setLEDs(0, 0, 0);
+  }
+
   @Override
   public void periodic() {
     // Periodically send the latest LED color data to the LED strip for it to
