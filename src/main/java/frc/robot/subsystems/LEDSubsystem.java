@@ -41,7 +41,7 @@ public class LEDSubsystem extends SubsystemBase {
 
 // Create an LED pattern that displays the first half of a strip as solid red,
 // and the second half of the strip as solid blue.
-LEDPattern steps = LEDPattern.steps(Map.of(0, Color.kGold, 0.5, Color.kDarkGreen));
+LEDPattern steps = LEDPattern.steps(Map.of(0, Color.kDarkGreen, 0.5, Color.kDarkGreen));
 LEDPattern stepsDark = steps.atBrightness(Percent.of(50));
 
 LEDPattern breathe = steps.breathe(Seconds.of(10));
