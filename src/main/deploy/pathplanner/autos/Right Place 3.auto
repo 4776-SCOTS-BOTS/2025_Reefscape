@@ -23,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Start - Initial to Reef 2 Left"
+                  "pathName": "3p Right Start - Initial to Reef 2 Left"
                 }
               },
               {
@@ -86,7 +86,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Start - Reef 2 to Station"
+                  "pathName": "3p Right Start - Reef 2 to Station"
                 }
               },
               {
@@ -142,7 +142,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Start - Station to Reef 3 Right"
+                  "pathName": "3p Right Start - Station to Reef 3 Right"
                 }
               },
               {
@@ -186,7 +186,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Start - Reef 3 Right to Station"
+                  "pathName": "3p Right Start - Reef 3 Right to Station"
                 }
               },
               {
@@ -236,7 +236,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Start - Station to Reef 3 Left"
+                  "pathName": "3p Right Start - Station to Reef 3 Left"
                 }
               },
               {
