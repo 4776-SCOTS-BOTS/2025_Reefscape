@@ -17,13 +17,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Start - Initial to Reef 3 Right"
+                  "pathName": "3p Right Start - Initial to Reef 2 Left"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "ReadyHigh"
+                  "name": "ReadyHighInitial"
                 }
               },
               {
@@ -74,7 +74,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Start - Reef 3 Right to Station"
+                  "pathName": "3p Right Start - Reef 2 Left to Station"
                 }
               },
               {
@@ -130,7 +130,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Start - Station to Reef 3 Left"
+                  "pathName": "3p Right Start - Station to Reef 3 Right"
                 }
               },
               {
@@ -140,9 +140,22 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "IntakeDeliverPos"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.5
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "IntakeDeliverPos"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -153,11 +166,100 @@
           "data": {
             "commands": [
               {
-                "type": "wait",
+                "type": "named",
                 "data": {
-                  "waitTime": 0.5
+                  "name": "DeliverCoral"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "3p Right Start - Reef 3 Right to Station"
                 }
               },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.2
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "StationIntakeDelay"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.25
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "IntakePickupPos"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "IntakeCoral"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "3p Right Start - Station to Reef 3 Left"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ReadyHigh"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "IntakeDeliverPos"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
               {
                 "type": "named",
                 "data": {
@@ -165,57 +267,19 @@
                 }
               },
               {
-                "type": "named",
-                "data": {
-                  "name": "RemoveAlgae"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.5
-                }
-              },
-              {
-                "type": "parallel",
+                "type": "sequential",
                 "data": {
                   "commands": [
                     {
-                      "type": "path",
+                      "type": "wait",
                       "data": {
-                        "pathName": "Right Start - Reef 3 Left to Station"
+                        "waitTime": 0.5
                       }
                     },
                     {
-                      "type": "sequential",
+                      "type": "path",
                       "data": {
-                        "commands": [
-                          {
-                            "type": "wait",
-                            "data": {
-                              "waitTime": 0.25
-                            }
-                          },
-                          {
-                            "type": "named",
-                            "data": {
-                              "name": "StationSafe"
-                            }
-                          },
-                          {
-                            "type": "named",
-                            "data": {
-                              "name": "IntakePickupPos"
-                            }
-                          }
-                        ]
+                        "pathName": "3p Right Start - Reef 3 Left Backoff"
                       }
                     }
                   ]
@@ -228,6 +292,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "1 & 2 Piece",
+  "folder": "3 Piece Left",
   "choreoAuto": false
 }

@@ -226,7 +226,8 @@ public class RobotContainer {
         }
 
         // Register Named Commands
-        NamedCommands.registerCommand("ReadyHigh", new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.75));
+        NamedCommands.registerCommand("ReadyHigh", new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.85));
+        NamedCommands.registerCommand("ReadyHighInitial", new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.4));
         NamedCommands.registerCommand("DeliverCoral", new DeliverCoral(intake, shoulder, false));
         NamedCommands.registerCommand("IntakeDeliverPos", new InstantCommand(intake::wristDeliver1, intake));
         NamedCommands.registerCommand("IntakePickupPos", new InstantCommand(intake::wristPickup, intake));
@@ -336,7 +337,8 @@ public class RobotContainer {
         }
 
         if (hasIntake && hasShoulder) {
-            placeCoral.onTrue(new DeliverCoral(intake, shoulder, false));
+            placeCoral.onTrue(new DeliverCoral(intake, shoulder, false))
+            ;//.onFalse(new InstantCommand(intake::intakeOff, intake));
         }
 
         if (hasElevator && hasShoulder) {

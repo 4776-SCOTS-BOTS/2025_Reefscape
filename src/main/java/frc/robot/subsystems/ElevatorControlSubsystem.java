@@ -51,14 +51,14 @@ public class ElevatorControlSubsystem extends SubsystemBase {
                                                                     / (MOTOR_TOP - MOTOR_BOTTOM); // m/rot
 
   // Convert Elevator Speed and Acceleration to rotations
-  private final double MAX_LINEAR_SPEED = 1.0; // m/s
-  private final double MAX_LINEAR_ACCEL = 1.25; // m / s^2
+  private final double MAX_LINEAR_SPEED = 1.5; // m/s
+  private final double MAX_LINEAR_ACCEL = 2.0; // m / s^2
   private final double MAX_ROT_SPEED = MAX_LINEAR_SPEED/ MOTOR_ENCODER_POSITION_COEFFICIENT; // rot / s
   private final double MAX_ROT_ACCEL = MAX_LINEAR_ACCEL / MOTOR_ENCODER_POSITION_COEFFICIENT;// rot /s^2
   private final double MAX_ROT_JERK = MAX_ROT_ACCEL * 10;
 
-  private final double SLOW_LINEAR_SPEED = 0.6; // m/s
-  private final double SLOW_LINEAR_ACCEL = 1.0; // m / s^2
+  private final double SLOW_LINEAR_SPEED = 0.75; // m/s
+  private final double SLOW_LINEAR_ACCEL = 1.1; // m / s^2
   private final double SLOW_ROT_SPEED = SLOW_LINEAR_SPEED/ MOTOR_ENCODER_POSITION_COEFFICIENT; // rot / s
   private final double SLOW_ROT_ACCEL = SLOW_LINEAR_ACCEL / MOTOR_ENCODER_POSITION_COEFFICIENT;// rot /s^2
   private final double SLOW_ROT_JERK = SLOW_ROT_ACCEL * 5;
@@ -71,7 +71,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   public ElevatorMode elevatorMode = ElevatorMode.MANUAL;
 
   public boolean useLeader = false;
-  public boolean useDynamic = false;
+  public boolean useDynamic = true;
 
 
   private final TalonFX elevatorLeader;
@@ -87,8 +87,8 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   private double targetPosition = Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters);
 
   public ElevatorControlSubsystem() {
-    elevatorLeader = new TalonFX(ElevatorConstants.ELEVATOR_LEADER_ID, "rio");
-    elevatorFollower = new TalonFX(ElevatorConstants.ELEVATOR_FOLLOWER_ID, "rio");
+    elevatorLeader = new TalonFX(ElevatorConstants.ELEVATOR_LEADER_ID, "TestBed");
+    elevatorFollower = new TalonFX(ElevatorConstants.ELEVATOR_FOLLOWER_ID, "TestBed");
 
     TalonFXConfiguration leader_cfg = new TalonFXConfiguration();
     TalonFXConfiguration follower_cfg = new TalonFXConfiguration();
@@ -120,7 +120,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     leader_mo.Inverted = InvertedValue.Clockwise_Positive;
     leader_mo.NeutralMode = NeutralModeValue.Brake;
 
-    leader_cfg.CurrentLimits.StatorCurrentLimit = 60; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
+    leader_cfg.CurrentLimits.StatorCurrentLimit = 70; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
     leader_cfg.CurrentLimits.StatorCurrentLimitEnable = true;
 
     elevatorLeader.getConfigurator().apply(leader_cfg);
@@ -130,7 +130,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     follower_mo.Inverted = InvertedValue.Clockwise_Positive;
     follower_mo.NeutralMode = NeutralModeValue.Brake;
 
-    follower_cfg.CurrentLimits.StatorCurrentLimit = 60; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
+    follower_cfg.CurrentLimits.StatorCurrentLimit = 70; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
     follower_cfg.CurrentLimits.StatorCurrentLimitEnable = true;
 
     if(!useLeader){

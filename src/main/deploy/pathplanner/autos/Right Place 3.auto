@@ -5,12 +5,6 @@
     "data": {
       "commands": [
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 5.0
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "LimelightFront"
@@ -29,7 +23,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "ReadyHigh"
+                  "name": "ReadyHighInitial"
                 }
               },
               {
@@ -39,7 +33,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.0
+                        "waitTime": 0.5
                       }
                     },
                     {
@@ -58,12 +52,6 @@
           "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 5.0
-                }
-              },
               {
                 "type": "named",
                 "data": {
@@ -86,7 +74,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "3p Right Start - Reef 2 to Station"
+                  "pathName": "3p Right Start - Reef 2 Left to Station"
                 }
               },
               {
@@ -152,9 +140,22 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "IntakeDeliverPos"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.5
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "IntakeDeliverPos"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -164,12 +165,6 @@
           "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 5.0
-                }
-              },
               {
                 "type": "named",
                 "data": {
@@ -246,28 +241,48 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "IntakeDeliverPos"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "IntakeDeliverPos"
+                      }
+                    }
+                  ]
                 }
               }
             ]
           }
         },
         {
-          "type": "sequential",
+          "type": "parallel",
           "data": {
             "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 5.0
-                }
-              },
               {
                 "type": "named",
                 "data": {
                   "name": "DeliverCoral"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.5
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "3p Right Start - Reef 3 Left Backoff"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -277,6 +292,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "3 Piece",
+  "folder": "3 Piece Right",
   "choreoAuto": false
 }

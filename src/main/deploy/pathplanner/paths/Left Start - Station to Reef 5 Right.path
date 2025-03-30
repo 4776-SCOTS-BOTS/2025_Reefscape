@@ -8,7 +8,7 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3132621844635923,
+        "x": 2.3132621844635928,
         "y": 6.494331609582534
       },
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": -59.99999999999999
   },
   "reversed": false,
-  "folder": "Blue",
+  "folder": "1 & 2 Piece",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -55.0

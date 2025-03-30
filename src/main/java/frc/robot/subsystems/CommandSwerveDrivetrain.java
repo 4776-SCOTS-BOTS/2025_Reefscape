@@ -54,7 +54,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // private final Field2d field2d = new Field2d();
     // ShuffleboardTab tab = Shuffleboard.getTab("Field Map");
 
-    private CANrange armCANrange = new CANrange(51, "rio");
+    //private CANrange armCANrange = new CANrange(51, "rio");
     private double ARM_RANGE_L4 = 0.30;
     private double ARM_RANGE_LOWER = 0.4;
     private LinearFilter m_filter = LinearFilter.movingAverage(5);
@@ -350,8 +350,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         // field2d.setRobotPose(getState().Pose);
         // SmartDashboard.putNumber("Front Distance", frontCANrange.getDistance().getValueAsDouble());
-        armRangeFiltered = m_filter.calculate(armCANrange.getDistance().getValueAsDouble()); 
-        SmartDashboard.putNumber("Arm Range", armRangeFiltered);   
+        // armRangeFiltered = m_filter.calculate(armCANrange.getDistance().getValueAsDouble()); 
+        // SmartDashboard.putNumber("Arm Range", armRangeFiltered);   
     }
 
     private void startSimThread() {
@@ -607,9 +607,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         currentLimelightUpdateMode = LimelightUpdateMode.none;
     }
 
-    public double getArmRange(){
-        return armCANrange.getDistance().getValueAsDouble();
-    }
+    // public double getArmRange(){
+    //     return armCANrange.getDistance().getValueAsDouble();
+    // }
 
     public boolean isArmInRangeL4(){
         return armRangeFiltered <= ARM_RANGE_L4;

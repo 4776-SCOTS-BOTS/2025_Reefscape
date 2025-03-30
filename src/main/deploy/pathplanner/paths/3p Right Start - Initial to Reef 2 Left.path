@@ -16,19 +16,24 @@
     },
     {
       "anchor": {
-        "x": 4.9868852459016395,
-        "y": 2.7962602459016397
+        "x": 5.011371900488638,
+        "y": 2.8623323041075754
       },
       "prevControl": {
-        "x": 5.304273881837233,
-        "y": 2.246527002716211
+        "x": 5.328760536424231,
+        "y": 2.312599060922147
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "Reef 2 Right Pole"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 150.91117555006943
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -45,10 +50,10 @@
     "rotation": 119.99999999999999
   },
   "reversed": false,
-  "folder": "3 Piece",
+  "folder": "3 Piece Right",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

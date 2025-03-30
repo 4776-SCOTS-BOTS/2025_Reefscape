@@ -56,7 +56,7 @@ public class DeliverCoral extends Command {
     )) {
       intake.intakeOut();
     }
-    if (timer.hasElapsed(1.25)) {
+    if (timer.hasElapsed(1.0)) {
       isCompleted = true;
     }
 
@@ -71,7 +71,7 @@ public class DeliverCoral extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-      intake.intakeOff();
+      //intake.intakeOff();
       isCompleted = false;
       timerStarted = false;
   }
