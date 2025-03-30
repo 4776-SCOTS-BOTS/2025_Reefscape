@@ -199,4 +199,16 @@ public class Intake extends SubsystemBase {
     // layout.addNumber("Target Position Meters", () -> targetPosition).withPosition(0, 2);
   }
 
+  public void setWrist(double pos){
+    wristMotor.getEncoder().setPosition(pos);
+  }
+
+  public void updateWrist(double targetPos) {
+    if (targetPos < 0) {
+      wristMotor.set(-0.1);
+    } else {
+      wristMotor.set(0.1);
+    }
+  }
+
 }

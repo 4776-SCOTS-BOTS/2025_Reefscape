@@ -54,6 +54,7 @@ import frc.robot.commands.ReadyClimb;
 import frc.robot.commands.RemoveAlgae;
 import frc.robot.commands.RemoveAlgaeHigh;
 import frc.robot.commands.UnReadyClimb;
+import frc.robot.commands.UpdateWrist;
 import frc.robot.customClass.FieldPositions.Side;
 import frc.robot.customClass.SystemPositions.Positions;
 import frc.robot.generated.TunerConstants;
@@ -162,7 +163,7 @@ public class RobotContainer {
 
     // Manipulator contorls
     private Trigger placeCoral = manipCommandController.axisGreaterThan(Constants.rightTrigger, 0.5);
-    private Trigger holdAlgae = manipCommandController.axisGreaterThan(Constants.leftTrigger, 0.5);
+    private Trigger adjustWrist = manipCommandController.axisGreaterThan(Constants.leftTrigger, 0.5);
     private Trigger intakeButton = manipCommandController.button(Constants.leftButton);
     private Trigger outFastButton = manipCommandController.button(Constants.rightButton);
     private Trigger intakeOffButton = manipCommandController.button(Constants.bottomButton);
@@ -322,8 +323,12 @@ public class RobotContainer {
             wristPickupButton.onTrue(new InstantCommand(intake::wristPickup, intake));
             wristPos1Button.onTrue(new InstantCommand(intake::wristDeliver1, intake));
             wristPos2Button.onTrue(new InstantCommand(intake::wristDeliver2, intake));
-            holdAlgae.onTrue(new InstantCommand(intake::intakeAlgae))
-                    .onFalse(new InstantCommand(intake::intakeOut));
+
+
+            adjustWrist.and(wristPos1Button).whileTrue(new UpdateWrist(intake, intake.deliverPos1))
+                .onFalse(new InstantCommand(() -> {}));
+            adjustWrist.and(wristPos2Button).whileTrue(new UpdateWrist(intake, intake.deliverPos2))
+                .onFalse(new InstantCommand(() -> {}));    
 
             // Manual Controls
             // manipCommandController.button(Constants.rightBumper)
@@ -428,10 +433,10 @@ public class RobotContainer {
 
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
 
-        searchLeftButton.onTrue(new AlignToRange(drivetrain, true, isL4))
-                .onFalse(new InstantCommand(() -> {}, drivetrain));
-        searchRighttButton.onTrue(new AlignToRange(drivetrain, false, isL4))
-                .onFalse(new InstantCommand(() -> {}, drivetrain));
+        // searchLeftButton.onTrue(new AlignToRange(drivetrain, true, isL4))
+        //         .onFalse(new InstantCommand(() -> {}, drivetrain));
+        // searchRighttButton.onTrue(new AlignToRange(drivetrain, false, isL4))
+        //         .onFalse(new InstantCommand(() -> {}, drivetrain));
 
         // reset the field-centric heading
         resetGyro.onTrue(drivetrain.runOnce(drivetrain::zeroFieldCentric));
