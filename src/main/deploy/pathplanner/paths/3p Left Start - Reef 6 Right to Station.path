@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.897950819672132,
-        "y": 5.805174180327868
+        "x": 5.448128560395575,
+        "y": 5.766886979841311
       },
       "isLocked": false,
       "linkedName": "Reef 6 Right Pole"
@@ -20,8 +20,8 @@
         "y": 6.949864396467779
       },
       "prevControl": {
-        "x": 1.3905737704918033,
-        "y": 6.176793032786884
+        "x": 1.555128392086562,
+        "y": 6.973987595342803
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +31,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.44502199120351993,
-      "rotationDegrees": -5.458203186333056
+      "rotationDegrees": -49.63836527284084
     }
   ],
   "constraintZones": [],

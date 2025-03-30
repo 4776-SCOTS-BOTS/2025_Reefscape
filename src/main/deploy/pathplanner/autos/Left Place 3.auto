@@ -17,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "3p Right Start - Initial to Reef 2 Left"
+                  "pathName": "3p Left Start - Initial to Reef 6 Right"
                 }
               },
               {
@@ -53,6 +53,12 @@
           "data": {
             "commands": [
               {
+                "type": "wait",
+                "data": {
+                  "waitTime": 8.0
+                }
+              },
+              {
                 "type": "named",
                 "data": {
                   "name": "DeliverCoral"
@@ -74,7 +80,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "3p Right Start - Reef 2 Left to Station"
+                  "pathName": "3p Left Start - Reef 6 Right to Station"
                 }
               },
               {
@@ -90,7 +96,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "StationIntakeDelay"
+                        "name": "StationSafe"
                       }
                     },
                     {
@@ -130,7 +136,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "3p Right Start - Station to Reef 3 Right"
+                  "pathName": "3p Left Start - Station to Reef 5 Left"
                 }
               },
               {
@@ -166,6 +172,12 @@
           "data": {
             "commands": [
               {
+                "type": "wait",
+                "data": {
+                  "waitTime": 8.0
+                }
+              },
+              {
                 "type": "named",
                 "data": {
                   "name": "DeliverCoral"
@@ -181,7 +193,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "3p Right Start - Reef 3 Right to Station"
+                  "pathName": "3p Left Start - Reef 5 Left to Station"
                 }
               },
               {
@@ -197,7 +209,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "StationIntakeDelay"
+                        "name": "StationSafe"
                       }
                     },
                     {
@@ -231,7 +243,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "3p Right Start - Station to Reef 3 Left"
+                  "pathName": "3p Left Start - Station to Reef 5 Right"
                 }
               },
               {
@@ -261,6 +273,12 @@
           "data": {
             "commands": [
               {
+                "type": "wait",
+                "data": {
+                  "waitTime": 8.0
+                }
+              },
+              {
                 "type": "named",
                 "data": {
                   "name": "DeliverCoral"
@@ -279,7 +297,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "3p Right Start - Reef 3 Left Backoff"
+                        "pathName": "3p Left Start - Reef 5 Backoff"
                       }
                     }
                   ]
