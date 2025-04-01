@@ -59,6 +59,7 @@ import frc.robot.customClass.FieldPositions.Side;
 import frc.robot.customClass.SystemPositions.Positions;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.ClimberNew;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorControlSubsystem;
 import frc.robot.subsystems.Intake;
@@ -115,7 +116,8 @@ public class RobotContainer {
     private boolean hasIntake = true;
     private Intake intake;
 
-    private boolean hasClimber = true;
+    private boolean hasOldClimber = false;
+    private boolean hasNewClimber = true;
     private boolean climberMode = false;
     private Climber climber;
 
@@ -163,13 +165,15 @@ public class RobotContainer {
 
     // Manipulator contorls
     private Trigger placeCoral = manipCommandController.axisGreaterThan(Constants.rightTrigger, 0.5);
-    private Trigger adjustWrist = manipCommandController.axisGreaterThan(Constants.leftTrigger, 0.5);
+    // private Trigger adjustWrist = manipCommandController.axisGreaterThan(Constants.leftTrigger, 0.5);
     private Trigger intakeButton = manipCommandController.button(Constants.leftButton);
     private Trigger outFastButton = manipCommandController.button(Constants.rightButton);
     private Trigger intakeOffButton = manipCommandController.button(Constants.bottomButton);
     private Trigger wristPickupButton = manipCommandController.button(Constants.topButton);
     private Trigger wristPos1Button = manipCommandController.button(Constants.leftBumper);
     private Trigger wristPos2Button = manipCommandController.button(Constants.rightBumper);
+    private Trigger moveWristPos = manipCommandController.button(Constants.rightStickButton);
+    private Trigger moveWristNeg = manipCommandController.button(Constants.leftStickButton);
 
     private Trigger climberModeButton = manipCommandController.button(Constants.rightMenuButton);
     private Trigger autoClimbButton = manipCommandController.button(Constants.leftMenuButton);
@@ -220,8 +224,10 @@ public class RobotContainer {
         }
 
         // Setup Climber if present
-        if (hasClimber) {
+        if (hasOldClimber) {
             climber = new Climber();
+        } else if (hasNewClimber) {
+            climber = new ClimberNew();
         } else {
             climber = null;
         }
@@ -324,11 +330,21 @@ public class RobotContainer {
             wristPos1Button.onTrue(new InstantCommand(intake::wristDeliver1, intake));
             wristPos2Button.onTrue(new InstantCommand(intake::wristDeliver2, intake));
 
+            moveWristPos.whileTrue(new InstantCommand(intake::adjustWristPos))
+                    .onFalse(new SequentialCommandGroup(
+                            new InstantCommand(intake::stopWrist, intake),
+                            new InstantCommand(intake::setWristbyCurrentSetpoint, intake)));
 
-            adjustWrist.and(wristPos1Button).whileTrue(new UpdateWrist(intake, intake.deliverPos1))
-                .onFalse(new InstantCommand(() -> {}));
-            adjustWrist.and(wristPos2Button).whileTrue(new UpdateWrist(intake, intake.deliverPos2))
-                .onFalse(new InstantCommand(() -> {}));    
+            moveWristNeg.whileTrue(new InstantCommand(intake::adjustWristNeg))
+                    .onFalse(new SequentialCommandGroup(
+                            new InstantCommand(intake::stopWrist, intake),
+                            new InstantCommand(intake::setWristbyCurrentSetpoint, intake)));
+
+
+            // adjustWrist.and(wristPos1Button).whileTrue(new UpdateWrist(intake, intake.deliverPos1))
+            //     .onFalse(new InstantCommand(() -> {}));
+            // adjustWrist.and(wristPos2Button).whileTrue(new UpdateWrist(intake, intake.deliverPos2))
+            //     .onFalse(new InstantCommand(() -> {}));    
 
             // Manual Controls
             // manipCommandController.button(Constants.rightBumper)
@@ -364,7 +380,7 @@ public class RobotContainer {
             
         }
 
-        if (hasClimber){
+        if (hasOldClimber){
             climberModeButton.onTrue(new InstantCommand(() -> climberMode = !climberMode)
                 .andThen(new ConditionalCommand(new ReadyClimb(climber), new UnReadyClimb(climber), () -> {return climberMode;}))
                 .andThen(new InstantCommand(() -> {SmartDashboard.putBoolean("Climber Moder", climberMode);})));
@@ -373,7 +389,15 @@ public class RobotContainer {
 
             climber.setDefaultCommand(
                 new RunCommand(climberRunnable, climber));
+        } else if (hasNewClimber){
+            climberModeButton.onTrue(new InstantCommand(() -> climberMode = !climberMode)
+                .andThen(new ConditionalCommand(new ReadyClimb(climber), new UnReadyClimb(climber), () -> {return climberMode;}))
+                .andThen(new InstantCommand(() -> {SmartDashboard.putBoolean("Climber Moder", climberMode);})));
 
+            autoClimbButton.onTrue(new ConditionalCommand(new Climb(climber), new InstantCommand(() -> {}), () -> {return climberMode;}));
+
+            climber.setDefaultCommand(
+                new RunCommand(climberRunnable, climber));
         }
 
         // setFieldCentButton.onTrue(setFieldCent());

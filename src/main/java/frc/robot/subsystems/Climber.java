@@ -23,10 +23,11 @@ import frc.robot.Constants.ElevatorConstants;
 
 public class Climber extends SubsystemBase {
   /** Creates a new Climber. */
-  public final TalonFX climbMotor;
-  public final TalonFX tiltMotor;
+  public TalonFX climbMotor;
+  public TalonFX tiltMotor;
 
   public double climbPosition = 23;
+  public double climbReadyPosition = 0;
   public double tiltRange = 41;//15
 
   public enum ClimberMode {

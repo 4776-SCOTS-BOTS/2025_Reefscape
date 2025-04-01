@@ -45,7 +45,8 @@ public class Intake extends SubsystemBase {
 
   public enum WRIST_POSTION{
     PICKUP,
-    DELIVER
+    DELIVER1,
+    DELIVER2
   }
 
   public WRIST_POSTION wristPos = WRIST_POSTION.PICKUP;
@@ -163,12 +164,12 @@ public class Intake extends SubsystemBase {
 
   public void wristDeliver1(){
     wristControl.setReference(deliverPos1, ControlType.kMAXMotionPositionControl);
-    wristPos = WRIST_POSTION.DELIVER;
+    wristPos = WRIST_POSTION.DELIVER1;
   }
 
   public void wristDeliver2(){
     wristControl.setReference(deliverPos2, ControlType.kMAXMotionPositionControl);
-    wristPos = WRIST_POSTION.DELIVER;
+    wristPos = WRIST_POSTION.DELIVER2;
   }
 
   public double getFilteredCurent(){
@@ -209,6 +210,35 @@ public class Intake extends SubsystemBase {
     } else {
       wristMotor.set(0.1);
     }
+  }
+
+  public void stopWrist() {
+    wristMotor.set(0);
+  }
+
+  public void adjustWristPos() {
+    wristMotor.set(0.1);
+  }
+
+  public void adjustWristNeg() {
+    wristMotor.set(-0.1);
+  }
+
+  public double getWristPosValue(WRIST_POSTION pos){
+    switch(pos){
+      case PICKUP:
+        return pickupPos;
+      case DELIVER1:
+        return deliverPos1;
+      case DELIVER2:
+        return deliverPos2;
+      default:
+        return 0;
+    }
+  }
+
+  public void setWristbyCurrentSetpoint(){
+    setWrist(getWristPosValue(wristPos));
   }
 
 }
