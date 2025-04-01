@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.Map;
+import java.util.Random;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Per;
@@ -33,10 +34,35 @@ public class LEDSubsystem extends SubsystemBase {
   private static final int GOLD_WIDTH = 10;
   private int speed = 1; // Adjustable speed
   private Timer timer = new Timer();
-  private double delay = 0.005; // Delay between updates
+  private double delay = 0.1; // Delay between updates
   private int bounceStart = 110;
   private int bounceEnd = 176;
   private int goldPosition = bounceStart;
+
+  private final Random random;
+  private final int[][] colorList = {
+      { 255, 0, 0 }, // Red
+      { 0, 255, 0 }, // Green
+      { 0, 0, 255 }, // Blue
+      { 255, 255, 0 }, // Yellow
+      { 255, 0, 255 }, // Magenta
+      { 0, 255, 255 } // Cyan
+  };
+  private final Color[] blueAlianceColors = {
+    Color.kAliceBlue,
+    Color.kAzure,
+    Color.kBlue,
+    Color.kCyan,
+    Color.kDarkBlue,
+    Color.kLightCyan
+  };
+
+  private final Color[] redAlianceColors = {
+    Color.kRed,
+    Color.kDarkRed,
+    Color.kDarkOrange
+  };
+
 
 
   //Setup Rainbow
@@ -64,6 +90,7 @@ LEDPattern breathe = steps.breathe(Seconds.of(10));
     m_led.start();
 
     timer.restart();
+    random = new Random();
 
     // Set the default command to turn the strip off, otherwise the last colors written by
     // the last command to run will continue to be displayed.
@@ -100,7 +127,8 @@ LEDPattern breathe = steps.breathe(Seconds.of(10));
     // Write to the actual LEDs
     // m_led.setData(m_buffer);
 
-    update();
+    // updateKITT();
+    applyRandomSparkle();
 
   }
 
@@ -129,7 +157,7 @@ private void setGoldPatch() {
     }
 }
 
-public void update() {
+public void updateKITT() {
   if (timer.advanceIfElapsed(delay)) {
     setDarkGreen(); // Reset all to Dark Green
     setGoldPatch(); // Apply Gold Patch
@@ -143,7 +171,19 @@ public void update() {
   }
 }
 
-public void setSpeed(int newSpeed) {
-  speed = Math.max(1, newSpeed); // Ensure speed is at least 1
+private void applyRandomSparkle() {
+  if (timer.advanceIfElapsed(delay)) { // Update every 100ms
+      for (int i = 0; i < kLength; i++) {
+          if (random.nextDouble() < 0.5) { // 10% chance to sparkle
+              // int[] color = colorList[random.nextInt(colorList.length)];
+              Color color = redAlianceColors[random.nextInt(redAlianceColors.length)];
+              // m_buffer.setRGB(i, color[0], color[1], color[2]);
+              m_buffer.setLED(i, color);
+          } else {
+              m_buffer.setRGB(i, 0, 0, 0); // Turn off non-sparkling LEDs
+          }
+      }
+      m_led.setData(m_buffer);
+  }
 }
 }
