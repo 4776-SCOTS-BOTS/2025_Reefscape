@@ -139,6 +139,9 @@ public class LEDSubsystem extends SubsystemBase {
     updateKITT();
     // applyRandomSparkle();
 
+    if (DriverStation.getMatchTime() <= 30.0 && DriverStation.getMatchTime() >= 20.0) {
+      endgameBlink();
+    }
   }
 
   /**
@@ -156,22 +159,13 @@ public class LEDSubsystem extends SubsystemBase {
     }
   }
 
-  public void endgameBlink() {
-    boolean blinking = false;
-    double currentTime = System.currentTimeMillis() / 1000;
-    double lastBlinkTime = 0;
+  private void endgameBlink() {
     double blinkInterval = 1.0;
 
-    if (currentTime - lastBlinkTime > blinkInterval) {
-      if (currentTime - lastBlinkTime > blinkInterval) {
-        blinking = !blinking;
-        if (blinking) {
-          setDarkGreen();
-        } else {
-          turnOffLeds();
-        }
-        lastBlinkTime = currentTime;
-      }
+    if (timer.advanceIfElapsed(blinkInterval)) {
+      setDarkGreen();
+    } else {
+      turnOffLeds();
     }
   }
 
