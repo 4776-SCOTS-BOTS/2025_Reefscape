@@ -20,7 +20,7 @@ public class ClimberNew extends Climber {
     tiltMotor = null;
 
     climbPosition = 160;// Actual 160
-    climbReadyPosition = 285;
+    climbReadyPosition = 270;
     tiltRange = 0;
 
     TalonFXConfiguration climb_cfg = new TalonFXConfiguration();
