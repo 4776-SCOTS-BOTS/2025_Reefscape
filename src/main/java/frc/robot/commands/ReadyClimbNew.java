@@ -24,15 +24,15 @@ public class ReadyClimbNew extends Command {
   @Override
   public void initialize() {
     // System.out.println("Ready Climber");
-    climber.autoClimb(0.25);
+    climber.autoClimb(0.5);
     isComplete = false;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (climber.climbMotor.getPosition().getValueAsDouble() >= climber.climbReadyPosition) {
-      climber.autoClimb(0.25);
+    if (climber.climbMotor.getPosition().getValueAsDouble() <= climber.climbReadyPosition) {
+      climber.autoClimb(0.5);
     } else {
       climber.autoClimb(0);
       isComplete = true;

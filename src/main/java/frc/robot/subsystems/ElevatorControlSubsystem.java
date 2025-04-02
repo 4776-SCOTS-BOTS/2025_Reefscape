@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.customClass.SystemPositions.Positions;
 
 /**
  * Subsystem for elevator mechanism
@@ -205,8 +206,10 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     if (useDynamic) {
       if (targetPosition == Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters)) {
         goSlow();
-      } else {
+      } else if (Math.abs((targetPosition - Positions.L4_READY.elevatorHeight)/Positions.L4_READY.elevatorHeight) < 0.1) {
         goFast();
+      } else {
+        goSlow();
       }
 
       elevatorLeader.setControl(m_dynamicRequest.withPosition(metersToMotorPosition(meters)));

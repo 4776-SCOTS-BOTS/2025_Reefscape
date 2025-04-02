@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
+import javax.crypto.Cipher;
+
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -36,7 +38,7 @@ public class LEDSubsystem extends SubsystemBase {
   private static final int PATCH_WIDTH = 10;
   private int speed = 1; // Adjustable speed
   private Timer timer = new Timer();
-  private double delay = 0.1; // Delay between updates
+  private double delay = 0.02; // Delay between updates
   private int bounceStart = 110;
   private int bounceEnd = 176;
   private int patchPosition = bounceStart;
@@ -134,8 +136,8 @@ public class LEDSubsystem extends SubsystemBase {
     // Write to the actual LEDs
     // m_led.setData(m_buffer);
 
-    // updateKITT();
-    applyRandomSparkle();
+    updateKITT();
+    // applyRandomSparkle();
 
   }
 
@@ -154,12 +156,31 @@ public class LEDSubsystem extends SubsystemBase {
     }
   }
 
+  public void endgameBlink() {
+    boolean blinking = false;
+    double currentTime = System.currentTimeMillis() / 1000;
+    double lastBlinkTime = 0;
+    double blinkInterval = 1.0;
+
+    if (currentTime - lastBlinkTime > blinkInterval) {
+      if (currentTime - lastBlinkTime > blinkInterval) {
+        blinking = !blinking;
+        if (blinking) {
+          setDarkGreen();
+        } else {
+          turnOffLeds();
+        }
+        lastBlinkTime = currentTime;
+      }
+    }
+  }
+
   private void setColorPatch() {
     Optional<Alliance> alliance = DriverStation.getAlliance();
     Color color = Color.kGold;
 
     if (alliance.isPresent()) {
-      color = alliance.get() == Alliance.Red ? Color.kFirstRed : Color.kFirstBlue;
+      color = alliance.get() == Alliance.Red ? Color.kRed : Color.kFirstBlue;
     }
 
     for (int i = 0; i < PATCH_WIDTH; i++) {

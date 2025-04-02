@@ -19,17 +19,18 @@ public class ClimberNew extends Climber {
     climbMotor = new TalonFX(Constants.ClimberConstants.climberMotorCANID, "rio");
     tiltMotor = null;
 
-    climbPosition = 42;
-    climbReadyPosition = 21;
+    climbPosition = 160;// Actual 160
+    climbReadyPosition = 285;
     tiltRange = 0;
 
     TalonFXConfiguration climb_cfg = new TalonFXConfiguration();
-    
+
     MotorOutputConfigs climb_mo = climb_cfg.MotorOutput;
-    climb_mo.Inverted = InvertedValue.CounterClockwise_Positive;
+    climb_mo.Inverted = InvertedValue.Clockwise_Positive;
     climb_mo.NeutralMode = NeutralModeValue.Brake;
 
-    climb_cfg.CurrentLimits.StatorCurrentLimit = 90; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
+    climb_cfg.CurrentLimits.StatorCurrentLimit = 90; // This will help limit total torque the motor can apply to the
+                                                     // mechanism. Could be too low for fast operation
     climb_cfg.CurrentLimits.StatorCurrentLimitEnable = true;
 
     climbMotor.getConfigurator().apply(climb_cfg);
@@ -41,10 +42,10 @@ public class ClimberNew extends Climber {
   }
 
   @Override
-  public void runClimber(double speed){
-    if(speed > 0 && climbMotor.getPosition().getValueAsDouble() >= climbPosition*1.1){
+  public void runClimber(double speed) {
+    if (speed > 0 && climbMotor.getPosition().getValueAsDouble() >= climbReadyPosition * 1.1) {
       speed = 0;
-    } else if(speed < 0 && climbMotor.getPosition().getValueAsDouble() <= 0){
+    } else if (speed < 0 && climbMotor.getPosition().getValueAsDouble() <= 0) {
       speed = 0;
     }
     climbMotor.set(speed);
@@ -52,17 +53,29 @@ public class ClimberNew extends Climber {
 
   // No tilt motor so tilt methods are empty
   @Override
-  public void runTilt(double speed){
+  public void runTilt(double speed) {
     // Do nothing
   }
 
   @Override
-  public void manualTilt(double speed){
+  public void manualTilt(double speed) {
     // Do nothing
   }
 
   @Override
-  public void autoTilt(double speed){
+  public void autoTilt(double speed) {
     // Do nothing
+  }
+
+  @Override
+  public void manualClimb(double speed) {
+    runClimber(speed);
+    climberMode = ClimberMode.MANUAL;
+  }
+
+  @Override
+  public void autoClimb(double speed) {
+    runClimber(speed);
+    climberMode = ClimberMode.RUN_TO_POSITION;
   }
 }

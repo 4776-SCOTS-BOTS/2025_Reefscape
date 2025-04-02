@@ -44,6 +44,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.AlignToRange;
 import frc.robot.commands.Climb;
+import frc.robot.commands.ClimbNew;
 import frc.robot.commands.DeliverCoral;
 import frc.robot.commands.DriveToReefTag;
 import frc.robot.commands.IntakeCoral;
@@ -51,9 +52,11 @@ import frc.robot.commands.MoveArmAndElevator;
 import frc.robot.commands.MoveRobot;
 import frc.robot.commands.PathfindToReefTag;
 import frc.robot.commands.ReadyClimb;
+import frc.robot.commands.ReadyClimbNew;
 import frc.robot.commands.RemoveAlgae;
 import frc.robot.commands.RemoveAlgaeHigh;
 import frc.robot.commands.UnReadyClimb;
+import frc.robot.commands.UnReadyClimbNew;
 import frc.robot.commands.UpdateWrist;
 import frc.robot.customClass.FieldPositions.Side;
 import frc.robot.customClass.SystemPositions.Positions;
@@ -119,7 +122,7 @@ public class RobotContainer {
     private boolean hasOldClimber = false;
     private boolean hasNewClimber = true;
     private boolean climberMode = false;
-    private Climber climber;
+    private ClimberNew climber;
 
     private boolean isL4 = false;
 
@@ -225,7 +228,7 @@ public class RobotContainer {
 
         // Setup Climber if present
         if (hasOldClimber) {
-            climber = new Climber();
+            // climber = new Climber();
         } else if (hasNewClimber) {
             climber = new ClimberNew();
         } else {
@@ -391,10 +394,10 @@ public class RobotContainer {
                 new RunCommand(climberRunnable, climber));
         } else if (hasNewClimber){
             climberModeButton.onTrue(new InstantCommand(() -> climberMode = !climberMode)
-                .andThen(new ConditionalCommand(new ReadyClimb(climber), new UnReadyClimb(climber), () -> {return climberMode;}))
+                .andThen(new ConditionalCommand(new ReadyClimbNew(climber), new UnReadyClimbNew(climber), () -> {return climberMode;}))
                 .andThen(new InstantCommand(() -> {SmartDashboard.putBoolean("Climber Moder", climberMode);})));
 
-            autoClimbButton.onTrue(new ConditionalCommand(new Climb(climber), new InstantCommand(() -> {}), () -> {return climberMode;}));
+            autoClimbButton.onTrue(new ConditionalCommand(new ClimbNew(climber), new InstantCommand(() -> {}), () -> {return climberMode;}));
 
             climber.setDefaultCommand(
                 new RunCommand(climberRunnable, climber));

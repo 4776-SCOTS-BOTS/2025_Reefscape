@@ -24,15 +24,29 @@ public class UnReadyClimbNew extends Command {
   // Called when the command is initially scheduled.
   // Cant really Unready the new climber so this is all emtpy
   @Override
-  public void initialize() {}
+  public void initialize() {
+    climber.autoClimb(-0.5);
+    isComplete = false;
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    if (climber.climbMotor.getPosition().getValueAsDouble() >= 0) {
+      climber.autoClimb(-0.4);
+    } else {
+      climber.autoClimb(0);
+      isComplete = true;
+    }
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    climber.autoTilt(0);
+    climber.autoClimb(0);
+    climber.climberMode = Climber.ClimberMode.RUN_TO_POSITION;
+  }
 
   // Returns true when the command should end.
   @Override

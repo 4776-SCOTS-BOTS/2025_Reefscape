@@ -41,7 +41,7 @@ public class Climber extends SubsystemBase {
 
   public Climber() {
     climbMotor = new TalonFX(Constants.ClimberConstants.climberMotorCANID, "rio");
-    tiltMotor = new TalonFX(Constants.ClimberConstants.tiltMotorCANID, "rio");
+    // tiltMotor = new TalonFX(Constants.ClimberConstants.tiltMotorCANID, "rio");
 
     TalonFXConfiguration climb_cfg = new TalonFXConfiguration();
     TalonFXConfiguration tilt_cfg = new TalonFXConfiguration();
@@ -55,10 +55,10 @@ public class Climber extends SubsystemBase {
 
     climbMotor.getConfigurator().apply(climb_cfg);
 
-    tilt_cfg = climb_cfg;
-    tilt_cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    tilt_cfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    tiltMotor.getConfigurator().apply(climb_cfg);
+    // tilt_cfg = climb_cfg;
+    // tilt_cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    // tilt_cfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    // tiltMotor.getConfigurator().apply(climb_cfg);
 
   }
 
