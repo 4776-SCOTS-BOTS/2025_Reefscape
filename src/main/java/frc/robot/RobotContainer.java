@@ -159,6 +159,7 @@ public class RobotContainer {
     // private Trigger forcePoseButton = driverCommandController.a();
     private Trigger searchLeftButton = driverCommandController.leftBumper();
     private Trigger searchRighttButton = driverCommandController.rightBumper();
+    private Trigger sparkleButton = driverCommandController.b();
 
     // d-pad field-rel Movement
     POVButton dpadUp = new POVButton(m_driverController, 0);
@@ -432,6 +433,8 @@ public class RobotContainer {
                     speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
                     rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
                 }));
+
+        sparkleButton.onTrue(new InstantCommand(m_led::sparkleToggle));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.

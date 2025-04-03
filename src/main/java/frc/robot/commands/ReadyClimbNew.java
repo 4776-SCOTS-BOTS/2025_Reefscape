@@ -24,7 +24,7 @@ public class ReadyClimbNew extends Command {
   @Override
   public void initialize() {
     // System.out.println("Ready Climber");
-    climber.autoClimb(0.5);
+    climber.autoClimb(0.75);
     isComplete = false;
   }
 
@@ -32,7 +32,7 @@ public class ReadyClimbNew extends Command {
   @Override
   public void execute() {
     if (climber.climbMotor.getPosition().getValueAsDouble() <= climber.climbReadyPosition) {
-      climber.autoClimb(0.5);
+      climber.autoClimb(0.75);
     } else {
       climber.autoClimb(0);
       isComplete = true;

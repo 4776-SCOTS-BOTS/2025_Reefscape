@@ -25,7 +25,7 @@ public class UnReadyClimb extends Command {
   @Override
   public void initialize() {
     // System.out.println("UNReady Climber");
-    climber.autoTilt(-0.25);
+    climber.autoTilt(-0.4);
     startTilt = false;
     isComplete = false;
   }
@@ -34,7 +34,7 @@ public class UnReadyClimb extends Command {
   @Override
   public void execute() {
     if (climber.tiltMotor.getPosition().getValueAsDouble() > 0) {
-      climber.autoTilt(-0.3);
+      climber.autoTilt(-0.4);
     } else {
       climber.autoTilt(0);
       isComplete = true;

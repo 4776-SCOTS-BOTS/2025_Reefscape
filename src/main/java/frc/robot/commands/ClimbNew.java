@@ -31,7 +31,7 @@ public class ClimbNew extends Command {
   @Override
   public void execute() {
     if(climber.climbMotor.getPosition().getValueAsDouble() >= climber.climbPosition) {
-      climber.autoClimb(-0.5);
+      climber.autoClimb(-0.8);
     } else {
       climber.autoClimb(0);
       isComplete = true;

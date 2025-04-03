@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotGearing;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -42,6 +43,7 @@ public class LEDSubsystem extends SubsystemBase {
   private int bounceStart = 110;
   private int bounceEnd = 176;
   private int patchPosition = bounceStart;
+  private boolean hasBlinked = false;
 
   private final Random random;
   private final int[][] colorList = {
@@ -68,9 +70,19 @@ public class LEDSubsystem extends SubsystemBase {
       Color.kDarkRed,
       Color.kCoral,
       Color.kCrimson,
-      Color.kFirebrick,
-      Color.kFirstRed
+      Color.kFirebrick
   };
+
+  public static enum LEDModes {
+    OFF,
+    SOLID,
+    KITT,
+    SPARKLE,
+    ENDGAME
+  }
+
+  public LEDModes currentMode = LEDModes.KITT;
+  private LEDModes lastMode = currentMode;
 
   // Setup Rainbow
   // all hues at maximum saturation and half brightness
@@ -135,13 +147,36 @@ public class LEDSubsystem extends SubsystemBase {
 
     // Write to the actual LEDs
     // m_led.setData(m_buffer);
-
-    updateKITT();
-    // applyRandomSparkle();
-
+    // System.out.println(DriverStation.getMatchTime());
+    
     if (DriverStation.getMatchTime() <= 30.0 && DriverStation.getMatchTime() >= 20.0) {
-      endgameBlink();
+      lastMode = currentMode;
+      currentMode = LEDModes.ENDGAME;
+    } else {
+      currentMode = lastMode;
     }
+
+    switch (currentMode) {
+      case OFF:
+        turnOffLeds();
+        break;
+      case SOLID:
+        setDarkGreen();
+        break;
+      case KITT:
+        updateKITT();
+        break;
+      case SPARKLE:
+        applyRandomSparkle();
+        break;
+      case ENDGAME:
+        endgameBlink();
+        break;
+    }
+
+    // updateKITT();
+    // // applyRandomSparkle();
+
   }
 
   /**
@@ -160,13 +195,19 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   private void endgameBlink() {
-    double blinkInterval = 1.0;
+    double blinkInterval = 0.5;
 
     if (timer.advanceIfElapsed(blinkInterval)) {
-      setDarkGreen();
-    } else {
-      turnOffLeds();
+      if (hasBlinked) {
+        setDarkGreen();
+        hasBlinked = false;
+      } else if (!hasBlinked) {
+        turnOffLeds();
+        hasBlinked = true;
+      }
     }
+
+    m_led.setData(m_buffer);
   }
 
   private void setColorPatch() {
@@ -186,6 +227,7 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public void updateKITT() {
+    double kittDelay = 0.02;
     if (timer.advanceIfElapsed(delay)) {
       setDarkGreen(); // Reset all to Dark Green
       setColorPatch(); // Apply Gold Patch
@@ -200,9 +242,10 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   private void applyRandomSparkle() {
+    double sparkleDelay = 0.1;
     Color color = Color.kBlack;
     Optional<Alliance> alliance = DriverStation.getAlliance();
-    if (timer.advanceIfElapsed(delay)) { // Update
+    if (timer.advanceIfElapsed(sparkleDelay)) { // Update
       for (int i = 0; i < kLength; i++) {
         if (random.nextDouble() < 0.5) { // 50% chance to sparkle
           if (alliance.isPresent()) {
@@ -215,6 +258,21 @@ public class LEDSubsystem extends SubsystemBase {
         }
       }
       m_led.setData(m_buffer);
+    }
+  }
+
+  public void setMode(LEDModes mode) {
+    currentMode = mode;
+    lastMode = currentMode;
+  }
+
+  public void sparkleToggle(){
+    if(currentMode == LEDModes.SPARKLE){
+      currentMode = LEDModes.KITT;
+      lastMode = currentMode;
+    } else {
+      currentMode = LEDModes.SPARKLE;
+      lastMode = currentMode;
     }
   }
 
