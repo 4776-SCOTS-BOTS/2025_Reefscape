@@ -69,8 +69,8 @@ public final class Constants {
   }
 
   public static final class ElevatorConstants {
-    public static final Distance ELEVATOR_BASE_HEIGHT = Inches.of(1.75 + 29.5);
-    public static final Distance ELEVATOR_MAX_HEIGHT = Inches.of(1.75 + 71.5);
+    public static final Distance ELEVATOR_BASE_HEIGHT = Inches.of(1.75 + 31.0);//Was 29.5
+    public static final Distance ELEVATOR_MAX_HEIGHT = Inches.of(1.75 + 72.5);//Was 71.5
 
     public static final int ELEVATOR_LEADER_ID = 28;
     public static final int ELEVATOR_FOLLOWER_ID = 29;

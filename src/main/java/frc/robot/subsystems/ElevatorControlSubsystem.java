@@ -9,12 +9,17 @@ import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StrictFollower;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.mechanisms.DifferentialMechanism;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -45,7 +50,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
   // Motor's encoder limits, in encoder ticks
   private static final double MOTOR_BOTTOM = 0;
-  private static final double MOTOR_TOP = 186.6;
+  private static final double MOTOR_TOP = 137;
 
   // Mutiply by sensor position to get meters
   private final double MOTOR_ENCODER_POSITION_COEFFICIENT = (Constants.ElevatorConstants.ELEVATOR_MAX_HEIGHT.in(Meters) - Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters))
@@ -72,13 +77,18 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   public ElevatorMode elevatorMode = ElevatorMode.MANUAL;
 
   public boolean useLeader = false;
-  public boolean useDynamic = true;
+  public boolean useDynamic = false;
 
 
   private final TalonFX elevatorLeader;
   private final TalonFX elevatorFollower;
 
-  final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
+  private final DifferentialMechanism elevatorMech;
+
+  final MotionMagicVoltage m_request = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(true);
+  final VelocityVoltage m_velocity = new VelocityVoltage(0).withSlot(1).withEnableFOC(true);
+  final DutyCycleOut m_dutyCycleRequest = new DutyCycleOut(0).withEnableFOC(true);
+  final VelocityDutyCycle m_velDutyCycle = new VelocityDutyCycle(0).withEnableFOC(true).withSlot(1);
   private DynamicMotionMagicVoltage m_dynamicRequest;
   
   // Limit switches - FALSE means at limit
@@ -91,20 +101,22 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     elevatorLeader = new TalonFX(ElevatorConstants.ELEVATOR_LEADER_ID, "TestBed");
     elevatorFollower = new TalonFX(ElevatorConstants.ELEVATOR_FOLLOWER_ID, "TestBed");
 
+    elevatorMech = new DifferentialMechanism(elevatorLeader, elevatorFollower, true);
+
     TalonFXConfiguration leader_cfg = new TalonFXConfiguration();
     TalonFXConfiguration follower_cfg = new TalonFXConfiguration();
 
     /* Configure Motion Magic */
     if (!useDynamic) {
       MotionMagicConfigs mm = leader_cfg.MotionMagic;
-      mm.withMotionMagicCruiseVelocity(RotationsPerSecond.of(MAX_ROT_SPEED)) // (motor) rotations per second cruise
-          .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(MAX_ROT_ACCEL)) // Take approximately 0.5 seconds
-                                                                                      // to reach max vel
-          .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(MAX_ROT_JERK)); // Take approximately
+      mm.withMotionMagicCruiseVelocity(RotationsPerSecond.of(SLOW_ROT_SPEED)) // (motor) rotations per second cruise
+          .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(SLOW_ROT_ACCEL)) // Take approximately 0.5 seconds
+                                                                                      // to reach Max vel
+          .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(SLOW_ROT_JERK)); // Take approximately
                                                                                                 // 0.1 seconds to reach
                                                                                                 // max accel
     } else {
-      m_dynamicRequest = new DynamicMotionMagicVoltage(0, MAX_ROT_SPEED, MAX_ROT_ACCEL, MAX_ROT_JERK);
+      m_dynamicRequest = new DynamicMotionMagicVoltage(0, SLOW_ROT_SPEED, SLOW_ROT_ACCEL, SLOW_ROT_JERK);
     }
 
     Slot0Configs slot0 = leader_cfg.Slot0;
@@ -116,12 +128,21 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     slot0.kD = 0; // A velocity error of 1 rps results in 0.5 V output
     slot0.GravityType = GravityTypeValue.Elevator_Static;
     slot0.kG = 0.2;
+  
+
+    Slot1Configs slot1 = leader_cfg.Slot1;
+    slot1.kS = 0.25; // Add 0.25 V output to overcome static friction
+    slot1.kV = 0.0; // A velocity target of 1 rps results in 0.12 V output
+    slot1.kA = 0; // An acceleration of 1 rps/s requires 0.01 V output
+    slot1.kP = 0.5; // A position error of 0.2 rotations results in 12 V output
+    slot1.kI = 0; // No output for integrated error
+    slot1.kD = 0; // A velocity error of 1 rps results in 0.5 V output
 
     MotorOutputConfigs leader_mo = leader_cfg.MotorOutput;
     leader_mo.Inverted = InvertedValue.Clockwise_Positive;
     leader_mo.NeutralMode = NeutralModeValue.Brake;
 
-    leader_cfg.CurrentLimits.StatorCurrentLimit = 70; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
+    leader_cfg.CurrentLimits.StatorCurrentLimit = 90; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
     leader_cfg.CurrentLimits.StatorCurrentLimitEnable = true;
 
     elevatorLeader.getConfigurator().apply(leader_cfg);
@@ -131,22 +152,14 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     follower_mo.Inverted = InvertedValue.Clockwise_Positive;
     follower_mo.NeutralMode = NeutralModeValue.Brake;
 
-    follower_cfg.CurrentLimits.StatorCurrentLimit = 70; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
+    follower_cfg.CurrentLimits.StatorCurrentLimit = 90; // This will help limit total torque the motor can apply to the mechanism. Could be too low for fast operation
     follower_cfg.CurrentLimits.StatorCurrentLimitEnable = true;
 
-    if(!useLeader){
       follower_cfg.MotionMagic = leader_cfg.MotionMagic;
       follower_cfg.Slot0 = leader_cfg.Slot0;
-    }
+      follower_cfg.Slot1 = leader_cfg.Slot1;
 
     elevatorFollower.getConfigurator().apply(follower_cfg);
-    
-    if (useLeader) {
-      // StricFollower seemed to have issues.
-      // elevatorFollower.setControl(new StrictFollower(elevatorLeader.getDeviceID()));
-      
-      elevatorFollower.setControl(new Follower(elevatorLeader.getDeviceID(), false));
-    }
 
   }
 
@@ -170,6 +183,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     //   elevatorLeader.setControl(m_request.withPosition(MOTOR_TOP));
     // }
     // bottomLimitSwitchTrigger.onTrue(new InstantCommand(() -> {resetPosition();}));
+
   }
 
   /**
@@ -181,10 +195,12 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
     speed = limitPower(speed);
 
-    elevatorLeader.set(speed / 2);
-    if (!useLeader) {
-      elevatorFollower.set(speed / 2);
-    }
+    elevatorMech.setControl(m_dutyCycleRequest.withOutput(speed),m_velDutyCycle.withVelocity(0));
+    
+    // elevatorLeader.set(speed / 2);
+    // if (!useLeader) {
+    //   elevatorFollower.set(speed / 2);
+    // }
     elevatorMode = ElevatorMode.MANUAL;
     targetPosition = getElevatorPosition();
   }
@@ -203,28 +219,10 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
     targetPosition = meters;
 
-    if (useDynamic) {
-      if (targetPosition == Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters)) {
-        goSlow();
-      } else if (Math.abs((targetPosition - Positions.L4_READY.elevatorHeight)/Positions.L4_READY.elevatorHeight) < 0.1) {
-        goFast();
-      } else {
-        goSlow();
-      }
-
-      elevatorLeader.setControl(m_dynamicRequest.withPosition(metersToMotorPosition(meters)));
-      if (!useLeader) {
-        elevatorFollower.setControl(m_dynamicRequest.withPosition(metersToMotorPosition(meters)));
-      }
-    } else {
-      elevatorLeader.setControl(m_request.withPosition(metersToMotorPosition(meters)));
-      if (!useLeader) {
-        elevatorFollower.setControl(m_request.withPosition(metersToMotorPosition(meters)));
-      }
-    }
+    elevatorMech.setControl(m_request.withPosition(metersToMotorPosition(meters)), m_velocity.withVelocity(0));
 
     elevatorMode = ElevatorMode.RUN_TO_POSITION;
-    
+
   }
   
   /**
@@ -254,10 +252,9 @@ public class ElevatorControlSubsystem extends SubsystemBase {
    * Stop the elevator
    */
   public void stop() {
-    elevatorLeader.stopMotor();
-    if(!useLeader){
-      elevatorFollower.stopMotor();
-    }
+
+    moveElevator(0);
+
   }
 
   // public boolean isAtBottomLimit() {

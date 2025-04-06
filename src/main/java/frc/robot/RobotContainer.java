@@ -69,7 +69,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.ShoulderSubsystem;
 import frc.robot.subsystems.Climber.ClimberMode;
-import frc.robot.subsystems.ElevatorControlSubsystem.ElevatorMode;
+import frc.robot.subsystems.ElevatorControlSubsystemOld.ElevatorMode;
 import frc.robot.subsystems.ShoulderSubsystem.ShoulderMode;
 
 public class RobotContainer {
@@ -203,10 +203,10 @@ public class RobotContainer {
         // Setup Elevator if present
         if (hasElevator) {
             elevator = new ElevatorControlSubsystem();
-            // elevatorLayout =
-            // Shuffleboard.getTab("Subsystems").getLayout("ElevatorControl",
-            // BuiltInLayouts.kList);
-            // elevator.addDashboardWidgets(elevatorLayout);
+            elevatorLayout =
+            Shuffleboard.getTab("Subsystems").getLayout("ElevatorControl",
+            BuiltInLayouts.kList);
+            elevator.addDashboardWidgets(elevatorLayout);
         } else {
             elevator = null;
         }
@@ -552,7 +552,7 @@ public class RobotContainer {
             double elevatorStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.leftStickY),
                     0.05);
 
-            if (elevatorStick == 0 && elevator.getMode() != ElevatorMode.RUN_TO_POSITION) {
+            if (elevatorStick == 0 && elevator.getMode() != ElevatorControlSubsystem.ElevatorMode.RUN_TO_POSITION) {
                 elevator.moveElevator(0);
             } else if (elevatorStick != 0) {
                 elevator.moveElevator(elevatorStick);
