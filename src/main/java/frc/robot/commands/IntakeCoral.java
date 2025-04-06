@@ -43,9 +43,9 @@ public class IntakeCoral extends Command {
   public void execute() {
     // System.out.println(intake.getFilteredCurent());
     if (!hasCoral && timer.hasElapsed(0.5)) {
-      hasCoral = (intake.getFilteredCurent() > 15) ? true : false;
+      hasCoral = (intake.getFilteredCurent() > 13) ? true : false;
     }
-    if (hasCoral && timer.hasElapsed(1.0)) {
+    if (hasCoral && timer.hasElapsed(0.9)) {
       isCompleted = true;
     }
 

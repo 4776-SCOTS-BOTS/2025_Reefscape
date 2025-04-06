@@ -52,7 +52,7 @@ public class DeliverCoral extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (timer.hasElapsed(0.7
+    if (timer.hasElapsed(0.8
     )) {
       intake.intakeOut();
     }

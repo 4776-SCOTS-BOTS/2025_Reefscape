@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 1.2323073190855718,
-        "y": 6.7478263742063636
+        "x": 1.1711053857410518,
+        "y": 6.859696496635693
       },
       "prevControl": {
-        "x": 0.9980342292107824,
-        "y": 6.907106387778911
+        "x": 0.9368322958662625,
+        "y": 7.01897651020824
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "3p Left Station"
+      "linkedName": "3p Left 2nd Station"
     }
   ],
   "rotationTargets": [],

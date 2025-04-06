@@ -146,6 +146,7 @@ public class RobotContainer {
 
     // Driver Controls
     JoystickButton brakeButton = new JoystickButton(m_driverController, XboxController.Button.kX.value);
+    JoystickButton altBrakeButton = new JoystickButton(m_driverController, XboxController.Button.kB.value);
     // POVButton resetGyro = new POVButton(m_driverController, 0); // Up on the
     // D-Pad
     Trigger resetGyro = new Trigger(() -> m_driverController.getStartButton());
@@ -159,7 +160,7 @@ public class RobotContainer {
     // private Trigger forcePoseButton = driverCommandController.a();
     private Trigger searchLeftButton = driverCommandController.leftBumper();
     private Trigger searchRighttButton = driverCommandController.rightBumper();
-    private Trigger sparkleButton = driverCommandController.b();
+    private Trigger sparkleButton = driverCommandController.a();
 
     // d-pad field-rel Movement
     POVButton dpadUp = new POVButton(m_driverController, 0);
@@ -167,7 +168,7 @@ public class RobotContainer {
     POVButton dpadDown = new POVButton(m_driverController, 180);
     POVButton dpadLeft = new POVButton(m_driverController, 270);
 
-    // Manipulator contorls
+    // Manipulator controls
     private Trigger placeCoral = manipCommandController.axisGreaterThan(Constants.rightTrigger, 0.5);
     // private Trigger adjustWrist = manipCommandController.axisGreaterThan(Constants.leftTrigger, 0.5);
     private Trigger intakeButton = manipCommandController.button(Constants.leftButton);
@@ -179,7 +180,8 @@ public class RobotContainer {
     private Trigger moveWristPos = manipCommandController.button(Constants.rightStickButton);
     private Trigger moveWristNeg = manipCommandController.button(Constants.leftStickButton);
 
-    private Trigger climberModeButton = manipCommandController.button(Constants.rightMenuButton);
+    //private Trigger climberModeButton = manipCommandController.button(Constants.rightMenuButton);
+    private Trigger climberModeButton = driverCommandController.y();
     private Trigger autoClimbButton = manipCommandController.button(Constants.leftMenuButton);
 
     // private Trigger testButton = manipCommandController.button(Constants.rightMenuButton);
@@ -239,6 +241,7 @@ public class RobotContainer {
         // Register Named Commands
         NamedCommands.registerCommand("ReadyHigh", new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.85));
         NamedCommands.registerCommand("ReadyHighInitial", new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.4));
+        NamedCommands.registerCommand("ArmClear", new MoveArmAndElevator(elevator, shoulder, Positions.ARM_CLEAR, 0));
         NamedCommands.registerCommand("DeliverCoral", new DeliverCoral(intake, shoulder, false));
         NamedCommands.registerCommand("IntakeDeliverPos", new InstantCommand(intake::wristDeliver2, intake));
         NamedCommands.registerCommand("IntakePickupPos", new InstantCommand(intake::wristPickup, intake));
@@ -462,6 +465,7 @@ public class RobotContainer {
                 .applyRequest(() -> driveRoboRel.withVelocityX(0).withVelocityY(dpadSpeed).withRotationalRate(0)));
 
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
+        altBrakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
 
         // searchLeftButton.onTrue(new AlignToRange(drivetrain, true, isL4))
         //         .onFalse(new InstantCommand(() -> {}, drivetrain));
@@ -544,7 +548,7 @@ public class RobotContainer {
     // };
 
     Runnable elevatorRunnable = () -> {
-        if (!climberMode) {
+        //if (!climberMode) {
             double elevatorStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.leftStickY),
                     0.05);
 
@@ -553,7 +557,7 @@ public class RobotContainer {
             } else if (elevatorStick != 0) {
                 elevator.moveElevator(elevatorStick);
             }
-        }
+        //}
 
     };
 
@@ -571,7 +575,7 @@ public class RobotContainer {
 
     Runnable climberRunnable = () -> {
         if (climberMode) {
-            double climberStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.leftStickY),
+            double climberStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.rightStickY),
                     0.03);
 
             if ((Math.abs(climberStick) < 0.03) && climber.climberMode == ClimberMode.MANUAL) {

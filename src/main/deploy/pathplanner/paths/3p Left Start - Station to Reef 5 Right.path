@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.2323073190855718,
-        "y": 6.7478263742063636
+        "x": 1.1711053857410518,
+        "y": 6.859696496635693
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.189841860264478,
-        "y": 5.9600269441225855
+        "x": 2.334751337983997,
+        "y": 6.123518425541285
       },
       "isLocked": false,
-      "linkedName": "3p Left Station"
+      "linkedName": "3p Left 2nd Station"
     },
     {
       "anchor": {

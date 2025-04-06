@@ -21,9 +21,22 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "ReadyHighInitial"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ArmClear"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ReadyHighInitial"
+                      }
+                    }
+                  ]
                 }
               },
               {

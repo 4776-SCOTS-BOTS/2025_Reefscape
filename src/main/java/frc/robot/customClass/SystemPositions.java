@@ -10,6 +10,7 @@ public class SystemPositions {
         
         SAFE_STATION(Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters), 0.64),
         INTAKE_STATION(Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters), 0.70),
+        ARM_CLEAR(Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters), 0.8),
         L4_READY(1.708, 0.36),
         L3_READY(1.05, 0.365),
         L2_READY(Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters), 0.32),
