@@ -172,11 +172,11 @@ public class Intake extends SubsystemBase {
     wristPos = WRIST_POSTION.DELIVER2;
   }
 
-  public double getFilteredCurent(){
+  public double getFilteredCurrent(){
     return filteredCurrent;
   }
 
-  public double getRawCurent(){
+  public double getRawCurrent(){
     return intakeMotor.getOutputCurrent();
   }
 
@@ -194,8 +194,8 @@ public class Intake extends SubsystemBase {
 
     public void addDashboardWidgets(ShuffleboardLayout layout) {
     layout.withProperties(Map.of("Number of columns", 1, "Number of rows", 3));
-    layout.addNumber("Filtered Current", this::getFilteredCurent).withPosition(0, 0);
-    layout.addNumber("Raw Current", this::getRawCurent).withPosition(0, 2);
+    layout.addNumber("Filtered Current", this::getFilteredCurrent).withPosition(0, 0);
+    layout.addNumber("Raw Current", this::getRawCurrent).withPosition(0, 2);
     // layout.addNumber("Position Meters", this::getElevatorPosition).withPosition(0, 1);
     // layout.addNumber("Target Position Meters", () -> targetPosition).withPosition(0, 2);
   }
