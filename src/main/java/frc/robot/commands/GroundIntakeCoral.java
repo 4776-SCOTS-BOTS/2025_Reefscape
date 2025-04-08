@@ -6,10 +6,10 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.GroundIntake;
 
-public class IntakeCoral extends Command {
-  private Intake intake;
+public class GroundIntakeCoral extends Command {
+  private GroundIntake groundIntake;
   private Timer timer = new Timer();
   private Timer timeoutTimer = new Timer();
   private boolean isCompleted = false;
@@ -18,10 +18,10 @@ public class IntakeCoral extends Command {
   private static double timeout = 4.0;
 
   /** Creates a new IntakeNote. */
-  public IntakeCoral(Intake intake) {
+  public GroundIntakeCoral(GroundIntake groundIntake) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(intake);
-    this.intake = intake;
+    addRequirements(groundIntake);
+    this.groundIntake = groundIntake;
 
 
   }
@@ -31,7 +31,7 @@ public class IntakeCoral extends Command {
   public void initialize() {
     timer.reset();
     timeoutTimer.restart();
-    intake.intakeIn();
+    groundIntake.intakeIn();
     isCompleted = false;
     timerStarted = true;
     hasCoral = false;
@@ -43,7 +43,7 @@ public class IntakeCoral extends Command {
   public void execute() {
     // System.out.println(intake.getFilteredCurent());
     if (!hasCoral && timer.hasElapsed(0.5)) {
-      hasCoral = (intake.getFilteredCurrent() > 13) ? true : false;
+      hasCoral = (groundIntake.getFilteredCurrent() > 13) ? true : false;
     }
     if (hasCoral && timer.hasElapsed(0.9)) {
       isCompleted = true;
@@ -60,7 +60,7 @@ public class IntakeCoral extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-      intake.intakeOff();
+      groundIntake.intakeOff();
       isCompleted = false;
       timerStarted = false;
   }

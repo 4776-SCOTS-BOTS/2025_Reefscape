@@ -9,17 +9,22 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
+import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.LEDSubsystem.LEDModes;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ClimberNew extends Climber {
+  
+  LEDSubsystem m_led = new LEDSubsystem();
+
   /** Creates a new ClimberNew. */
   public ClimberNew() {
+
     climbMotor = new TalonFX(Constants.ClimberConstants.climberMotorCANID, "rio");
     tiltMotor = null;
 
-    climbPosition = 45;// Actual 160
+    climbPosition = 40;// Actual 160
     climbReadyPosition = 270;
     tiltRange = 0;
 
@@ -77,5 +82,6 @@ public class ClimberNew extends Climber {
   public void autoClimb(double speed) {
     runClimber(speed);
     climberMode = ClimberMode.RUN_TO_POSITION;
+    m_led.setMode(LEDModes.SPARKLE);
   }
 }
