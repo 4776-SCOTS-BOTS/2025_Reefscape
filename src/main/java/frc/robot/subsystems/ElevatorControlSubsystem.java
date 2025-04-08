@@ -28,6 +28,7 @@ import com.ctre.phoenix6.mechanisms.DifferentialMechanism;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.pathplanner.lib.auto.AutoBuilder.TriFunction;
 
 import edu.wpi.first.math.MathUtil;
@@ -151,6 +152,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     /* Slot0 used for Average position */
     Slot0Configs slot0 = leader_cfg.Slot0;
     slot0.kS = 1.0; // Amps to just start moving
+    slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
     slot0.kV = 0; // Should be zero for Torque Current FOC
     slot0.kA = 0.11; // Amps / rot / s^2 extracted at 0.11
     slot0.kP = 1.0; // Amps / rot
@@ -164,7 +166,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     slot1.kS = 0; // Amps to just start moving
     slot1.kV = 0; // Should be zero for Torque Current FOC
     slot1.kA = 0; // Amps / rot / s^2
-    slot1.kP = 0; // Amps / rot
+    slot1.kP = 0.1; // Amps / rot
     slot1.kI = 0; // No output for integrated error
     slot1.kD = 0; // Amps / rot / s
 
