@@ -139,8 +139,8 @@ public class RobotContainer {
             Constants.Controllers.kManipulatorControllerPort);
 
     // Testing Controller -- Comment out for comps
-    // private CommandXboxController testCommandXboxController = new
-    // CommandXboxController(4);
+    private CommandXboxController testCommandXboxController = new CommandXboxController(4);
+    private Trigger testControl_a = testCommandXboxController.a();
     // private Trigger testControl_dPadRight = testCommandXboxController.pov(90);
     // private Trigger testControl_dPadLeft = testCommandXboxController.pov(270);
 
@@ -481,6 +481,7 @@ public class RobotContainer {
         // driverCommandController.a().onTrue(new MoveRobot(drivetrain, 1, 0, 0))
         // .onFalse(new InstantCommand(driveRunnable, drivetrain));
         // forcePoseButton.onTrue(new InstantCommand(() -> drivetrain.forcePoseUpdate("limelight-front")));
+        testControl_a.onTrue(new InstantCommand(() -> {elevator.moveToPosition(1.5);}));
     
 
 
@@ -548,16 +549,20 @@ public class RobotContainer {
     // };
 
     Runnable elevatorRunnable = () -> {
-        //if (!climberMode) {
-            double elevatorStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.leftStickY),
-                    0.05);
+        // if (!climberMode) {
+        double elevatorStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.leftStickY),
+                0.05);
 
+        // if (testControl_a.getAsBoolean()) {
+        //     elevator.torqueCurrentControl(10);
+        // } else {
             if (elevatorStick == 0 && elevator.getMode() != ElevatorControlSubsystem.ElevatorMode.RUN_TO_POSITION) {
                 elevator.moveElevator(0);
             } else if (elevatorStick != 0) {
                 elevator.moveElevator(elevatorStick);
             }
-        //}
+        // }
+        // }
 
     };
 
@@ -578,11 +583,15 @@ public class RobotContainer {
             double climberStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.rightStickY),
                     0.03);
 
-            if ((Math.abs(climberStick) < 0.03) && climber.climberMode == ClimberMode.MANUAL) {
+            if(testControl_a.getAsBoolean()){
+                System.out.println("Climber Stick: " + climberStick);
+            } else
+
+{            if ((Math.abs(climberStick) < 0.03) && climber.climberMode == ClimberMode.MANUAL) {
                 climber.manualClimb(0);
             } else if (Math.abs(climberStick) >= 0.03) {
                 climber.manualClimb(climberStick * 0.5);
-            }
+            }}
 
             double tiltStick = MathUtil.applyDeadband(manipCommandController.getRawAxis(Constants.leftStickX),
                     0.1);
