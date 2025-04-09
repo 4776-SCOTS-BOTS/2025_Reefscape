@@ -29,6 +29,13 @@ import frc.robot.Constants;
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
 
+  enum coralPosition{
+    empty,
+    beltSide,
+    notBeltSide,
+    center
+  }
+
   public SparkMax intakeMotor, wristMotor;
   LinearFilter filter = LinearFilter.movingAverage(6);
   private SparkMaxConfig wristMotorConfig;
@@ -127,6 +134,8 @@ public class Intake extends SubsystemBase {
   public void periodic(){
     rawCurrent = intakeMotor.getOutputCurrent();
     filteredCurrent = filter.calculate(rawCurrent);
+
+    intakeMotor.getForwardLimitSwitch();
     
     // if(filter.calculate(intakeMotor.getOutputCurrent()) > 5){ //! number is temporary
     //   Timer.delay(0.5);
@@ -239,6 +248,22 @@ public class Intake extends SubsystemBase {
 
   public void setWristbyCurrentSetpoint(){
     setWrist(getWristPosValue(wristPos));
+  }
+
+  public coralPosition getCoralPosition()
+  {
+    if (intakeMotor.getForwardLimitSwitch().isPressed())
+    {
+      if (intakeMotor.getReverseLimitSwitch().isPressed())
+      {
+        return coralPosition.center;
+      }
+      return coralPosition.beltSide;
+    } else if (intakeMotor.getReverseLimitSwitch().isPressed())
+    {
+      return coralPosition.notBeltSide;
+    }
+    return coralPosition.empty;
   }
 
 }
