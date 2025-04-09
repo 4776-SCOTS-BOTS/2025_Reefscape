@@ -240,7 +240,7 @@ public class RobotContainer {
         if (hasOldClimber) {
             // climber = new Climber();
         } else if (hasNewClimber) {
-            climber = new ClimberNew(m_led);
+            climber = new ClimberNew();
         } else {
             climber = null;
         }
@@ -412,7 +412,7 @@ public class RobotContainer {
                 .andThen(new ConditionalCommand(new ReadyClimbNew(climber), new UnReadyClimbNew(climber), () -> {return climberMode;}))
                 .andThen(new InstantCommand(() -> {SmartDashboard.putBoolean("Climber Moder", climberMode);})));
 
-            autoClimbButton.onTrue(new ConditionalCommand(new ClimbNew(climber), new InstantCommand(() -> {}), () -> {return climberMode;}));
+            autoClimbButton.onTrue(new ConditionalCommand(new ClimbNew(climber, m_led), new InstantCommand(() -> {}), () -> {return climberMode;}));
 
             climber.setDefaultCommand(
                 new RunCommand(climberRunnable, climber));

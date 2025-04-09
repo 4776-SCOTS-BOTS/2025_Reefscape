@@ -15,12 +15,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ClimberNew extends Climber {
-  
-  LEDSubsystem m_led;
 
   /** Creates a new ClimberNew. */
-  public ClimberNew(LEDSubsystem led) {
-    m_led = led;
+  public ClimberNew() {
 
     climbMotor = new TalonFX(Constants.ClimberConstants.climberMotorCANID, "rio");
     tiltMotor = null;
@@ -83,6 +80,5 @@ public class ClimberNew extends Climber {
   public void autoClimb(double speed) {
     runClimber(speed);
     climberMode = ClimberMode.RUN_TO_POSITION;
-    // m_led.setMode(LEDModes.SPARKLE);
   }
 }
