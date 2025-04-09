@@ -59,6 +59,14 @@ public class GroundIntake extends SubsystemBase {
     groundIntakeMotor.set(0);
   }
 
+  public void rotateToPickup() {
+    rotateMotor.setPosition(0.5);
+  }
+
+  public void rotateToHandoff() {
+    rotateMotor.setPosition(0.2);
+  }
+
   public double getFilteredCurrent() {
     return filteredCurrent;
   }

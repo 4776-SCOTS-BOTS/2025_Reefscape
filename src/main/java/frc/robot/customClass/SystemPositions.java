@@ -15,7 +15,8 @@ public class SystemPositions {
         L3_READY(1.05, 0.365),
         L2_READY(Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters), 0.32),
         L1_READY(Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters), 0.3),
-        ARM_SAFE_HIGH(Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters), 0.58);
+        ARM_SAFE_HIGH(Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters), 0.58),
+        HANDOFF_POSE(1.05, 0.08);
 
         public final double elevatorHeight;
         public final double armPosition;
