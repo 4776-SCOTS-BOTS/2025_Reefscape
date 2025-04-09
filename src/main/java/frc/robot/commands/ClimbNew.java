@@ -6,18 +6,22 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.LEDSubsystem.LEDModes;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ClimbNew extends Command {
   /** Creates a new Climb. */
   private Climber climber;
   private boolean isComplete = false;
+  LEDSubsystem led;
   
-  public ClimbNew(Climber climber) {
+  public ClimbNew(Climber climber, LEDSubsystem led) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(climber);
-
+    
     this.climber = climber;
+    this.led = led;
   }
 
   // Called when the command is initially scheduled.
@@ -43,6 +47,7 @@ public class ClimbNew extends Command {
   public void end(boolean interrupted) {
     climber.autoTilt(0);
     climber.autoClimb(0);
+    led.setMode(LEDModes.SPARKLE);
   }
 
   // Returns true when the command should end.
