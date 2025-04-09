@@ -16,16 +16,17 @@ import frc.robot.Constants;
 
 public class ClimberNew extends Climber {
   
-  LEDSubsystem m_led = new LEDSubsystem();
+  LEDSubsystem m_led;
 
   /** Creates a new ClimberNew. */
-  public ClimberNew() {
+  public ClimberNew(LEDSubsystem led) {
+    m_led = led;
 
     climbMotor = new TalonFX(Constants.ClimberConstants.climberMotorCANID, "rio");
     tiltMotor = null;
 
-    climbPosition = 40;// Actual 160
-    climbReadyPosition = 270;
+    climbPosition = 70;
+    climbReadyPosition = 156;
     tiltRange = 0;
 
     TalonFXConfiguration climb_cfg = new TalonFXConfiguration();
@@ -82,6 +83,6 @@ public class ClimberNew extends Climber {
   public void autoClimb(double speed) {
     runClimber(speed);
     climberMode = ClimberMode.RUN_TO_POSITION;
-    m_led.setMode(LEDModes.SPARKLE);
+    // m_led.setMode(LEDModes.SPARKLE);
   }
 }

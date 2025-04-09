@@ -49,6 +49,7 @@ import frc.robot.commands.DeliverCoral;
 import frc.robot.commands.DriveToReefTag;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.MoveArmAndElevator;
+import frc.robot.commands.MoveElevator;
 import frc.robot.commands.MoveRobot;
 import frc.robot.commands.PathfindToReefTag;
 import frc.robot.commands.ReadyClimb;
@@ -141,6 +142,8 @@ public class RobotContainer {
     // Testing Controller -- Comment out for comps
     private CommandXboxController testCommandXboxController = new CommandXboxController(4);
     private Trigger testControl_a = testCommandXboxController.a();
+    private Trigger testControl_b = testCommandXboxController.b();
+    private Trigger testControl_y = testCommandXboxController.y();
     // private Trigger testControl_dPadRight = testCommandXboxController.pov(90);
     // private Trigger testControl_dPadLeft = testCommandXboxController.pov(270);
 
@@ -233,7 +236,7 @@ public class RobotContainer {
         if (hasOldClimber) {
             // climber = new Climber();
         } else if (hasNewClimber) {
-            climber = new ClimberNew();
+            climber = new ClimberNew(m_led);
         } else {
             climber = null;
         }
@@ -481,8 +484,11 @@ public class RobotContainer {
         // driverCommandController.a().onTrue(new MoveRobot(drivetrain, 1, 0, 0))
         // .onFalse(new InstantCommand(driveRunnable, drivetrain));
         // forcePoseButton.onTrue(new InstantCommand(() -> drivetrain.forcePoseUpdate("limelight-front")));
-        testControl_a.onTrue(new InstantCommand(() -> {elevator.moveToPosition(1.5);}));
-    
+
+        testControl_a.onTrue(new InstantCommand(() -> {elevator.moveToPosition(Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters));}));
+        testControl_b.onTrue(new InstantCommand(() -> {elevator.moveToPosition(Positions.L3_READY.elevatorHeight);}));    
+        testControl_y.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY));    
+
 
 
         // if (hasElevator) {
@@ -583,15 +589,11 @@ public class RobotContainer {
             double climberStick = MathUtil.applyDeadband(-manipCommandController.getRawAxis(Constants.rightStickY),
                     0.03);
 
-            if(testControl_a.getAsBoolean()){
-                System.out.println("Climber Stick: " + climberStick);
-            } else
-
-{            if ((Math.abs(climberStick) < 0.03) && climber.climberMode == ClimberMode.MANUAL) {
+            if ((Math.abs(climberStick) < 0.03) && climber.climberMode == ClimberMode.MANUAL) {
                 climber.manualClimb(0);
             } else if (Math.abs(climberStick) >= 0.03) {
                 climber.manualClimb(climberStick * 0.5);
-            }}
+            }
 
             double tiltStick = MathUtil.applyDeadband(manipCommandController.getRawAxis(Constants.leftStickX),
                     0.1);

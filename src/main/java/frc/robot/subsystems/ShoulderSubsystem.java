@@ -47,15 +47,15 @@ public class ShoulderSubsystem extends SubsystemBase {
   private static double kDt = 0.02;
 
   private double kS = 0;//0.27
-  private double kG = 0.3; // was 0.17 from test arm
-  private double kV = 2.0;//1.5 - 4.77
+  private double kG = 0.4; // was 0.17 from test arm
+  private double kV = 1;//1.5 - 4.77
 
   private final ArmFeedforward m_feedforward = new ArmFeedforward(kS, kG, kV);
 
     // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint. Values are rotations / s
   // Max speed is about 0.4 rev/s at 225:1
-  private final TrapezoidProfile m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(0.6, 2));
+  private final TrapezoidProfile m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(0.8, 2));
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   private double arbFF;
@@ -97,7 +97,7 @@ public class ShoulderSubsystem extends SubsystemBase {
     .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
     // Set PID values for position control. We don't need to pass a closed
     // loop slot, as it will default to slot 0.
-    .p(4)
+    .p(3)
     .i(0)
     .d(0)
     .outputRange(-1, 1);

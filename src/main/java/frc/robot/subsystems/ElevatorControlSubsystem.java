@@ -19,6 +19,7 @@ import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
@@ -70,8 +71,8 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   private final double MAX_ROT_ACCEL = MAX_LINEAR_ACCEL / MOTOR_ENCODER_POSITION_COEFFICIENT;// rot /s^2
   private final double MAX_ROT_JERK = MAX_ROT_ACCEL * 10;
 
-  private final double SLOW_LINEAR_SPEED = 1.0; // m/s
-  private final double SLOW_LINEAR_ACCEL = 0.25; // m / s^2
+  private final double SLOW_LINEAR_SPEED = 0.75; // m/s --> 0.85 seems to be the max mechanical speed
+  private final double SLOW_LINEAR_ACCEL = 1.5; // m / s^2
   private final double SLOW_ROT_SPEED = SLOW_LINEAR_SPEED / MOTOR_ENCODER_POSITION_COEFFICIENT; // rot / s
   private final double SLOW_ROT_ACCEL = SLOW_LINEAR_ACCEL / MOTOR_ENCODER_POSITION_COEFFICIENT;// rot /s^2
   private final double SLOW_ROT_JERK = SLOW_ROT_ACCEL * 10;
@@ -93,15 +94,17 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   final PositionDutyCycle m_positionDutyCycleRequest = new PositionDutyCycle(0).withEnableFOC(true).withSlot(2);
 
   // Non Torque Current FOC requests
-  // final MotionMagicVoltage m_request = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(true);
+  final MotionMagicVoltage m_request = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(true);
+  final PositionVoltage m_positionVoltageRequest = new PositionVoltage(0).withEnableFOC(true).withSlot(1);
+
   // final VelocityVoltage m_velocity = new VelocityVoltage(0).withSlot(1).withEnableFOC(true);
   // final VelocityDutyCycle m_velDutyCycle = new VelocityDutyCycle(0).withEnableFOC(true).withSlot(1);
   // final PositionDutyCycle m_positionDutyCycleRequest = new PositionDutyCycle(0).withEnableFOC(true).withSlot(1);
 
   // Torque Current FOC requests
-  final TorqueCurrentFOC m_torqueCurrentRequest = new TorqueCurrentFOC(0);
-  final MotionMagicTorqueCurrentFOC m_MM_torqueCurrentRequest = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
-  final PositionTorqueCurrentFOC m_positionTorqueCurrentRequest = new PositionTorqueCurrentFOC(0).withSlot(1);
+  // final TorqueCurrentFOC m_torqueCurrentRequest = new TorqueCurrentFOC(0);
+  // // final MotionMagicTorqueCurrentFOC m_MM_torqueCurrentRequest = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
+  // final PositionTorqueCurrentFOC m_positionTorqueCurrentRequest = new PositionTorqueCurrentFOC(0).withSlot(1);
 
   // Limit switches - FALSE means at limit
   // private final DigitalInput bottomLimitSwitch = new DigitalInput(9); //TODO:
@@ -130,45 +133,45 @@ public class ElevatorControlSubsystem extends SubsystemBase {
                                                                                          // max accel
 
     /* Values for Motion Magic Voltage Request */
-    // Slot0Configs slot0 = leader_cfg.Slot0;
-    // slot0.kS = 0.05; // Add 0.25 V output to overcome static friction
-    // slot0.kV = 0.05; // A velocity target of 1 rps results in 0.12 V output
-    // slot0.kA = 0.1; // An acceleration of 1 rps/s requires 0.01 V output
-    // slot0.kP = 10; // A position error of 0.2 rotations results in 12 V output
-    // slot0.kI = 0; // No output for integrated error
-    // slot0.kD = 0; // A velocity error of 1 rps results in 0.5 V output
-    // slot0.GravityType = GravityTypeValue.Elevator_Static;
-    // slot0.kG = 0.2;
-
-    // Slot1Configs slot1 = leader_cfg.Slot1;
-    // slot1.kS = 0.25; // Add 0.25 V output to overcome static friction
-    // slot1.kV = 0.0; // A velocity target of 1 rps results in 0.12 V output
-    // slot1.kA = 0; // An acceleration of 1 rps/s requires 0.01 V output
-    // slot1.kP = 0.5; // A position error of 0.2 rotations results in 12 V output
-    // slot1.kI = 0; // No output for integrated error
-    // slot1.kD = 0; // A velocity error of 1 rps results in 0.5 V output
-
-    /* Values for Motion Magic Torque Current FOC */
-    /* Slot0 used for Average position */
     Slot0Configs slot0 = leader_cfg.Slot0;
-    slot0.kS = 1.0; // Amps to just start moving
-    slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
-    slot0.kV = 0; // Should be zero for Torque Current FOC
-    slot0.kA = 0.11; // Amps / rot / s^2 extracted at 0.11
-    slot0.kP = 1.0; // Amps / rot
+    slot0.kS = 0.05; // Add 0.25 V output to overcome static friction
+    slot0.kV = 0.01; // A velocity target of 1 rps results in 0.12 V output
+    slot0.kA = 0; // An acceleration of 1 rps/s requires 0.01 V output
+    slot0.kP = 5; // A position error of 0.2 rotations results in 12 V output
     slot0.kI = 0; // No output for integrated error
-    slot0.kD = 0; // Amps / rot / s
+    slot0.kD = 0; // A velocity error of 1 rps results in 0.5 V output
     slot0.GravityType = GravityTypeValue.Elevator_Static;
-    slot0.kG = 3.0; // Amps to hold in place
+    slot0.kG = 0.3;
 
-    /* Slot1 used for Differential position */
     Slot1Configs slot1 = leader_cfg.Slot1;
-    slot1.kS = 0; // Amps to just start moving
-    slot1.kV = 0; // Should be zero for Torque Current FOC
-    slot1.kA = 0; // Amps / rot / s^2
-    slot1.kP = 0.1; // Amps / rot
+    slot1.kS = 0; // Add 0.25 V output to overcome static friction
+    slot1.kV = 0.0; // A velocity target of 1 rps results in 0.12 V output
+    slot1.kA = 0; // An acceleration of 1 rps/s requires 0.01 V output
+    slot1.kP = 0.1; // A position error of 0.2 rotations results in 12 V output
     slot1.kI = 0; // No output for integrated error
-    slot1.kD = 0; // Amps / rot / s
+    slot1.kD = 0; // A velocity error of 1 rps results in 0.5 V output
+
+    // /* Values for Motion Magic Torque Current FOC */
+    // /* Slot0 used for Average position */
+    // Slot0Configs slot0 = leader_cfg.Slot0;
+    // slot0.kS = 1.0; // Amps to just start moving
+    // slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
+    // slot0.kV = 1.0; // Should be zero for Torque Current FOC
+    // slot0.kA = 0.11; // Amps / rot / s^2 extracted at 0.11
+    // slot0.kP = 2.0; // Amps / rot
+    // slot0.kI = 0; // No output for integrated error
+    // slot0.kD = 0; // Amps / rot / s
+    // slot0.GravityType = GravityTypeValue.Elevator_Static;
+    // slot0.kG = 3.0; // Amps to hold in place
+
+    // /* Slot1 used for Differential position */
+    // Slot1Configs slot1 = leader_cfg.Slot1;
+    // slot1.kS = 0; // Amps to just start moving
+    // slot1.kV = 0; // Should be zero for Torque Current FOC
+    // slot1.kA = 0; // Amps / rot / s^2
+    // slot1.kP = 0.1; // Amps / rot
+    // slot1.kI = 0; // No output for integrated error
+    // slot1.kD = 0; // Amps / rot / s
 
     /* Slot2 used for Differential position */
     Slot2Configs slot2 = leader_cfg.Slot2;
@@ -267,7 +270,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
     targetPosition = meters;
 
-    elevatorMech.setControl(m_MM_torqueCurrentRequest.withPosition(metersToMotorPosition(meters)), m_positionTorqueCurrentRequest.withPosition(0));
+    elevatorMech.setControl(m_request.withPosition(metersToMotorPosition(meters)), m_positionVoltageRequest.withPosition(0));
 
     elevatorMode = ElevatorMode.RUN_TO_POSITION;
 
@@ -370,8 +373,13 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     elevatorFollower.setPosition(0);
   }
 
-  public void torqueCurrentControl(double current){
-    elevatorMech.setControl(m_torqueCurrentRequest.withOutput(current), m_positionTorqueCurrentRequest.withPosition(0));
+  // public void torqueCurrentControl(double current){
+  //   elevatorMech.setControl(m_torqueCurrentRequest.withOutput(current), m_positionTorqueCurrentRequest.withPosition(0));
+  // }
+
+  public boolean isDone(){
+    double check = (Math.abs(elevatorLeader.getPosition().getValueAsDouble() - metersToMotorPosition(targetPosition)))/metersToMotorPosition(targetPosition);
+    return check <= 0.01;
   }
 
 }
