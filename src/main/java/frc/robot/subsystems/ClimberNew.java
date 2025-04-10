@@ -5,11 +5,15 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.Backups.Climber;
 import frc.robot.subsystems.LEDSubsystem.LEDModes;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -17,6 +21,7 @@ import frc.robot.Constants;
 public class ClimberNew extends Climber {
   
   LEDSubsystem m_led;
+  PositionVoltage m_request = new PositionVoltage(0).withSlot(0).withEnableFOC(true);
 
   /** Creates a new ClimberNew. */
   public ClimberNew(LEDSubsystem led) {
@@ -34,6 +39,16 @@ public class ClimberNew extends Climber {
     MotorOutputConfigs climb_mo = climb_cfg.MotorOutput;
     climb_mo.Inverted = InvertedValue.Clockwise_Positive;
     climb_mo.NeutralMode = NeutralModeValue.Brake;
+
+    Slot0Configs slot0 = climb_cfg.Slot0;
+    slot0.kS = 0.; // Add 0.25 V output to overcome static friction
+    slot0.kV = 0; // A velocity target of 1 rps results in 0.12 V output
+    slot0.kA = 0; // An acceleration of 1 rps/s requires 0.01 V output
+    slot0.kP = 5; // A position error of 0.2 rotations results in 12 V output
+    slot0.kI = 0; // No output for integrated error
+    slot0.kD = 0; // A velocity error of 1 rps results in 0.5 V output
+    slot0.GravityType = GravityTypeValue.Elevator_Static;
+    slot0.kG = 1.0;
 
     climb_cfg.CurrentLimits.StatorCurrentLimit = 90; // This will help limit total torque the motor can apply to the
                                                      // mechanism. Could be too low for fast operation
@@ -84,5 +99,13 @@ public class ClimberNew extends Climber {
     runClimber(speed);
     climberMode = ClimberMode.RUN_TO_POSITION;
     // m_led.setMode(LEDModes.SPARKLE);
+  }
+
+  public void climbToPosition(double position) {
+    climbMotor.setControl(m_request.withPosition(position));
+  }
+
+  public void climbToHang(){
+    climbToPosition(climbPosition);
   }
 }

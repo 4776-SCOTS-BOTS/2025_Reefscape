@@ -71,11 +71,11 @@ public class ElevatorControlSubsystem extends SubsystemBase {
   private final double MAX_ROT_ACCEL = MAX_LINEAR_ACCEL / MOTOR_ENCODER_POSITION_COEFFICIENT;// rot /s^2
   private final double MAX_ROT_JERK = MAX_ROT_ACCEL * 10;
 
-  private final double SLOW_LINEAR_SPEED = 0.75; // m/s --> 0.85 seems to be the max mechanical speed
-  private final double SLOW_LINEAR_ACCEL = 1.5; // m / s^2
-  private final double SLOW_ROT_SPEED = SLOW_LINEAR_SPEED / MOTOR_ENCODER_POSITION_COEFFICIENT; // rot / s
-  private final double SLOW_ROT_ACCEL = SLOW_LINEAR_ACCEL / MOTOR_ENCODER_POSITION_COEFFICIENT;// rot /s^2
-  private final double SLOW_ROT_JERK = SLOW_ROT_ACCEL * 10;
+  private final double LINEAR_SPEED = 0.75; // m/s --> 0.85 seems to be the max mechanical speed
+  private final double LINEAR_ACCEL = 1.5; // m / s^2
+  private final double ROT_SPEED = LINEAR_SPEED / MOTOR_ENCODER_POSITION_COEFFICIENT; // rot / s
+  private final double ROT_ACCEL = LINEAR_ACCEL / MOTOR_ENCODER_POSITION_COEFFICIENT;// rot /s^2
+  private final double ROT_JERK = ROT_ACCEL * 10;
 
   public enum ElevatorMode {
     RUN_TO_POSITION,
@@ -125,10 +125,10 @@ public class ElevatorControlSubsystem extends SubsystemBase {
 
     /* Configure Motion Magic */
     MotionMagicConfigs mm = leader_cfg.MotionMagic;
-    mm.withMotionMagicCruiseVelocity(RotationsPerSecond.of(SLOW_ROT_SPEED)) // (motor) rotations per second cruise
-        .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(SLOW_ROT_ACCEL)) // Take approximately 0.5 seconds
+    mm.withMotionMagicCruiseVelocity(RotationsPerSecond.of(ROT_SPEED)) // (motor) rotations per second cruise
+        .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(ROT_ACCEL)) // Take approximately 0.5 seconds
                                                                                      // to reach Max vel
-        .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(SLOW_ROT_JERK)); // Take approximately
+        .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(ROT_JERK)); // Take approximately
                                                                                          // 0.1 seconds to reach
                                                                                          // max accel
 
@@ -215,7 +215,7 @@ public class ElevatorControlSubsystem extends SubsystemBase {
     layout.addNumber("Position Raw", () -> elevatorLeader.getRotorPosition().getValueAsDouble()).withPosition(0, 0);
     layout.addNumber("Position Meters", this::getElevatorPosition).withPosition(0, 1);
     layout.addNumber("Target Position Meters", () -> targetPosition).withPosition(0, 2);
-    layout.addNumber("Target Acceleration", () -> SLOW_ROT_ACCEL).withPosition(0, 3);
+    layout.addNumber("Target Acceleration", () -> ROT_ACCEL).withPosition(0, 3);
     // var limitsLayout = layout.getLayout("Limits", BuiltInLayouts.kGrid)
     // .withProperties(Map.of("Number of columns", 2, "Number of rows",
     // 1)).withPosition(0, 3).withSize(2,1);

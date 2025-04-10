@@ -62,15 +62,15 @@ import frc.robot.commands.UpdateWrist;
 import frc.robot.customClass.FieldPositions.Side;
 import frc.robot.customClass.SystemPositions.Positions;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ClimberNew;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorControlSubsystem;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.ShoulderSubsystem;
+import frc.robot.subsystems.Backups.Climber;
+import frc.robot.subsystems.Backups.Climber.ClimberMode;
 import frc.robot.subsystems.Backups.ElevatorControlSubsystemOld.ElevatorMode;
-import frc.robot.subsystems.Climber.ClimberMode;
 import frc.robot.subsystems.ShoulderSubsystem.ShoulderMode;
 
 public class RobotContainer {
