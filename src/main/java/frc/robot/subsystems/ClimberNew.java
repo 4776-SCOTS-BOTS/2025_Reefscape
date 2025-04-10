@@ -29,8 +29,8 @@ public class ClimberNew extends Climber {
     climbMotor = new TalonFX(Constants.ClimberConstants.climberMotorCANID, "rio");
     tiltMotor = null;
 
-    climbPosition = 70;
-    climbReadyPosition = 156;
+    climbPosition = 80;
+    climbReadyPosition = 165;
     tiltRange = 0;
 
     TalonFXConfiguration climb_cfg = new TalonFXConfiguration();
@@ -47,7 +47,7 @@ public class ClimberNew extends Climber {
     slot0.kI = 0; // No output for integrated error
     slot0.kD = 0; // A velocity error of 1 rps results in 0.5 V output
     slot0.GravityType = GravityTypeValue.Elevator_Static;
-    slot0.kG = 1.0;
+    slot0.kG = 0.25;
 
     climb_cfg.CurrentLimits.StatorCurrentLimit = 90; // This will help limit total torque the motor can apply to the
                                                      // mechanism. Could be too low for fast operation
