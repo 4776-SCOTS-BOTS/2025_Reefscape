@@ -7,9 +7,12 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.GroundIntake;
+import frc.robot.subsystems.Intake;
 
 public class GroundIntakeCoral extends Command {
   private GroundIntake groundIntake;
+  private Intake intake;
+
   private Timer timer = new Timer();
   private Timer timeoutTimer = new Timer();
   private boolean isCompleted = false;
@@ -17,7 +20,7 @@ public class GroundIntakeCoral extends Command {
   public boolean hasCoral = false;
   private static double timeout = 4.0;
 
-  /** Creates a new IntakeNote. */
+  /** Creates a new GroundIntakeCoral. */
   public GroundIntakeCoral(GroundIntake groundIntake) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(groundIntake);
@@ -31,6 +34,7 @@ public class GroundIntakeCoral extends Command {
   public void initialize() {
     timer.reset();
     timeoutTimer.restart();
+    groundIntake.rotateToPickup();
     groundIntake.intakeIn();
     isCompleted = false;
     timerStarted = true;
@@ -46,6 +50,9 @@ public class GroundIntakeCoral extends Command {
       hasCoral = (groundIntake.getFilteredCurrent() > 13) ? true : false;
     }
     if (hasCoral && timer.hasElapsed(0.9)) {
+      groundIntake.rotateToHandoff();
+      intake.intakeIn();
+      groundIntake.intakeOut();
       isCompleted = true;
     }
 

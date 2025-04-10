@@ -24,8 +24,7 @@ public class ClimberNew extends Climber {
   PositionVoltage m_request = new PositionVoltage(0).withSlot(0).withEnableFOC(true);
 
   /** Creates a new ClimberNew. */
-  public ClimberNew(LEDSubsystem led) {
-    m_led = led;
+  public ClimberNew() {
 
     climbMotor = new TalonFX(Constants.ClimberConstants.climberMotorCANID, "rio");
     tiltMotor = null;
