@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -47,6 +48,8 @@ import frc.robot.commands.Climb;
 import frc.robot.commands.ClimbNew;
 import frc.robot.commands.DeliverCoral;
 import frc.robot.commands.DriveToReefTag;
+import frc.robot.commands.GroundIntakeCoral;
+import frc.robot.commands.HandoffCoral;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.MoveArmAndElevator;
 import frc.robot.commands.MoveElevator;
@@ -122,6 +125,7 @@ public class RobotContainer {
     private Intake intake;
 
     private boolean hasGroundIntake = false;
+    private boolean groundIntakeMode = false;
     private GroundIntake groundIntake;
 
     private boolean hasOldClimber = false;
@@ -186,6 +190,8 @@ public class RobotContainer {
     private Trigger wristPos2Button = manipCommandController.button(Constants.rightBumper);
     private Trigger moveWristPos = manipCommandController.button(Constants.rightStickButton);
     private Trigger moveWristNeg = manipCommandController.button(Constants.leftStickButton);
+
+    private Trigger groundIntakeTrigger = manipCommandController.button(Constants.leftTrigger);
 
     //private Trigger climberModeButton = manipCommandController.button(Constants.rightMenuButton);
     private Trigger climberModeButton = driverCommandController.y();
@@ -337,9 +343,11 @@ public class RobotContainer {
         }
 
         if (hasIntake) {
-            intakeButton.onTrue(new IntakeCoral(intake));
-            outFastButton.onTrue(new InstantCommand(intake::intakeOut, intake));
-            intakeOffButton.onTrue(new InstantCommand(intake::intakeOff, intake));
+            if (groundIntakeMode == false) {
+                intakeButton.onTrue(new IntakeCoral(intake));
+                outFastButton.onTrue(new InstantCommand(intake::intakeOut, intake));
+                intakeOffButton.onTrue(new InstantCommand(intake::intakeOff, intake));
+            }
             wristPickupButton.onTrue(new InstantCommand(intake::wristPickup, intake));
             wristPos1Button.onTrue(new InstantCommand(intake::wristDeliver1, intake));
             wristPos2Button.onTrue(new InstantCommand(intake::wristDeliver2, intake));
@@ -378,8 +386,8 @@ public class RobotContainer {
 
         if (hasElevator && hasShoulder) {
             intakeAutoPos
-                    .onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION))
-                    .onFalse(new MoveArmAndElevator(elevator, shoulder, Positions.INTAKE_STATION));
+                .onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.SAFE_STATION))
+                .onFalse(new MoveArmAndElevator(elevator, shoulder, Positions.INTAKE_STATION));
 
             L4Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.75)
                     .andThen(new InstantCommand(() -> isL4 = true)));
@@ -387,11 +395,19 @@ public class RobotContainer {
                     .andThen(new InstantCommand(() -> isL4 = false)));
             L2Button.onTrue(new MoveArmAndElevator(elevator, shoulder, Positions.L2_READY)
                     .andThen(new InstantCommand(() -> isL4 = false)));
+            
 
         }
 
-        if (hasElevator && hasShoulder && hasIntake && hasGroundIntake) {
-            //TODO: Ground intake pickup button
+        if (hasElevator && hasShoulder && hasIntake && hasGroundIntake && groundIntakeMode) {
+            groundIntakeTrigger
+                .onTrue(new GroundIntakeCoral(groundIntake))
+                .onFalse(new ParallelCommandGroup(
+                        new MoveArmAndElevator(elevator, shoulder, Positions.HANDOFF_POSE),
+                        new HandoffCoral(groundIntake, intake)));
+            intakeButton.onTrue(new InstantCommand(groundIntake::intakeIn, groundIntake));
+            outFastButton.onTrue(new InstantCommand(groundIntake::intakeOut, groundIntake));
+            intakeOffButton.onTrue(new InstantCommand(groundIntake::intakeOff, groundIntake));
         }
         
         if (hasElevator && hasIntake){

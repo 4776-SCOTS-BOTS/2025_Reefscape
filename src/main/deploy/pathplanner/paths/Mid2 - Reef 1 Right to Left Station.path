@@ -1,0 +1,75 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.7738188652632125,
+        "y": 4.1912981235138
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.589337022569444,
+        "y": 5.639775028935185
+      },
+      "isLocked": false,
+      "linkedName": "Mid2 Reef 1 Right Pole"
+    },
+    {
+      "anchor": {
+        "x": 4.457558593749999,
+        "y": 6.456712601273148
+      },
+      "prevControl": {
+        "x": 5.594973604298371,
+        "y": 6.130656156662199
+      },
+      "nextControl": {
+        "x": 3.3201435832016273,
+        "y": 6.7827690458840975
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.6388962176989434,
+        "y": 7.2611522269512125
+      },
+      "prevControl": {
+        "x": 1.8612821903935173,
+        "y": 6.70111255787037
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Mid2 Left Station"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.15,
+      "rotationDegrees": -28.677317551936895
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -55.0
+  },
+  "reversed": false,
+  "folder": "2 Piece Mid",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}
