@@ -29,7 +29,7 @@ public class ClimberNew extends Climber {
     climbMotor = new TalonFX(Constants.ClimberConstants.climberMotorCANID, "rio");
     tiltMotor = null;
 
-    climbPosition = 80;
+    climbPosition = 30;
     climbReadyPosition = 165;
     tiltRange = 0;
 
@@ -43,11 +43,11 @@ public class ClimberNew extends Climber {
     slot0.kS = 0.; // Add 0.25 V output to overcome static friction
     slot0.kV = 0; // A velocity target of 1 rps results in 0.12 V output
     slot0.kA = 0; // An acceleration of 1 rps/s requires 0.01 V output
-    slot0.kP = 5; // A position error of 0.2 rotations results in 12 V output
+    slot0.kP = 7; // A position error of 0.2 rotations results in 12 V output
     slot0.kI = 0; // No output for integrated error
     slot0.kD = 0; // A velocity error of 1 rps results in 0.5 V output
     slot0.GravityType = GravityTypeValue.Elevator_Static;
-    slot0.kG = 0.25;
+    slot0.kG = 1.25;
 
     climb_cfg.CurrentLimits.StatorCurrentLimit = 90; // This will help limit total torque the motor can apply to the
                                                      // mechanism. Could be too low for fast operation

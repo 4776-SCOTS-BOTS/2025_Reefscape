@@ -226,11 +226,11 @@ public class Intake extends SubsystemBase {
   }
 
   public void adjustWristPos() {
-    wristMotor.set(0.1);
+    wristMotor.set(0.08);
   }
 
   public void adjustWristNeg() {
-    wristMotor.set(-0.1);
+    wristMotor.set(-0.08);
   }
 
   public double getWristPosValue(WRIST_POSTION pos){

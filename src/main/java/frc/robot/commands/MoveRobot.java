@@ -24,11 +24,11 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveRobot extends Command {
-    private static final double KpX = 1.0;
+    private static final double KpX = 0.75;
     private static final double KiX = 0;
     private static final double KdX = 0;
 
-    private static final double KpY = 0.5;
+    private static final double KpY = 0.75;
     private static final double KiY = 0;
     private static final double KdY = 0;
 

@@ -210,10 +210,10 @@ public class RobotContainer {
         // Setup Elevator if present
         if (hasElevator) {
             elevator = new ElevatorControlSubsystem();
-            elevatorLayout =
-            Shuffleboard.getTab("Subsystems").getLayout("ElevatorControl",
-            BuiltInLayouts.kList);
-            elevator.addDashboardWidgets(elevatorLayout);
+            // elevatorLayout =
+            // Shuffleboard.getTab("Subsystems").getLayout("ElevatorControl",
+            // BuiltInLayouts.kList);
+            // elevator.addDashboardWidgets(elevatorLayout);
         } else {
             elevator = null;
         }
