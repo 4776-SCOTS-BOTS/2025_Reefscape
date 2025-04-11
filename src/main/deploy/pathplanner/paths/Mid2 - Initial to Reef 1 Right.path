@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.6105,
-        "y": 4.0445
+        "x": 6.985489018918632,
+        "y": 4.047215564383884
       },
       "isLocked": false,
       "linkedName": "Mid Start"
@@ -20,25 +20,18 @@
         "y": 4.1912981235138
       },
       "prevControl": {
-        "x": 6.853858245332292,
-        "y": 4.1912981235138
+        "x": 5.451472178688617,
+        "y": 4.229716983980167
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Real Reef1 Right"
+      "linkedName": "Mid2 Reef 1 Right Pole"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.0,
     "maxAcceleration": 3.0,
@@ -52,9 +45,9 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": "1 & 2 Piece",
+  "folder": "2 Piece Mid",
   "idealStartingState": {
-    "velocity": 0.0,
+    "velocity": 0,
     "rotation": 180.0
   },
   "useDefaultConstraints": true
