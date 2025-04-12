@@ -47,8 +47,8 @@ public class Intake extends SubsystemBase {
   public double filteredCurrent;
 
   public double pickupPos = 0;
-  public double deliverPos1 = 0.20;
-  public double deliverPos2 = -0.20;
+  public double deliverPos1 = 0.205;
+  public double deliverPos2 = -0.205;
 
   public enum WRIST_POSTION{
     PICKUP,

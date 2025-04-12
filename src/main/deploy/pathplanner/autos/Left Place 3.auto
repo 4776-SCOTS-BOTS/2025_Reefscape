@@ -27,12 +27,6 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "ArmClear"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
                         "name": "ReadyHighInitial"
                       }
                     }
@@ -65,6 +59,12 @@
           "type": "sequential",
           "data": {
             "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 5.0
+                }
+              },
               {
                 "type": "named",
                 "data": {
@@ -103,7 +103,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "StationIntakeDelay"
+                        "name": "StationSafe"
                       }
                     },
                     {
@@ -175,9 +175,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "sequential",
           "data": {
-            "name": "DeliverCoral"
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 5.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "DeliverCoral"
+                }
+              }
+            ]
           }
         },
         {
@@ -203,7 +216,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "StationIntakeDelay"
+                        "name": "StationSafe"
                       }
                     },
                     {
@@ -263,20 +276,19 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "DeliverCoral"
-                      }
-                    }
-                  ]
+                  "name": "DeliverCoral"
                 }
               },
               {

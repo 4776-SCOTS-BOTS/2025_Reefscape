@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.1711053857410518,
-        "y": 6.859696496635693
+        "x": 1.4630643499478981,
+        "y": 6.942185166435499
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.334751337983997,
-        "y": 6.123518425541285
+        "x": 2.5618211527695394,
+        "y": 6.163604111497274
       },
       "isLocked": false,
       "linkedName": "3p Left 2nd Station"
     },
     {
       "anchor": {
-        "x": 3.65655172859382,
-        "y": 5.04419665812253
+        "x": 3.7220214969658105,
+        "y": 5.080840846306824
       },
       "prevControl": {
-        "x": 3.326757075136964,
-        "y": 5.673994906972689
+        "x": 3.3922268435089546,
+        "y": 5.710639095156983
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,7 @@
   "folder": "3 Piece Left",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -55.0
+    "rotation": -53.19030069174782
   },
   "useDefaultConstraints": true
 }

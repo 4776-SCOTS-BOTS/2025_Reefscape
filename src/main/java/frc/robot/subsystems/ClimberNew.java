@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -38,6 +39,9 @@ public class ClimberNew extends Climber {
     MotorOutputConfigs climb_mo = climb_cfg.MotorOutput;
     climb_mo.Inverted = InvertedValue.Clockwise_Positive;
     climb_mo.NeutralMode = NeutralModeValue.Brake;
+
+    VoltageConfigs climb_volts = climb_cfg.Voltage;
+    climb_volts.PeakForwardVoltage = 8;
 
     Slot0Configs slot0 = climb_cfg.Slot0;
     slot0.kS = 0.; // Add 0.25 V output to overcome static friction

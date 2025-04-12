@@ -253,7 +253,7 @@ public class RobotContainer {
 
         // Register Named Commands
         NamedCommands.registerCommand("ReadyHigh", new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.85));
-        NamedCommands.registerCommand("ReadyHighInitial", new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0.4));
+        NamedCommands.registerCommand("ReadyHighInitial", new MoveArmAndElevator(elevator, shoulder, Positions.L4_READY, 0));
         NamedCommands.registerCommand("ArmClear", new MoveArmAndElevator(elevator, shoulder, Positions.ARM_CLEAR, 0));
         NamedCommands.registerCommand("DeliverCoral", new DeliverCoral(intake, shoulder, false));
         NamedCommands.registerCommand("IntakeDeliverPos", new InstantCommand(intake::wristDeliver2, intake));
