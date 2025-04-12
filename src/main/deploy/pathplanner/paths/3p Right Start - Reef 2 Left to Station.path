@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.993398026751131,
-        "y": 2.848518647346501
+        "x": 4.946122474865656,
+        "y": 2.8041285077282283
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.48255010723838,
-        "y": 2.1956058406809724
+        "x": 5.435274555352905,
+        "y": 2.1512157010626995
       },
       "isLocked": false,
       "linkedName": "Reef 2 Right Pole"
     },
     {
       "anchor": {
-        "x": 1.3066598360655735,
-        "y": 1.1299692622950817
+        "x": 1.3173170514643062,
+        "y": 1.152613498867761
       },
       "prevControl": {
-        "x": 4.603568663854421,
-        "y": 1.6080869604846746
+        "x": 4.614225879253154,
+        "y": 1.630731197057354
       },
       "nextControl": null,
       "isLocked": false,
@@ -38,8 +38,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 4.6,
+    "maxAcceleration": 3.6,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

@@ -9,7 +9,7 @@ public class SystemPositions {
     public static enum Positions {
         
         SAFE_STATION(Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters), 0.64),
-        INTAKE_STATION(Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters), 0.70),
+        INTAKE_STATION(Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters), 0.69),
         ARM_CLEAR(Constants.ElevatorConstants.ELEVATOR_BASE_HEIGHT.in(Meters), 0.6),
         L4_READY(1.758, 0.36),
         L3_READY(1.15, 0.345),

@@ -53,12 +53,6 @@
           "data": {
             "commands": [
               {
-                "type": "wait",
-                "data": {
-                  "waitTime": 5.0
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "DeliverCoral"
@@ -96,13 +90,13 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "StationSafe"
+                        "name": "StationIntakeDelay"
                       }
                     },
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 5.25
+                        "waitTime": 0.25
                       }
                     },
                     {
@@ -172,18 +166,18 @@
           "data": {
             "commands": [
               {
-                "type": "wait",
-                "data": {
-                  "waitTime": 5.0
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "DeliverCoral"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LimelightBack"
           }
         },
         {
@@ -209,13 +203,13 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "StationSafe"
+                        "name": "StationIntakeDelay"
                       }
                     },
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 5.25
+                        "waitTime": 0.25
                       }
                     },
                     {
@@ -234,6 +228,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LimelightFront"
           }
         },
         {
@@ -266,12 +266,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 5.0
           }
         },
         {

@@ -15,7 +15,7 @@ public class RemoveAlgae extends Command {
   private ElevatorControlSubsystem elevator;
   private Intake intake;
   private Timer timer = new Timer();
-  double timeout = 2;
+  double timeout = 1;
 
   public RemoveAlgae(ElevatorControlSubsystem elevator, Intake intake) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -27,7 +27,7 @@ public class RemoveAlgae extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    double newPostion = elevator.getElevatorPosition() - 0.5;
+    double newPostion = elevator.getElevatorPosition() - 0.52;
     intake.intakeOutFast();
     elevator.moveToPosition(newPostion);
     timer.restart();

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.335083060928356,
-        "y": 5.032451823377238
+        "x": 5.3736061534623705,
+        "y": 5.023187284126352
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.875480756044459,
-        "y": 5.8094546787128145
+        "x": 5.914003848578473,
+        "y": 5.800190139461928
       },
       "isLocked": false,
       "linkedName": "Reef 6 Right Pole"
     },
     {
       "anchor": {
-        "x": 1.4320429784865545,
-        "y": 6.9267850666205035
+        "x": 1.399548580778353,
+        "y": 6.979317691546172
       },
       "prevControl": {
-        "x": 1.6808763992242763,
-        "y": 6.950908265495527
+        "x": 1.6483820015160748,
+        "y": 7.003440890421196
       },
       "nextControl": null,
       "isLocked": false,
@@ -38,8 +38,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 4.4,
+    "maxAcceleration": 3.4,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -55,5 +55,5 @@
     "velocity": 0,
     "rotation": -120.52970589993411
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

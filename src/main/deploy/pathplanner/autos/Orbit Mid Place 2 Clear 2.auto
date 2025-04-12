@@ -15,15 +15,9 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "Mid2 - Initial to Reef 1 Right"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
-                  "name": "ReadyHigh"
+                  "name": "ArmClear"
                 }
               },
               {
@@ -44,6 +38,31 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.0
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Mid2ReadyHighInitial"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "Mid2 - Initial to Reef 1 Right"
+                      }
+                    }
+                  ]
+                }
               }
             ]
           }
@@ -52,12 +71,6 @@
           "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 5.0
-                }
-              },
               {
                 "type": "named",
                 "data": {
@@ -102,13 +115,13 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "StationSafe"
+                        "name": "StationIntakeDelay"
                       }
                     },
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 5.25
+                        "waitTime": 0.25
                       }
                     },
                     {
@@ -142,7 +155,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Mid2 - Left Station to Reef 4 Left"
+                  "pathName": "Mid2 - Left Station to Reef 6 Right"
                 }
               },
               {
@@ -164,12 +177,6 @@
           "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 5.5
-                }
-              },
               {
                 "type": "named",
                 "data": {

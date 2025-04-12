@@ -27,7 +27,7 @@ public class RemoveAlgaeHigh extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    double newPostion = elevator.getElevatorPosition() - 0.10;
+    double newPostion = elevator.getElevatorPosition() - 0.14;
     intake.intakeOutFast();
     elevator.moveToPosition(newPostion);
     timer.restart();
