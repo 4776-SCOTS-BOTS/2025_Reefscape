@@ -13,6 +13,7 @@ import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -78,6 +79,9 @@ import frc.robot.subsystems.Backups.ElevatorControlSubsystemOld.ElevatorMode;
 import frc.robot.subsystems.ShoulderSubsystem.ShoulderMode;
 
 public class RobotContainer {
+
+    private boolean atWorlds = true;
+
     // Stick scaling factors
     private double deadband = 0.03;
     private double scaleFactor = 1 / (1 - deadband);
@@ -273,7 +277,9 @@ public class RobotContainer {
 
 
         // Build an auto chooser. This will use Commands.none() as the default option.
-        m_chooser = AutoBuilder.buildAutoChooser();
+        //m_chooser = AutoBuilder.buildAutoChooser();
+        m_chooser = AutoBuilder.buildAutoChooserWithOptionsModifier((stream) -> atWorlds 
+            ? stream.filter(auto -> auto.getName().contains("CMP")) : stream);
 
         // Another option that allows you to specify the default auto by its name
         // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
