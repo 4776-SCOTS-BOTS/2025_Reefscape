@@ -29,7 +29,7 @@ import frc.robot.Constants;
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
 
-  enum coralPosition{
+  public enum coralPosition{
     empty,
     beltSide,
     notBeltSide,
