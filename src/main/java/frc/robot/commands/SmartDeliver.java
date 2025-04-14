@@ -26,16 +26,17 @@ public class SmartDeliver extends Command {
   public void execute() {
     switch (intake.getCoralPosition()) {
       case beltSide:
-        intake.wristDeliver1();
-        break;
-      case notBeltSide:
         intake.wristDeliver2();
         break;
-      case center:
+      case notBeltSide:
         intake.wristDeliver1();
         break;
+      case center:
+        intake.wristDeliver2();
+        break;
       case empty:
-          break;
+        intake.wristDeliver2();
+        break;
     }
     isCompleted = true;
   }

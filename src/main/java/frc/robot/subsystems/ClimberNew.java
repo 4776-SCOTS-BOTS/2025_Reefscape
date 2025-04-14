@@ -30,8 +30,8 @@ public class ClimberNew extends Climber {
     climbMotor = new TalonFX(Constants.ClimberConstants.climberMotorCANID, "rio");
     tiltMotor = null;
 
-    climbPosition = 30;
-    climbReadyPosition = 165;
+    climbPosition = 63;
+    climbReadyPosition = 205;
     tiltRange = 0;
 
     TalonFXConfiguration climb_cfg = new TalonFXConfiguration();
@@ -41,7 +41,7 @@ public class ClimberNew extends Climber {
     climb_mo.NeutralMode = NeutralModeValue.Brake;
 
     VoltageConfigs climb_volts = climb_cfg.Voltage;
-    climb_volts.PeakForwardVoltage = 8;
+    climb_volts.PeakForwardVoltage = 12;
 
     Slot0Configs slot0 = climb_cfg.Slot0;
     slot0.kS = 0.; // Add 0.25 V output to overcome static friction

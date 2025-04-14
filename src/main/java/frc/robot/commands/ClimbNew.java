@@ -28,14 +28,15 @@ public class ClimbNew extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    climber.climbToHang();
+    // climber.climbToHang();
+    climber.autoClimb(-0.6);
     isComplete = false;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(Math.abs(climber.climbMotor.getPosition().getValueAsDouble() - climber.climbPosition)<=10) {
+    if(climber.climbMotor.getPosition().getValueAsDouble() - climber.climbPosition <=2 ) {
       isComplete = true;
       led.setMode(LEDModes.SPARKLE);
     }
@@ -44,7 +45,7 @@ public class ClimbNew extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    
+    climber.autoClimb(-0.05); // Hold voltage
   }
 
   // Returns true when the command should end.
@@ -54,3 +55,4 @@ public class ClimbNew extends Command {
   }
   
 }
+

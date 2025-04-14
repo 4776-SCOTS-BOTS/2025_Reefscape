@@ -4,12 +4,23 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.Slot1Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.VoltageConfigs;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.filter.LinearFilter;
@@ -19,31 +30,77 @@ import frc.robot.Constants;
 
 public class GroundIntake extends SubsystemBase {
   /** Creates a new GroundIntake. */
-  public SparkMax groundIntakeMotor;
+  public TalonFX groundIntakeMotor;
   public TalonFX rotateMotor;
 
   LinearFilter filter = LinearFilter.movingAverage(6);
   public double rawCurrent;
   public double filteredCurrent;
 
+  public double packagePos = 0.28;
   public double pickupPos = 0;
-  public double handoffPos = 0;
+  public double handoffPos = 0.15;
+
+  PositionVoltage lowerRequest = new PositionVoltage(0).withSlot(0).withEnableFOC(true);
+  PositionVoltage raiseRequest = new PositionVoltage(0).withSlot(1).withEnableFOC(true);
+
 
   public GroundIntake() {
-    groundIntakeMotor = new SparkMax(Constants.IntakeConstants.groundIntakeRollerCANID, MotorType.kBrushless);
-    rotateMotor = new TalonFX(Constants.IntakeConstants.groundIntakeRotateCANID, "rio");
+    groundIntakeMotor = new TalonFX(Constants.IntakeConstants.groundIntakeRollerCANID, "TestBed");
+    rotateMotor = new TalonFX(Constants.IntakeConstants.groundIntakeRotateCANID, "TestBed");
 
-    SparkMaxConfig groundIntakeConfig = new SparkMaxConfig();
-    groundIntakeConfig.idleMode(IdleMode.kBrake);
-    groundIntakeConfig.smartCurrentLimit(20, 20);
-    groundIntakeMotor.configure(groundIntakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    TalonFXConfiguration rotate_cfg = new TalonFXConfiguration();
+
+    MotorOutputConfigs rotate_mo = rotate_cfg.MotorOutput;
+    rotate_mo.Inverted = InvertedValue.Clockwise_Positive;
+    rotate_mo.NeutralMode = NeutralModeValue.Brake;
+
+    rotate_cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+    rotate_cfg.Feedback.SensorToMechanismRatio = 15;
+
+
+    Slot0Configs slot0 = rotate_cfg.Slot0;
+    slot0.kS = 0.; // Add 0.25 V output to overcome static friction
+    slot0.kV = 0; // A velocity target of 1 rps results in 0.12 V output
+    slot0.kA = 0; // An acceleration of 1 rps/s requires 0.01 V output
+    slot0.kP = 10; // A position error of 0.2 rotations results in 12 V output
+    slot0.kI = 0; // No output for integrated error
+    slot0.kD = 0; // A velocity error of 1 rps results in 0.5 V output
+    slot0.GravityType = GravityTypeValue.Arm_Cosine;
+    slot0.kG = 0.6;
+
+    Slot1Configs slot1 = rotate_cfg.Slot1;
+    slot1.kS = 0.; // Add 0.25 V output to overcome static friction
+    slot1.kV = 0; // A velocity target of 1 rps results in 0.12 V output
+    slot1.kA = 0; // An acceleration of 1 rps/s requires 0.01 V output
+    slot1.kP = 10; // A position error of 0.2 rotations results in 12 V output
+    slot1.kI = 0; // No output for integrated error
+    slot1.kD = 0; // A velocity error of 1 rps results in 0.5 V output
+    slot1.GravityType = GravityTypeValue.Arm_Cosine;
+    slot1.kG = 3.0;
+
+    rotate_cfg.CurrentLimits.StatorCurrentLimit = 60; // This will help limit total torque the motor can apply to the
+                                                     // mechanism. Could be too low for fast operation
+    rotate_cfg.CurrentLimits.StatorCurrentLimitEnable = true;
+
+    rotateMotor.getConfigurator().apply(rotate_cfg);
+
+    TalonFXConfiguration intake_cfg = new TalonFXConfiguration();
+
+    MotorOutputConfigs intake_mo = intake_cfg.MotorOutput;
+    intake_mo.Inverted = InvertedValue.Clockwise_Positive;
+    intake_mo.NeutralMode = NeutralModeValue.Brake;
+
+    groundIntakeMotor.getConfigurator().apply(intake_cfg);
+
+    rotateMotor.setPosition(0.28);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
 
-    rawCurrent = groundIntakeMotor.getOutputCurrent();
+    rawCurrent = getRawCurrent();
     filteredCurrent = filter.calculate(rawCurrent);
   }
 
@@ -60,11 +117,11 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public void rotateToPickup() {
-    rotateMotor.setPosition(0.5);
+    rotateMotor.setControl(lowerRequest.withPosition(pickupPos));
   }
 
   public void rotateToHandoff() {
-    rotateMotor.setPosition(0.2);
+    rotateMotor.setControl(raiseRequest.withPosition(handoffPos));
   }
 
   public double getFilteredCurrent() {
@@ -72,6 +129,10 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public double getRawCurrent() {
-    return rawCurrent;
+    return groundIntakeMotor.getStatorCurrent().getValueAsDouble();
+  }
+
+  public void setRotateMotor(double speed) {
+    rotateMotor.set(speed);
   }
 }

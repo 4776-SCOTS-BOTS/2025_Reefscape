@@ -44,10 +44,11 @@ public class GroundIntakeCoral extends Command {
   @Override
   public void execute() {
     // System.out.println(groundIntake.getFilteredCurent());
-    if (!hasCoral && timer.hasElapsed(0.5)) {
-      hasCoral = (groundIntake.getFilteredCurrent() > 13) ? true : false;
+    if (!hasCoral && timer.hasElapsed(1.0)) {
+      hasCoral = (groundIntake.getFilteredCurrent() > 35) ? true : false;
+      timer.restart();
     }
-    if (hasCoral && timer.hasElapsed(0.9)) {
+    if (hasCoral && timer.hasElapsed(0.5)) {
       isCompleted = true;
     }
 
