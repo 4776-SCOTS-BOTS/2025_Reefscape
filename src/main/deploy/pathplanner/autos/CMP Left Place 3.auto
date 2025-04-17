@@ -159,7 +159,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "IntakeDeliverPos"
+                        "name": "SmartDeliver"
                       }
                     }
                   ]
@@ -254,7 +254,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "IntakeDeliverPos"
+                        "name": "SmartDeliver"
                       }
                     }
                   ]

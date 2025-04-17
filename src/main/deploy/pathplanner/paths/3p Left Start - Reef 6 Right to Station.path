@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 1.399548580778353,
-        "y": 6.979317691546172
+        "x": 1.4755046362230027,
+        "y": 6.919416072896598
       },
       "prevControl": {
-        "x": 1.6483820015160748,
-        "y": 7.003440890421196
+        "x": 1.7243380569607245,
+        "y": 6.943539271771622
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "3p Left Station"
+      "linkedName": "3p Left 2nd Station"
     }
   ],
   "rotationTargets": [
@@ -47,7 +47,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -53.673174047879805
+    "rotation": -53.19030069174782
   },
   "reversed": false,
   "folder": "3 Piece Left",

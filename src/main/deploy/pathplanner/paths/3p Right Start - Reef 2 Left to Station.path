@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 1.3173170514643062,
-        "y": 1.152613498867761
+        "x": 1.3349233779635157,
+        "y": 1.171167577777296
       },
       "prevControl": {
-        "x": 4.614225879253154,
-        "y": 1.630731197057354
+        "x": 4.631832205752364,
+        "y": 1.649285275966889
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Station Right Reef 3 Right Pose"
+      "linkedName": "3p Right Station"
     }
   ],
   "rotationTargets": [
@@ -34,7 +34,21 @@
       "rotationDegrees": 32.17969173103843
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 0.43777533039647226,
+      "constraints": {
+        "maxVelocity": 3.8,
+        "maxAcceleration": 2.8,
+        "maxAngularVelocity": 480.0,
+        "maxAngularAcceleration": 520.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {

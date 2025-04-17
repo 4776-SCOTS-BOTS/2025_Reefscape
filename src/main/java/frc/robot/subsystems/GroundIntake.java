@@ -24,6 +24,7 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -39,7 +40,7 @@ public class GroundIntake extends SubsystemBase {
 
   public double packagePos = 0.28;
   public double pickupPos = 0;
-  public double handoffPos = 0.15;
+  public double handoffPos = 0.22;
 
   PositionVoltage lowerRequest = new PositionVoltage(0).withSlot(0).withEnableFOC(true);
   PositionVoltage raiseRequest = new PositionVoltage(0).withSlot(1).withEnableFOC(true);
@@ -63,11 +64,11 @@ public class GroundIntake extends SubsystemBase {
     slot0.kS = 0.; // Add 0.25 V output to overcome static friction
     slot0.kV = 0; // A velocity target of 1 rps results in 0.12 V output
     slot0.kA = 0; // An acceleration of 1 rps/s requires 0.01 V output
-    slot0.kP = 10; // A position error of 0.2 rotations results in 12 V output
+    slot0.kP = 12; // A position error of 0.2 rotations results in 12 V output
     slot0.kI = 0; // No output for integrated error
     slot0.kD = 0; // A velocity error of 1 rps results in 0.5 V output
     slot0.GravityType = GravityTypeValue.Arm_Cosine;
-    slot0.kG = 0.6;
+    slot0.kG = -0.5;
 
     Slot1Configs slot1 = rotate_cfg.Slot1;
     slot1.kS = 0.; // Add 0.25 V output to overcome static friction
@@ -79,8 +80,7 @@ public class GroundIntake extends SubsystemBase {
     slot1.GravityType = GravityTypeValue.Arm_Cosine;
     slot1.kG = 3.0;
 
-    rotate_cfg.CurrentLimits.StatorCurrentLimit = 60; // This will help limit total torque the motor can apply to the
-                                                     // mechanism. Could be too low for fast operation
+    rotate_cfg.CurrentLimits.StatorCurrentLimit = 80; // This will help limit total torque the motor can apply to the
     rotate_cfg.CurrentLimits.StatorCurrentLimitEnable = true;
 
     rotateMotor.getConfigurator().apply(rotate_cfg);
@@ -93,12 +93,16 @@ public class GroundIntake extends SubsystemBase {
 
     groundIntakeMotor.getConfigurator().apply(intake_cfg);
 
-    rotateMotor.setPosition(0.28);
+    rotateMotor.setPosition(packagePos);
+
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    if(DriverStation.isAutonomousEnabled()){
+      rotateToPackage();
+    }
 
     rawCurrent = getRawCurrent();
     filteredCurrent = filter.calculate(rawCurrent);
@@ -124,6 +128,10 @@ public class GroundIntake extends SubsystemBase {
     rotateMotor.setControl(raiseRequest.withPosition(handoffPos));
   }
 
+  public void rotateToPackage() {
+    rotateMotor.setControl(raiseRequest.withPosition(packagePos));
+  }
+
   public double getFilteredCurrent() {
     return filteredCurrent;
   }
@@ -134,5 +142,9 @@ public class GroundIntake extends SubsystemBase {
 
   public void setRotateMotor(double speed) {
     rotateMotor.set(speed);
+  }
+
+  public boolean atHandoff(){
+    return (Math.abs(rotateMotor.getPosition().getValueAsDouble() - handoffPos) <= 0.08);
   }
 }

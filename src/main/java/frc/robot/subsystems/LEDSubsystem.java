@@ -40,8 +40,8 @@ public class LEDSubsystem extends SubsystemBase {
   private int speed = 1; // Adjustable speed
   private Timer timer = new Timer();
   private double delay = 0.02; // Delay between updates
-  private int bounceStart = 110;
-  private int bounceEnd = 176;
+  private int bounceStart = 110+27;
+  private int bounceEnd = 176+25;
   private int patchPosition = bounceStart;
   private boolean hasBlinked = false;
 

@@ -153,10 +153,10 @@ public class RobotContainer {
             Constants.Controllers.kManipulatorControllerPort);
 
     // Testing Controller -- Comment out for comps
-    private CommandXboxController testCommandXboxController = new CommandXboxController(4);
-    private Trigger testControl_a = testCommandXboxController.a();
-    private Trigger testControl_b = testCommandXboxController.b();
-    private Trigger testControl_y = testCommandXboxController.y();
+    // private CommandXboxController testCommandXboxController = new CommandXboxController(4);
+    // private Trigger testControl_a = testCommandXboxController.a();
+    // private Trigger testControl_b = testCommandXboxController.b();
+    // private Trigger testControl_y = testCommandXboxController.y();
     // private Trigger testControl_dPadRight = testCommandXboxController.pov(90);
     // private Trigger testControl_dPadLeft = testCommandXboxController.pov(270
 
@@ -196,7 +196,7 @@ public class RobotContainer {
     private Trigger moveWristPos = manipCommandController.button(Constants.rightStickButton);
     private Trigger moveWristNeg = manipCommandController.button(Constants.leftStickButton);
 
-    private Trigger groundIntakeTrigger = manipCommandController.button(Constants.leftTrigger);
+    private Trigger groundIntakeTrigger = manipCommandController.axisGreaterThan(Constants.leftTrigger, 0.5);
 
     //private Trigger climberModeButton = manipCommandController.button(Constants.rightMenuButton);
     private Trigger climberModeButton = driverCommandController.y();
@@ -359,9 +359,9 @@ public class RobotContainer {
         }
 
         if (hasIntake) {
-                intakeButton.onTrue(new IntakeCoral(intake));
-                outFastButton.onTrue(new InstantCommand(intake::intakeOut, intake));
-                intakeOffButton.onTrue(new InstantCommand(intake::intakeOff, intake));
+            intakeButton.and(groundIntakeTrigger.negate()).onTrue(new IntakeCoral(intake));
+            outFastButton.and(groundIntakeTrigger.negate()).onTrue(new InstantCommand(intake::intakeOut, intake));
+            intakeOffButton.and(groundIntakeTrigger.negate()).onTrue(new InstantCommand(intake::intakeOff, intake));
 
             wristPickupButton.onTrue(new InstantCommand(intake::wristPickup, intake));
             wristPos1Button.onTrue(new InstantCommand(intake::wristDeliver1, intake));
@@ -415,28 +415,32 @@ public class RobotContainer {
         }
 
         if (hasElevator && hasShoulder && hasIntake && hasGroundIntake) {
-            groundIntakeTrigger
-                    .onTrue(new ParallelCommandGroup(
-                            new GroundIntakeCoral(groundIntake),
-                            new SequentialCommandGroup(
-                                    new WaitCommand(1.0),
-                                    new MoveArmAndElevator(elevator, shoulder, Positions.HANDOFF_POSE))))
-                    .onFalse(new HandoffCoral(groundIntake, intake));
-
-            testControl_b.onTrue(new ParallelCommandGroup(
+            groundIntakeTrigger.onTrue(new ParallelCommandGroup(
                 new GroundIntakeCoral(groundIntake),
                 new SequentialCommandGroup(
                         new WaitCommand(0.5),
                         new MoveArmAndElevator(elevator, shoulder, Positions.HANDOFF_POSE),
                         new WaitCommand(0.25),
                         new InstantCommand(intake::wristDeliver1, intake)
-                        )));
+                        )))
+                    .onFalse(new HandoffCoral(groundIntake, intake, shoulder));
 
-            testControl_y.onTrue(new InstantCommand(groundIntake::rotateToHandoff, groundIntake));
+            // testControl_b.onTrue(new ParallelCommandGroup(
+            //     new GroundIntakeCoral(groundIntake),
+            //     new SequentialCommandGroup(
+            //             new WaitCommand(0.5),
+            //             new MoveArmAndElevator(elevator, shoulder, Positions.HANDOFF_POSE),
+            //             new WaitCommand(0.25),
+            //             new InstantCommand(intake::wristDeliver1, intake)
+            //             )));
 
-            groundIntakeTrigger.and(intakeButton.onTrue(new InstantCommand(groundIntake::intakeIn, groundIntake)));
-            groundIntakeTrigger.and(outFastButton.onTrue(new InstantCommand(groundIntake::intakeOut, groundIntake)));
-            groundIntakeTrigger.and(intakeOffButton.onTrue(new InstantCommand(groundIntake::intakeOff, groundIntake)));
+            // testControl_y.onTrue(new InstantCommand(groundIntake::rotateToHandoff, groundIntake));
+
+
+
+            groundIntakeTrigger.and(intakeButton).onTrue(new InstantCommand(groundIntake::intakeIn, groundIntake));
+            groundIntakeTrigger.and(outFastButton).onTrue(new InstantCommand(groundIntake::intakeOut, groundIntake));
+            groundIntakeTrigger.and(intakeOffButton).onTrue(new InstantCommand(groundIntake::intakeOff, groundIntake));
         }
         
         if (hasElevator && hasIntake){
@@ -538,7 +542,7 @@ public class RobotContainer {
         // .onFalse(new InstantCommand(driveRunnable, drivetrain));
         // forcePoseButton.onTrue(new InstantCommand(() -> drivetrain.forcePoseUpdate("limelight-front")));
 
-        testControl_a.onTrue(new SmartDeliver(intake)); 
+        // testControl_a.onTrue(new SmartDeliver(intake)); 
 
 
 

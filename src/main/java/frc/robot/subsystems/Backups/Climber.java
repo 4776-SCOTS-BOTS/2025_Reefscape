@@ -26,7 +26,7 @@ public class Climber extends SubsystemBase {
   public TalonFX climbMotor;
   public TalonFX tiltMotor;
 
-  public double climbPosition = 23;
+  public double climbPosition = 18;
   public double climbReadyPosition = 0;
   public double tiltRange = 41;//15
 

@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Intake.coralPosition;
 
 public class IntakeCoral extends Command {
   private Intake intake;
@@ -43,7 +44,7 @@ public class IntakeCoral extends Command {
   public void execute() {
     // System.out.println(intake.getFilteredCurent());
     if (!hasCoral && timer.hasElapsed(0.5)) {
-      hasCoral = (intake.getFilteredCurrent() > 13) ? true : false;
+      hasCoral = (intake.getFilteredCurrent() > 13) ? true : false || intake.getCoralPosition() != coralPosition.empty  ;
     }
     if (hasCoral && timer.hasElapsed(0.9)) {
       isCompleted = true;

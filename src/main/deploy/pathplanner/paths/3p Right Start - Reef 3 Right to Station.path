@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.8763881244906417,
-        "y": 2.8419800292849926
+        "x": 3.855316441633983,
+        "y": 2.830035152133918
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.6837650333581924,
-        "y": 2.3459328046059627
+        "x": 3.6626933505015336,
+        "y": 2.333987927454888
       },
       "isLocked": false,
       "linkedName": "3p Reef 3 Right Pole"
     },
     {
       "anchor": {
-        "x": 1.28830982807748,
-        "y": 1.117541527465936
+        "x": 1.3349233779635157,
+        "y": 1.171167577777296
       },
       "prevControl": {
-        "x": 1.5322066321946342,
-        "y": 1.1724446142775042
+        "x": 1.5788201820806698,
+        "y": 1.2260706645888644
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "3p Right Station"
     }
   ],
   "rotationTargets": [],
