@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5697315799513696,
-        "y": 2.9947353947102857
+        "x": 3.6776452540179103,
+        "y": 3.0055017358843643
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.4207049515679935,
-        "y": 2.7940090535572546
+        "x": 3.528618625634534,
+        "y": 2.804775394731333
       },
       "isLocked": false,
       "linkedName": "3p Reef 3 Left Pole"
     },
     {
       "anchor": {
-        "x": 3.5468066564585303,
-        "y": 2.8324004569026955
+        "x": 3.5031719465093114,
+        "y": 2.855370027552841
       },
       "prevControl": {
-        "x": 3.712305410900893,
-        "y": 3.03378784508912
+        "x": 3.668670700951674,
+        "y": 3.0567574157392654
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,9 +34,9 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.0,
-    "maxAcceleration": 3.0,
+    "maxAcceleration": 1.8,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxAngularAcceleration": 400.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
@@ -50,5 +50,5 @@
     "velocity": 0,
     "rotation": 59.99999999999999
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

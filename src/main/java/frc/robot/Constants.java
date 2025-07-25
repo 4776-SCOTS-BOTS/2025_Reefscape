@@ -89,8 +89,8 @@ public final class Constants {
     // Non-final constants are initialized with the values of the practice bot
     // below.
 
-    public static final double driveNormalPercentScale = 0.8;
-    public static final double rotNormalRateModifier = 0.8;
+    public static final double driveNormalPercentScale = 0.8; // 0.8
+    public static final double rotNormalRateModifier = 0.8; // 0.8
     public static final double driveLowPercentScale = 0.45;
     public static final double rotLowRateModifier = 0.6;
 

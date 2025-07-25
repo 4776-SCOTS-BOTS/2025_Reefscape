@@ -273,9 +273,16 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "DeliverCoral"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "DeliverCoral"
+                      }
+                    }
+                  ]
                 }
               },
               {

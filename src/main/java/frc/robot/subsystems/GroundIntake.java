@@ -39,7 +39,7 @@ public class GroundIntake extends SubsystemBase {
   public double filteredCurrent;
 
   public double packagePos = 0.28;
-  public double pickupPos = 0;
+  public double pickupPos = 0.02;
   public double handoffPos = 0.22;
 
   PositionVoltage lowerRequest = new PositionVoltage(0).withSlot(0).withEnableFOC(true);
@@ -68,17 +68,17 @@ public class GroundIntake extends SubsystemBase {
     slot0.kI = 0; // No output for integrated error
     slot0.kD = 0; // A velocity error of 1 rps results in 0.5 V output
     slot0.GravityType = GravityTypeValue.Arm_Cosine;
-    slot0.kG = -0.5;
+    slot0.kG = -0.9;
 
     Slot1Configs slot1 = rotate_cfg.Slot1;
     slot1.kS = 0.; // Add 0.25 V output to overcome static friction
     slot1.kV = 0; // A velocity target of 1 rps results in 0.12 V output
     slot1.kA = 0; // An acceleration of 1 rps/s requires 0.01 V output
-    slot1.kP = 10; // A position error of 0.2 rotations results in 12 V output
+    slot1.kP = 8; // A position error of 0.2 rotations results in 12 V output
     slot1.kI = 0; // No output for integrated error
     slot1.kD = 0; // A velocity error of 1 rps results in 0.5 V output
     slot1.GravityType = GravityTypeValue.Arm_Cosine;
-    slot1.kG = 3.0;
+    slot1.kG = 2.0;
 
     rotate_cfg.CurrentLimits.StatorCurrentLimit = 80; // This will help limit total torque the motor can apply to the
     rotate_cfg.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -109,7 +109,7 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public void intakeIn() {
-    groundIntakeMotor.set(0.4);
+    groundIntakeMotor.set(0.3);
   }
 
   public void intakeOut() {
@@ -145,6 +145,6 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public boolean atHandoff(){
-    return (Math.abs(rotateMotor.getPosition().getValueAsDouble() - handoffPos) <= 0.08);
+    return (Math.abs(rotateMotor.getPosition().getValueAsDouble() - handoffPos) <= 0.09);
   }
 }

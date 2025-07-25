@@ -60,7 +60,7 @@ public class HandoffCoral extends Command {
       movedArm = true;
       timer.restart();
     }
-    if (movedArm && timer.hasElapsed(0.25)){
+    if (movedArm && timer.hasElapsed(0.4)){
       groundIntake.intakeOff();
       intake.intakeOff();
       isCompleted = true;

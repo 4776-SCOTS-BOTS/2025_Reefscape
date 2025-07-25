@@ -30,8 +30,8 @@ public class ClimberNew extends Climber {
     climbMotor = new TalonFX(Constants.ClimberConstants.climberMotorCANID, "rio");
     tiltMotor = null;
 
-    climbPosition = 55;
-    climbReadyPosition = 205;
+    climbPosition = 85; //40
+    climbReadyPosition = 230; //190
     tiltRange = 0;
 
     TalonFXConfiguration climb_cfg = new TalonFXConfiguration();

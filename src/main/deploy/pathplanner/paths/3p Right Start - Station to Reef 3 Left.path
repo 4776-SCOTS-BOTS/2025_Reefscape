@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3349233779635157,
-        "y": 1.171167577777296
+        "x": 1.0110554315301379,
+        "y": 1.1549855475777975
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.330253147441767,
-        "y": 1.9062142409902507
+        "x": 2.006385201008389,
+        "y": 1.8900322107907515
       },
       "isLocked": false,
       "linkedName": "3p Right Station"
     },
     {
       "anchor": {
-        "x": 3.5697315799513696,
-        "y": 2.9947353947102857
+        "x": 3.6776452540179103,
+        "y": 3.0055017358843643
       },
       "prevControl": {
-        "x": 3.3565737112649345,
-        "y": 2.5741923590997926
+        "x": 3.4644873853314753,
+        "y": 2.584958700273871
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,9 +34,9 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.0,
-    "maxAcceleration": 3.0,
+    "maxAcceleration": 1.8,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxAngularAcceleration": 400.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },

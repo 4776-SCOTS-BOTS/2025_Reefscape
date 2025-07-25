@@ -647,7 +647,7 @@ public class RobotContainer {
             if ((Math.abs(climberStick) < 0.03) && climber.climberMode == ClimberMode.MANUAL) {
                 climber.manualClimb(0);
             } else if (Math.abs(climberStick) >= 0.03) {
-                climber.manualClimb(climberStick * 0.5);
+                climber.manualClimb(climberStick * 1.0);
             }
 
             double tiltStick = MathUtil.applyDeadband(manipCommandController.getRawAxis(Constants.leftStickX),

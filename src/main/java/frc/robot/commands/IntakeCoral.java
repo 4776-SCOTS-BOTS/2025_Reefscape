@@ -44,9 +44,10 @@ public class IntakeCoral extends Command {
   public void execute() {
     // System.out.println(intake.getFilteredCurent());
     if (!hasCoral && timer.hasElapsed(0.5)) {
-      hasCoral = (intake.getFilteredCurrent() > 13) ? true : false || intake.getCoralPosition() != coralPosition.empty  ;
+      hasCoral = (intake.getFilteredCurrent() > 13) ? true : false || intake.getCoralPosition() != coralPosition.empty;
+      timer.restart();
     }
-    if (hasCoral && timer.hasElapsed(0.9)) {
+    if (hasCoral && timer.hasElapsed(0.3)) {
       isCompleted = true;
     }
 
