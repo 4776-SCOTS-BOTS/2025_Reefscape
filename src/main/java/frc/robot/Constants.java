@@ -94,6 +94,11 @@ public final class Constants {
     public static final double driveLowPercentScale = 0.45;
     public static final double rotLowRateModifier = 0.6;
 
+    public static final double judahDriveNormalPercentScale = 0.56;
+    public static final double judahRotNormalRateModifier = 0.56;
+    public static final double judahDriveLowPercentScale = 0.4;
+    public static final double judahRotLowRateModifier = 0.42;
+
     public static double drivePercentScale = driveNormalPercentScale;
     public static double rotRateModifier = rotNormalRateModifier;
 

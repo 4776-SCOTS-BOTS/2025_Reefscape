@@ -96,13 +96,15 @@ public class RobotContainer {
 
     private double dpadSpeed = 0.3;
 
+    private final SendableChooser<String> speedChooser = new SendableChooser<>();
+
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(1.5).in(RadiansPerSecond); // Chaged from 3/4 to 1 of a
                                                                                      // rotation per second max angular
                                                                                      // velocity
     public boolean fieldCentric = true;
-    private double speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
-    private double rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
+    private double speedMultiplier;
+    private double rotMultiplier;
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric driveFieldRel = new SwerveRequest.FieldCentric()
@@ -303,12 +305,19 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", m_chooser);
         SmartDashboard.putBoolean("Climber Moder", climberMode);
 
+        speedChooser.setDefaultOption("Ben Mode", "benSpeed");
+        speedChooser.addOption("Judah Mode", "judahSpeed");
+        SmartDashboard.putData("Speed Mode", speedChooser);
+
         configureBindings();
     }
 
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
+
+        
+
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 // driveCommand()
@@ -471,21 +480,41 @@ public class RobotContainer {
         // setRobotCentButton.onTrue(setRobotCent());
 
         lowSpeedTrigger.onTrue(new InstantCommand(() -> {
-            speedMultiplier = Constants.DriveConstants.driveLowPercentScale;
-            rotMultiplier = Constants.DriveConstants.rotLowRateModifier;
+            if (speedChooser.getSelected().equals("judahSpeed")) {
+                speedMultiplier = Constants.DriveConstants.judahDriveLowPercentScale;
+                rotMultiplier = Constants.DriveConstants.judahRotLowRateModifier;
+            } else {
+                speedMultiplier = Constants.DriveConstants.driveLowPercentScale;
+                rotMultiplier = Constants.DriveConstants.rotLowRateModifier;
+            }
         }))
                 .onFalse(new InstantCommand(() -> {
-                    speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
-                    rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
+                    if (speedChooser.getSelected().equals("judahSpeed")) {
+                        speedMultiplier = Constants.DriveConstants.judahDriveNormalPercentScale;
+                        rotMultiplier = Constants.DriveConstants.judahRotNormalRateModifier;
+                    } else {
+                        speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
+                        rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
+                    }
                 }));
 
         reallylowSpeedTrigger.onTrue(new InstantCommand(() -> {
-            speedMultiplier = Constants.DriveConstants.driveLowPercentScale * 0.4;
-            rotMultiplier = Constants.DriveConstants.rotLowRateModifier * 0.4;
+            if (speedChooser.getSelected().equals("judahSpeed")) {
+                speedMultiplier = Constants.DriveConstants.judahDriveLowPercentScale * 0.4;
+                rotMultiplier = Constants.DriveConstants.judahRotLowRateModifier * 0.4;
+            } else {
+                speedMultiplier = Constants.DriveConstants.driveLowPercentScale * 0.4;
+                rotMultiplier = Constants.DriveConstants.rotLowRateModifier * 0.4;
+            }
         }))
                 .onFalse(new InstantCommand(() -> {
-                    speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
-                    rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
+                    if (speedChooser.getSelected().equals("judahSpeed")) {
+                        speedMultiplier = Constants.DriveConstants.judahDriveNormalPercentScale;
+                        rotMultiplier = Constants.DriveConstants.judahRotNormalRateModifier;
+                    } else {
+                        speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
+                        rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
+                    }
                 }));
 
         sprintTrigger.onTrue(new InstantCommand(() -> {
@@ -493,8 +522,13 @@ public class RobotContainer {
             rotMultiplier = 1.0;
         }))
                 .onFalse(new InstantCommand(() -> {
-                    speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
-                    rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
+                    if (speedChooser.getSelected().equals("judahSpeed")) {
+                        speedMultiplier = Constants.DriveConstants.judahDriveNormalPercentScale;
+                        rotMultiplier = Constants.DriveConstants.judahRotNormalRateModifier;
+                    } else {
+                        speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
+                        rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
+                    }
                 }));
 
         sparkleButton.onTrue(new InstantCommand(m_led::sparkleToggle));
@@ -681,6 +715,10 @@ public class RobotContainer {
 
         return (weight * cubedInput) + (remainingWeight * input);
 
+    }
+
+    public String getSelectedSpeedMode() {
+        return speedChooser.getSelected();
     }
 
 }

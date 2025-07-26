@@ -21,7 +21,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.subsystems.LEDSubsystem;
 
 public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
+  private Command m_autonomousCommand; 
 
   private final RobotContainer m_robotContainer;
 
@@ -89,6 +89,18 @@ public class Robot extends TimedRobot {
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
+    }
+
+    String selectedMode = m_robotContainer.getSelectedSpeedMode();
+    double speedMultiplier;
+    double rotMultiplier;
+
+    if ("Judah Mode".equals(selectedMode)) {
+      speedMultiplier = Constants.DriveConstants.judahDriveNormalPercentScale;
+      rotMultiplier = Constants.DriveConstants.judahRotNormalRateModifier;
+    } else {
+      speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
+      rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
     }
 
     // Switch Limelight Megatag2 mode to internal IMU
