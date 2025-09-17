@@ -5,13 +5,10 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
@@ -21,11 +18,10 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class MoveRobotProfiled extends Command {
+public class MoveRobotProfiledRobotRelative extends Command {
   private static final double KpX = 1.0;
     private static final double KiX = 0;
     private static final double KdX = 0;
@@ -62,16 +58,16 @@ public class MoveRobotProfiled extends Command {
 
     private CommandSwerveDrivetrain drivetrain;
 
-    private final SwerveRequest.FieldCentric driveFieldRel = new SwerveRequest.FieldCentric()
-    .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-    .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+    // private final SwerveRequest.FieldCentric driveFieldRel = new SwerveRequest.FieldCentric()
+    // .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+    // .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     
     private final SwerveRequest.RobotCentric driveRoboRel = new SwerveRequest.RobotCentric()
     .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
     .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
   /** Creates a new MoveRobot. */
-  public MoveRobotProfiled(CommandSwerveDrivetrain drivetrain, double targetX, double targetY, double targetRot) {
+  public MoveRobotProfiledRobotRelative(CommandSwerveDrivetrain drivetrain, double targetX, double targetY, double targetRot) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drivetrain);
 
@@ -124,7 +120,7 @@ public class MoveRobotProfiled extends Command {
     // System.out.println("X Error: " + pidControllerX.getError() + " Xpos" + currentPositionX);
 
     drivetrain.applyRequestMethod(
-                () -> driveFieldRel.withVelocityX(outputX * MaxSpeed) // Drive forward with negative Y (forward)
+                () -> driveRoboRel.withVelocityX(outputX * MaxSpeed) // Drive forward with negative Y (forward)
                 .withVelocityY(outputY * MaxSpeed) // Drive left with negative X (left)
                 .withRotationalRate(outputRot * MaxAngularRate));// Drive counterclockwise with negative X (left)
   }
@@ -134,7 +130,7 @@ public class MoveRobotProfiled extends Command {
   public void end(boolean interrupted) {
     System.out.println("DONE!");
     drivetrain.applyRequestMethod(
-                () -> driveFieldRel.withVelocityX(0) // Drive forward with negative Y (forward)
+                () -> driveRoboRel.withVelocityX(0) // Drive forward with negative Y (forward)
                 .withVelocityY(0) // Drive left with negative X (left)
                 .withRotationalRate(0));// Drive counterclockwise with negative X (left)
   }
