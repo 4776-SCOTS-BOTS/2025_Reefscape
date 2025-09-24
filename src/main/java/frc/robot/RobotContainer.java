@@ -103,8 +103,8 @@ public class RobotContainer {
                                                                                      // rotation per second max angular
                                                                                      // velocity
     public boolean fieldCentric = true;
-    private double speedMultiplier;
-    private double rotMultiplier;
+    private double speedMultiplier = Constants.DriveConstants.driveNormalPercentScale;
+    private double rotMultiplier = Constants.DriveConstants.rotNormalRateModifier;
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric driveFieldRel = new SwerveRequest.FieldCentric()
@@ -131,7 +131,7 @@ public class RobotContainer {
     private boolean hasIntake = true;
     private Intake intake;
 
-    private boolean hasGroundIntake = true;
+    private boolean hasGroundIntake = false;
     private boolean groundIntakeMode = true;
     private GroundIntake groundIntake;
 
@@ -307,6 +307,7 @@ public class RobotContainer {
 
         speedChooser.setDefaultOption("Ben Mode", "benSpeed");
         speedChooser.addOption("Judah Mode", "judahSpeed");
+        speedChooser.addOption("Child Mode", "childSpeed");
         SmartDashboard.putData("Speed Mode", speedChooser);
 
         configureBindings();
@@ -483,6 +484,9 @@ public class RobotContainer {
             if (speedChooser.getSelected().equals("judahSpeed")) {
                 speedMultiplier = Constants.DriveConstants.judahDriveLowPercentScale;
                 rotMultiplier = Constants.DriveConstants.judahRotLowRateModifier;
+            } else if (speedChooser.getSelected().equals("childSpeed")) {
+                speedMultiplier = Constants.DriveConstants.childDriveLowPercentScale;
+                rotMultiplier = Constants.DriveConstants.childRotLowRateModifier;
             } else {
                 speedMultiplier = Constants.DriveConstants.driveLowPercentScale;
                 rotMultiplier = Constants.DriveConstants.rotLowRateModifier;

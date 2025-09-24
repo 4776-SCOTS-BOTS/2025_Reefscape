@@ -30,7 +30,8 @@ public class ClimberNew extends Climber {
     climbMotor = new TalonFX(Constants.ClimberConstants.climberMotorCANID, "rio");
     tiltMotor = null;
 
-    climbPosition = 85; //40
+    //Lower number means climb higher, higher number means climb lower
+    climbPosition = 65; //40
     climbReadyPosition = 230; //190
     tiltRange = 0;
 
