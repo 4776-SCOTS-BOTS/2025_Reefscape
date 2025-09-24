@@ -55,6 +55,7 @@ import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.MoveArmAndElevator;
 import frc.robot.commands.MoveElevator;
 import frc.robot.commands.MoveRobot;
+import frc.robot.commands.MoveRobotProfiledRobotRelative;
 import frc.robot.commands.PathfindToReefTag;
 import frc.robot.commands.ReadyClimb;
 import frc.robot.commands.ReadyClimbNew;
@@ -563,7 +564,7 @@ public class RobotContainer {
                 .applyRequest(() -> driveRoboRel.withVelocityX(0).withVelocityY(dpadSpeed).withRotationalRate(0)));
 
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
-        altBrakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
+        altBrakeButton.whileTrue(new MoveRobotProfiledRobotRelative(drivetrain));
 
         // searchLeftButton.onTrue(new AlignToRange(drivetrain, true, isL4))
         //         .onFalse(new InstantCommand(() -> {}, drivetrain));
