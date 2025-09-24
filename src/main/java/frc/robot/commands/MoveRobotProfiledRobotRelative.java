@@ -7,8 +7,12 @@ package frc.robot.commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.LimelightHelpers;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
@@ -67,14 +71,18 @@ public class MoveRobotProfiledRobotRelative extends Command {
     .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
   /** Creates a new MoveRobot. */
-  public MoveRobotProfiledRobotRelative(CommandSwerveDrivetrain drivetrain, double targetX, double targetY, double targetRot) {
+  public MoveRobotProfiledRobotRelative(CommandSwerveDrivetrain drivetrain) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drivetrain);
 
+    // set target pose to 3 meters in front of the april tag... I think
+    Pose3d targetPose = LimelightHelpers.getBotPose3d_TargetSpace("LimelightFront");
+    targetPose = new Pose3d(targetPose.getX() + 3.0, 0.0, 0.0, new Rotation3d(new Rotation2d(0.0)));
+    
     this.drivetrain = drivetrain;
-    this.targetX = targetX;
-    this.targetY = targetY;
-    this.targetRot = targetRot;
+    this.targetX = targetPose.getX();
+    this.targetY = targetPose.getY();
+    this.targetRot = targetPose.getRotation().getAngle();
   }
 
   // Called when the command is initially scheduled.
